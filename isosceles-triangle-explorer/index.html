@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Isosceles Triangle Explorer</title>
+  <style>
+    :root {
+      --primary: #2a6edb;
+      --accent: #e94f37;
+      --background: #f9f9f9;
+      --error: #e94f37;
+      --side-highlight: #e94f37;
+      --font-main: 'Segoe UI', Arial, sans-serif;
+    }
+    body {
+      background: var(--background);
+      font-family: var(--font-main);
+      margin: 0;
+      padding: 0;
+      color: #222;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+    h1 {
+      color: var(--primary);
+      font-size: 2.2rem;
+      text-align: center;
+      margin-bottom: 0.5em;
+    }
+    .instructions {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      font-size: 1.1rem;
+    }
+    .input-section {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      margin-bottom: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .input-box {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 1rem;
+      min-width: 220px;
+    }
+    label {
+      font-weight: bold;
+      margin-bottom: 0.5em;
+    }
+    input[type="number"] {
+      padding: 0.5em;
+      font-size: 1.1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 100%;
+      margin-bottom: 0.5em;
+    }
+    .error {
+      color: var(--error);
+      font-weight: bold;
+      margin-top: 0.5em;
+      font-size: 1rem;
+    }
+    .button-row {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 0.7em 1.5em;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: var(--accent);
+    }
+    .svg-row {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      min-height: 350px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 1rem 0.5rem;
+    }
+    .triangle-svg {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 0.5rem;
+      width: 320px;
+      height: 280px;
+    }
+    .angle-label {
+      font-size: 1.3rem;
+      font-weight: bold;
+      fill: #222;
+      text-anchor: middle;
+    }
+    .side-highlight {
+      stroke: var(--side-highlight);
+      stroke-width: 5;
+    }
+    @media (max-width: 900px) {
+      .svg-row {
+        gap: 1rem;
+      }
+      .container {
+        padding: 0.5rem;
+      }
+    }
+    @media (max-width: 700px) {
+      .svg-row {
+        flex-direction: column;
+        align-items: center;
+      }
+      .input-section {
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Isosceles Triangle Explorer</h1>
+    <div class="instructions">
+      <strong>Instructions:</strong> <br>
+      Enter <b>either</b> the measure of one of the two equal angles <b>or</b> the measure of the different angle. <br>
+      <ul>
+        <li>Fill in <b>only one box</b> at a time.</li>
+        <li>Click <b>Generate Triangles</b> to see three isosceles triangles.</li>
+        <li>Try to identify which 2 sides are equal for each triangle.</li>
+        <li>Click <b>Show Equal Sides</b> to highlight the two equal sides in red.</li>
+      </ul>
+      <span style="color: #2a6edb;">Try different values to explore!</span>
+    </div>
+    <div class="input-section">
+      <div class="input-box">
+        <label for="equalAngle">Equal Angle (°)</label>
+        <input type="number" id="equalAngle" min="1" max="89" placeholder="e.g. 30">
+      </div>
+      <div class="input-box">
+        <label for="vertexAngle">Non-Equal Angle (°)</label>
+        <input type="number" id="vertexAngle" min="1" max="179" placeholder="e.g. 40">
+      </div>
+    </div>
+    <div class="error" id="errorMsg"></div>
+    <div class="button-row">
+      <button id="generateBtn">Generate Triangles</button>
+      <button id="showSidesBtn">Show Equal Sides</button>
+    </div>
+    <div class="svg-row" id="svgRow"></div>
+  </div>
+  <script>
+    // Educational feedback
+    function showError(msg) {
+      const errorMsg = document.getElementById('errorMsg');
+      errorMsg.textContent = msg;
+      errorMsg.style.display = msg ? 'block' : 'none';
+    }
+
+    function clearError() {
+      showError('');
+    }
+
+    // Angle calculation logic
+    function getAngles() {
+      const equalAngle = parseFloat(document.getElementById('equalAngle').value);
+      const vertexAngle = parseFloat(document.getElementById('vertexAngle').value);
+      if (equalAngle && vertexAngle) {
+        showError('Please fill in only one box at a time!');
+        return null;
+      }
+      if (!equalAngle && !vertexAngle) {
+        showError('Please enter a value in one box.');
+        return null;
+      }
+      if (equalAngle) {
+        if (equalAngle <= 0 || equalAngle >= 90) {
+          showError('Equal angle must be between 1° and 89°.');
+          return null;
+        }
+        const third = 180 - 2 * equalAngle;
+        if (third <= 0 || third >= 180) {
+          showError('Invalid triangle: angles do not add up to 180° or triangle is impossible.');
+          return null;
+        }
+        return [equalAngle, equalAngle, third];
+      }
+      if (vertexAngle) {
+        if (vertexAngle <= 0 || vertexAngle >= 180) {
+          showError('Non-equal angle must be between 1° and 179°.');
+          return null;
+        }
+        const equal = (180 - vertexAngle) / 2;
+        if (equal <= 0 || equal >= 90) {
+          showError('Invalid triangle: angles do not add up to 180° or triangle is impossible.');
+          return null;
+        }
+        return [equal, equal, vertexAngle];
+      }
+      showError('Unknown error.');
+      return null;
+    }
+
+    // Triangle rendering logic
+    function drawTriangles(angles, highlightSides = false) {
+      const svgRow = document.getElementById('svgRow');
+      svgRow.innerHTML = '';
+      // Triangle geometry: base = 160px, height = 140px
+      // Angles: [A, B, C] (A and B are equal)
+      // Vertices: A (left), B (right), C (top)
+      function triangleSVG(angles, rotate = 0, highlightSides = false, scale = 1) {
+        // Calculate side lengths using Law of Sines
+        const a = 160 * scale; // base
+        const angleA = angles[0] * Math.PI / 180;
+        const angleB = angles[1] * Math.PI / 180;
+        const angleC = angles[2] * Math.PI / 180;
+        // Law of Sines: a/sinA = b/sinB = c/sinC
+        const k = a / Math.sin(angleC);
+        const b = k * Math.sin(angleA);
+        const c = k * Math.sin(angleB);
+        // Place points
+        const Ax = 40, Ay = 180;
+        const Bx = Ax + a, By = Ay;
+        // Find C using base and height
+        // Use triangle area formula to get height
+        // For isosceles, C is centered above base
+        const midX = (Ax + Bx) / 2;
+        const height = Math.sqrt(c * c - (a / 2) * (a / 2));
+        const Cx = midX;
+        const Cy = Ay - height;
+        // SVG points
+        let points = [
+          [Ax, Ay],
+          [Bx, By],
+          [Cx, Cy]
+        ];
+        // Rotation
+        if (rotate !== 0) {
+          const rad = rotate * Math.PI / 180;
+          points = points.map(([x, y]) => {
+            const cx = midX, cy = Ay;
+            const dx = x - cx, dy = y - cy;
+            return [
+              cx + dx * Math.cos(rad) - dy * Math.sin(rad),
+              cy + dx * Math.sin(rad) + dy * Math.cos(rad)
+            ];
+          });
+        }
+        // SVG markup
+  let svg = `<svg width="320" height="280" class="triangle-svg">
+          <polygon points="${points.map(p=>p.join(',')).join(' ')}" fill="#ffe066" stroke="#2a6edb" stroke-width="3" />`;
+        // Highlight equal sides
+        if (highlightSides) {
+          // Sides AB and AC are equal
+          svg += `<line x1="${points[0][0]}" y1="${points[0][1]}" x2="${points[2][0]}" y2="${points[2][1]}" class="side-highlight" />`;
+          svg += `<line x1="${points[1][0]}" y1="${points[1][1]}" x2="${points[2][0]}" y2="${points[2][1]}" class="side-highlight" />`;
+        }
+        // Angle labels
+        svg += `<text x="${points[0][0]}" y="${points[0][1]+25}" class="angle-label">${angles[0].toFixed(1)}°</text>`;
+        svg += `<text x="${points[1][0]}" y="${points[1][1]+25}" class="angle-label">${angles[1].toFixed(1)}°</text>`;
+        svg += `<text x="${points[2][0]}" y="${points[2][1]-15}" class="angle-label">${angles[2].toFixed(1)}°</text>`;
+        svg += '</svg>';
+        return svg;
+      }
+      svgRow.innerHTML =
+        triangleSVG(angles, 0, highlightSides, 0.7) +
+        triangleSVG(angles, 40, highlightSides, 1.0) +
+        triangleSVG(angles, -40, highlightSides, 1.3);
+    }
+
+    // Button event handlers
+    document.getElementById('generateBtn').addEventListener('click', () => {
+      clearError();
+      const angles = getAngles();
+      if (!angles) return;
+      drawTriangles(angles, false);
+    });
+    document.getElementById('showSidesBtn').addEventListener('click', () => {
+      clearError();
+      const angles = getAngles();
+      if (!angles) return;
+      drawTriangles(angles, true);
+    });
+  </script>
+</body>
+</html>
