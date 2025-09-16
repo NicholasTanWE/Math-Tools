@@ -1,0 +1,35 @@
+/* colors.css: Primary color palette and usage */
+:root {
+  --primary-blue: #2a6edb;
+  --primary-green: #3bb273;
+  --primary-yellow: #ffe066;
+  --primary-red: #e94f37;
+  --background-light: #f9f9f9;
+  --background-dark: #222;
+  --text-main: #222;
+  --text-light: #fff;
+  --accent: #ffb700;
+}
+
+body {
+  background: var(--background-light);
+  color: var(--text-main);
+}
+
+a {
+  color: var(--primary-blue);
+}
+
+.project-table th {
+  background: var(--primary-blue);
+  color: var(--text-light);
+}
+
+.project-table td {
+  background: var(--background-light);
+}
+
+button, .btn {
+  background: var(--primary-green);
+  color: var(--text-light);
+}

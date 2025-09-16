@@ -1,0 +1,46 @@
+/* typography.css: Font families, sizes, and spacing */
+:root {
+  --font-main: 'Segoe UI', 'Arial', sans-serif;
+  --font-heading: 'Segoe UI', 'Arial', sans-serif;
+  --font-size-base: 1rem;
+  --font-size-h1: 2.5rem;
+  --font-size-h2: 2rem;
+  --font-size-h3: 1.5rem;
+  --font-size-h4: 1.25rem;
+  --font-size-h5: 1.1rem;
+  --font-size-h6: 1rem;
+  --line-height-base: 1.6;
+}
+
+body {
+  font-family: var(--font-main);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+}
+
+h1 {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-h1);
+  margin-bottom: 0.5em;
+}
+
+h2 {
+  font-size: var(--font-size-h2);
+  margin-bottom: 0.5em;
+}
+
+h3 {
+  font-size: var(--font-size-h3);
+}
+
+h4 {
+  font-size: var(--font-size-h4);
+}
+
+h5 {
+  font-size: var(--font-size-h5);
+}
+
+h6 {
+  font-size: var(--font-size-h6);
+}

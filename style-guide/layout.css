@@ -1,0 +1,65 @@
+/* layout.css: Margins, padding, containers, grid/flex utilities, breakpoints */
+:root {
+  --container-width: 1000px;
+  --container-padding: 1rem;
+  --section-margin: 2rem 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.main-header {
+  padding: 1rem;
+  background: var(--primary-blue);
+  color: var(--text-light);
+  text-align: center;
+}
+
+.search-bar {
+  margin: 1rem auto;
+  max-width: 400px;
+}
+
+main {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: var(--container-padding);
+}
+
+section {
+  margin: var(--section-margin);
+}
+
+
+.project-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  table-layout: fixed;
+}
+
+.project-table th, .project-table td {
+  padding: 0.75em 1em;
+  border: 1px solid #ddd;
+}
+.project-table th:nth-child(1), .project-table td:nth-child(1) {
+  width: 35%;
+}
+.project-table th:nth-child(2), .project-table td:nth-child(2) {
+  width: 25%;
+}
+.project-table th:nth-child(3), .project-table td:nth-child(3) {
+  width: 40%;
+}
+
+@media (max-width: 700px) {
+  main {
+    max-width: 100%;
+    padding: 0.5rem;
+  }
+  .project-table th, .project-table td {
+    padding: 0.5em;
+  }
+}
