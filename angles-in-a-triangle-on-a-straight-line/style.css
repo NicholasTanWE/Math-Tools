@@ -1,0 +1,106 @@
+/* Rotate handle style */
+.rotate-handle {
+    cursor: pointer;
+    stroke: #222;
+    stroke-width: 2;
+    fill: #fff;
+    r: 12;
+    filter: drop-shadow(0 1px 2px #0002);
+}
+.rotate-handle:hover {
+    fill: #ffe082;
+}
+svg .align-line {
+    stroke: #d2691e;
+    stroke-width: 4;
+    stroke-dasharray: 12 8;
+    opacity: 0.7;
+}
+/* Angles in a Triangle on a Straight Line Explorer custom styles */
+body {
+    background: var(--background-light);
+    color: var(--text-main);
+    font-family: var(--font-main);
+    margin: 0;
+    padding: 0;
+}
+header.main-header h1 {
+    text-align: center;
+    color: var(--primary-blue);
+    font-family: var(--font-heading);
+    font-size: var(--font-size-h1);
+    margin-top: 0;
+}
+.instructions {
+    margin-bottom: 2rem;
+    text-align: center;
+    font-family: var(--font-main);
+    color: var(--text-main);
+}
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    font-family: var(--font-main);
+}
+.controls label {
+    font-size: 1.1em;
+    color: var(--text-main);
+    font-family: var(--font-main);
+}
+.controls input[type="number"], .controls input[readonly] {
+    width: 60px;
+    margin-left: 5px;
+    font-size: 1em;
+    padding: 2px 5px;
+    border-radius: 4px;
+    border: 1px solid #bbb;
+    font-family: var(--font-main);
+    color: var(--text-main);
+}
+.controls input[readonly] {
+    background: #e9e9e9;
+    border: none;
+    color: #666;
+}
+button, .btn {
+    background: var(--primary-green);
+    color: var(--text-light);
+    border: none;
+    border-radius: 5px;
+    padding: 7px 18px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: var(--font-main);
+}
+button:hover, .btn:hover {
+    background: var(--primary-blue);
+}
+.prompt {
+    text-align: center;
+    font-size: 1.15em;
+    color: var(--text-main);
+    margin-bottom: 18px;
+    font-family: var(--font-main);
+}
+.canvas-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--background-light);
+    border-radius: 8px;
+    padding: 20px;
+    min-height: 420px;
+}
+svg#triangles-canvas {
+    background: var(--background-light);
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+body, header.main-header h1, .instructions, .controls, .controls label, .controls input[type="number"], .controls input[readonly], button, .btn, .prompt, .canvas-wrapper {
+    font-family: 'Segoe UI', 'Arial', sans-serif !important;
+}

@@ -1,4 +1,7 @@
 /* Parallelogram Angle Explorer Styles */
+body, header.main-header h1, .instructions, .controls, .controls label, .controls input[type="number"], .controls input[readonly], button, .btn, .prompt, .canvas-wrapper {
+    font-family: 'Segoe UI', 'Arial', sans-serif !important;
+}
 .parallelogram-container {
   display: flex;
   flex-direction: column;

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Angles in a Triangle on a Straight Line Explorer</title>
+    <link rel="stylesheet" href="../style-guide/colors.css">
+    <link rel="stylesheet" href="../style-guide/typography.css">
+    <link rel="stylesheet" href="../style-guide/layout.css">
+    <link rel="stylesheet" href="../style-guide/components.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav style="margin: 0;">
+      <a href="../index.html" style="font-size:1.1rem; text-decoration:underline; color:#fff;">← Back to Landing Page</a>
+    </nav>
+    <header class="main-header" style="margin-top:0;">
+      <h1>Angles in a Triangle on a Straight Line Explorer</h1>
+    </header>
+    <main>
+      <section class="instructions">
+        <h2>Explore Triangle Angles</h2>
+        <p>Align the 3 triangles on a line to form 180 degrees. Enter two angles and see the third calculated automatically. Drag and interact with the triangles below.</p>
+      </section>
+      <section class="controls">
+        <label>Angle 1: <input type="number" id="angle1" min="1" max="178" value="60">°</label>
+        <label>Angle 2: <input type="number" id="angle2" min="1" max="178" value="60">°</label>
+        <label>Angle 3: <input type="text" id="angle3" readonly>°</label>
+        <button id="generate" class="btn">Generate Triangles</button>
+        <button id="randomize" class="btn">Randomize Angles</button>
+      </section>
+      <div class="prompt">Align the 3 triangles on a line to form 180 degrees.</div>
+      <section class="canvas-wrapper">
+        <svg id="triangles-canvas" width="800" height="400"></svg>
+      </section>
+    </main>
+    <footer>
+      <p>&copy; Nicholas Tan</p>
+    </footer>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,4 +1,8 @@
 /* style.css for Angles in a Triangle */
+body, header.main-header h1, .instructions, .controls, .controls label, .controls input[type="number"], .controls input[readonly], button, .btn, .prompt, .canvas-wrapper {
+    font-family: 'Segoe UI', 'Arial', sans-serif !important;
+}
+
 #triangleCanvas {
   display: block;
   margin: 0 auto 1rem auto;
