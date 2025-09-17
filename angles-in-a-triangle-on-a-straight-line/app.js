@@ -42,24 +42,33 @@ function toRadians(deg) {
 }
 
 function trianglePoints(a, b, c, size=120) {
-    // Law of Sines to get side lengths
-    // a, b, c are angles in degrees
-    // size is the base length (between angle B and C)
+    // Generate triangle with angles a, b, c (in degrees)
+    // Place triangle with base horizontal for consistency
     let A = toRadians(a), B = toRadians(b), C = toRadians(c);
-    let sideA = size;
-    let sideB = sideA * Math.sin(B) / Math.sin(A);
-    let sideC = sideA * Math.sin(C) / Math.sin(A);
-    // Place point A at (0,0), B at (sideC,0), C calculated
-    let Ax = 0, Ay = 0;
-    let Bx = sideC, By = 0;
-    // Find C
-    let angle_BAC = Math.PI - B;
-    let Cx = sideB * Math.cos(angle_BAC);
-    let Cy = sideB * Math.sin(angle_BAC);
+    
+    // Use Law of Sines: a/sin(A) = b/sin(B) = c/sin(C)
+    // Let's set the base side (opposite to angle a) to 'size'
+    let sideA = size;  // Side opposite to angle A
+    let sideB = sideA * Math.sin(B) / Math.sin(A);  // Side opposite to angle B
+    let sideC = sideA * Math.sin(C) / Math.sin(A);  // Side opposite to angle C
+    
+    // Position vertices: place side A (opposite angle a) as horizontal base
+    // Vertex opposite to angle A at origin, vertex opposite to angle B at (sideA, 0)
+    let Bx = 0, By = 0;        // Vertex B (opposite angle b)
+    let Cx = sideA, Cy = 0;    // Vertex C (opposite angle c)
+    
+    // Find vertex A using angle at B
+    let Ax = sideC * Math.cos(B);
+    let Ay = sideC * Math.sin(B);
+    
+    // Center the triangle around origin
+    let centerX = (Ax + Bx + Cx) / 3;
+    let centerY = (Ay + By + Cy) / 3;
+    
     return [
-        {x: Ax, y: Ay},
-        {x: Bx, y: By},
-        {x: Cx, y: Cy}
+        {x: Ax - centerX, y: Ay - centerY},  // Vertex A (has angle a)
+        {x: Bx - centerX, y: By - centerY},  // Vertex B (has angle b)
+        {x: Cx - centerX, y: Cy - centerY}   // Vertex C (has angle c)
     ];
 }
 
