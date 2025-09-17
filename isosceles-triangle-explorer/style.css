@@ -1,3 +1,136 @@
+/* Isosceles Triangle Explorer custom styles */
 body, header.main-header h1, .instructions, .controls, .controls label, .controls input[type="number"], .controls input[readonly], button, .btn, .prompt, .canvas-wrapper {
     font-family: 'Segoe UI', 'Arial', sans-serif !important;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.instructions {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+}
+
+.input-section {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.input-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 1rem;
+  min-width: 220px;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+
+input[type="number"] {
+  padding: 0.5em;
+  font-size: 1.1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  margin-bottom: 0.5em;
+}
+
+.error {
+  color: var(--primary-red);
+  font-weight: bold;
+  margin-top: 0.5em;
+  font-size: 1rem;
+}
+
+.button-row {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+button {
+  background: var(--primary-green);
+  color: var(--text-light);
+  border: none;
+  border-radius: 4px;
+  padding: 0.7em 1.5em;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: var(--primary-blue);
+}
+
+.svg-row {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  min-height: 350px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 1rem 0.5rem;
+}
+
+.triangle-svg {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 0.5rem;
+  width: 320px;
+  height: 280px;
+}
+
+.angle-label {
+  font-size: 1.3rem;
+  font-weight: bold;
+  fill: #222;
+  text-anchor: middle;
+}
+
+.side-highlight {
+  stroke: var(--primary-red);
+  stroke-width: 5;
+}
+
+@media (max-width: 900px) {
+  .svg-row {
+    gap: 1rem;
+  }
+  .container {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .svg-row {
+    flex-direction: column;
+    align-items: center;
+  }
+  .input-section {
+    gap: 1rem;
+  }
 }

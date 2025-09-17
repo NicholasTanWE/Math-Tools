@@ -4,145 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Isosceles Triangle Explorer</title>
-  <style>
-    :root {
-      --primary: #2a6edb;
-      --accent: #e94f37;
-      --background: #f9f9f9;
-      --error: #e94f37;
-      --side-highlight: #e94f37;
-      --font-main: 'Segoe UI', Arial, sans-serif;
-    }
-    body {
-      background: var(--background);
-      font-family: var(--font-main);
-      margin: 0;
-      padding: 0;
-      color: #222;
-    }
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 1.5rem;
-    }
-    h1 {
-      color: var(--primary);
-      font-size: 2.2rem;
-      text-align: center;
-      margin-bottom: 0.5em;
-    }
-    .instructions {
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-      font-size: 1.1rem;
-    }
-    .input-section {
-      display: flex;
-      gap: 2rem;
-      justify-content: center;
-      margin-bottom: 1.2rem;
-      flex-wrap: wrap;
-    }
-    .input-box {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-      padding: 1rem;
-      min-width: 220px;
-    }
-    label {
-      font-weight: bold;
-      margin-bottom: 0.5em;
-    }
-    input[type="number"] {
-      padding: 0.5em;
-      font-size: 1.1rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      width: 100%;
-      margin-bottom: 0.5em;
-    }
-    .error {
-      color: var(--error);
-      font-weight: bold;
-      margin-top: 0.5em;
-      font-size: 1rem;
-    }
-    .button-row {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-    }
-    button {
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      padding: 0.7em 1.5em;
-      font-size: 1.1rem;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    button:hover {
-      background: var(--accent);
-    }
-    .svg-row {
-      display: flex;
-      gap: 2rem;
-      justify-content: center;
-      align-items: flex-end;
-      flex-wrap: wrap;
-      margin-bottom: 1.5rem;
-      min-height: 350px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-      padding: 1rem 0.5rem;
-    }
-    .triangle-svg {
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-      padding: 0.5rem;
-      width: 320px;
-      height: 280px;
-    }
-    .angle-label {
-      font-size: 1.3rem;
-      font-weight: bold;
-      fill: #222;
-      text-anchor: middle;
-    }
-    .side-highlight {
-      stroke: var(--side-highlight);
-      stroke-width: 5;
-    }
-    @media (max-width: 900px) {
-      .svg-row {
-        gap: 1rem;
-      }
-      .container {
-        padding: 0.5rem;
-      }
-    }
-    @media (max-width: 700px) {
-      .svg-row {
-        flex-direction: column;
-        align-items: center;
-      }
-      .input-section {
-        gap: 1rem;
-      }
-    }
-  </style>
+  <!-- Import style guide -->
+  <link rel="stylesheet" href="../style-guide/colors.css">
+  <link rel="stylesheet" href="../style-guide/typography.css">
+  <link rel="stylesheet" href="../style-guide/layout.css">
+  <link rel="stylesheet" href="../style-guide/components.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <nav style="margin: 0;">
@@ -151,18 +18,19 @@
   <header class="main-header" style="margin-top:0;">
     <h1>Isosceles Triangle Explorer</h1>
   </header>
-  <div class="container">
-    <div class="instructions">
-      <strong>Instructions:</strong> <br>
-      Enter <b>either</b> the measure of one of the two equal angles <b>or</b> the measure of the different angle. <br>
-      <ul>
-        <li>Fill in <b>only one box</b> at a time.</li>
-        <li>Click <b>Generate Triangles</b> to see three isosceles triangles.</li>
-        <li>Try to identify which 2 sides are equal for each triangle.</li>
-        <li>Click <b>Show Equal Sides</b> to highlight the two equal sides in red.</li>
-      </ul>
-      <span style="color: #2a6edb;">Try different values to explore!</span>
-    </div>
+  <main>
+    <div class="container">
+      <section class="instructions">
+        <h2>Instructions</h2>
+        <p>Enter <b>either</b> the measure of one of the two equal angles <b>or</b> the measure of the different angle.</p>
+        <ul>
+          <li>Fill in <b>only one box</b> at a time.</li>
+          <li>Click <b>Generate Triangles</b> to see three isosceles triangles.</li>
+          <li>Try to identify which 2 sides are equal for each triangle.</li>
+          <li>Click <b>Show Equal Sides</b> to highlight the two equal sides in red.</li>
+        </ul>
+        <p style="color: #2a6edb;">Try different values to explore!</p>
+      </section>
     <div class="input-section">
       <div class="input-box">
         <label for="equalAngle">Equal Angle (°)</label>
@@ -179,7 +47,11 @@
       <button id="showSidesBtn">Show Equal Sides</button>
     </div>
     <div class="svg-row" id="svgRow"></div>
-  </div>
+    </div>
+  </main>
+  <footer>
+    <p>&copy; Nicholas Tan</p>
+  </footer>
   <script>
     // Educational feedback
     function showError(msg) {
