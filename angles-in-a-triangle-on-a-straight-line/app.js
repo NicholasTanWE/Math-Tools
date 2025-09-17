@@ -76,6 +76,27 @@ function clearSVG() {
     while (svg.firstChild) svg.removeChild(svg.firstChild);
 }
 
+function updateLabelPositions(triangle) {
+    // Update label positions when triangle is moved or rotated
+    triangle.labels.forEach((labelData, j) => {
+        // Calculate rotated position
+        let angle = triangle.rotation * Math.PI / 180;
+        let cos = Math.cos(angle);
+        let sin = Math.sin(angle);
+        
+        // Rotate the local position around origin
+        let rotatedX = labelData.localX * cos - labelData.localY * sin;
+        let rotatedY = labelData.localX * sin + labelData.localY * cos;
+        
+        // Add to triangle center
+        let worldX = triangle.center.x + rotatedX;
+        let worldY = triangle.center.y + rotatedY;
+        
+        labelData.element.setAttribute('x', worldX);
+        labelData.element.setAttribute('y', worldY);
+    });
+}
+
 function drawTriangles() {
     clearSVG();
     // Draw alignment line
@@ -92,7 +113,7 @@ function drawTriangles() {
     let a2 = parseInt(angle2Input.value);
     let a3 = calcThirdAngle(a1, a2);
     if (a3 <= 0) return;
-    let points = trianglePoints(a1, a2, a3, 120);
+    let points = trianglePoints(a1, a2, a3, 144); // 20% larger
     // Center positions for 3 triangles
     let centers = [
         {x: 200, y: 200},
@@ -111,10 +132,9 @@ function drawTriangles() {
         poly.setAttribute('stroke-width', '2');
         group.appendChild(poly);
         // Add rotate handle (circle)
-        let handle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        // Place handle above triangle's first vertex
         let hx = points[0].x + (points[1].x - points[0].x) * 0.5;
         let hy = points[0].y - 30;
+        let handle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         handle.setAttribute('cx', hx);
         handle.setAttribute('cy', hy);
         handle.setAttribute('r', 12);
@@ -122,8 +142,40 @@ function drawTriangles() {
         handle.setAttribute('data-index', i);
         group.appendChild(handle);
         svg.appendChild(group);
+        
+        // Add vertex labels a, b, c (outside group to stay upright)
+        const labelTexts = ['a', 'b', 'c'];
+        const labelElements = [];
+        points.forEach((pt, j) => {
+            let label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            // Place label slightly inside from each vertex toward centroid
+            let centroid = {
+                x: (points[0].x + points[1].x + points[2].x) / 3,
+                y: (points[0].y + points[1].y + points[2].y) / 3
+            };
+            let lx = pt.x + (centroid.x - pt.x) * 0.4;
+            let ly = pt.y + (centroid.y - pt.y) * 0.4;
+            label.setAttribute('x', centers[i].x + lx);
+            label.setAttribute('y', centers[i].y + ly);
+            label.setAttribute('fill', '#222');
+            label.setAttribute('font-size', '1.5em');
+            label.setAttribute('font-family', 'Segoe UI, Arial, sans-serif');
+            label.setAttribute('font-weight', 'bold');
+            label.setAttribute('text-anchor', 'middle');
+            label.setAttribute('dominant-baseline', 'middle');
+            label.textContent = labelTexts[j];
+            svg.appendChild(label);
+            labelElements.push({
+                element: label,
+                localX: lx, // Position relative to triangle center
+                localY: ly
+            });
+        });
+        
         triangles.push({
             group,
+            labels: labelElements,
+            points: points,
             center: {...centers[i]},
             rotation: 0,
             dragging: false,
@@ -196,11 +248,13 @@ svg.addEventListener('mousemove', function(e) {
         current.center.x = svgP.x - current.dragOffset.x;
         current.center.y = svgP.y - current.dragOffset.y;
         current.group.setAttribute('transform', `translate(${current.center.x},${current.center.y}) rotate(${current.rotation})`);
+        updateLabelPositions(current);
     } else if (dragType === 'rotate' && current.rotating) {
         let angle = Math.atan2(svgP.y - current.center.y, svgP.x - current.center.x);
         let deg = ((angle - current.rotateStart) * 180 / Math.PI) + current.angleStart;
         current.rotation = deg;
         current.group.setAttribute('transform', `translate(${current.center.x},${current.center.y}) rotate(${current.rotation})`);
+        updateLabelPositions(current);
     }
 });
 
@@ -251,6 +305,7 @@ svg.addEventListener('touchmove', function(e) {
         current.center.x = svgP.x - current.dragOffset.x;
         current.center.y = svgP.y - current.dragOffset.y;
         current.group.setAttribute('transform', `translate(${current.center.x},${current.center.y}) rotate(${current.rotation})`);
+        updateLabelPositions(current);
     }
 }, {passive: false});
 svg.addEventListener('touchend', function(e) {
