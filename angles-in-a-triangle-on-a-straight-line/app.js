@@ -128,8 +128,8 @@ function drawTriangles() {
         let poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
         poly.setAttribute('points', points.map(p => `${p.x},${p.y}`).join(' '));
         poly.setAttribute('fill', colors[i]);
-        poly.setAttribute('stroke', '#222');
-        poly.setAttribute('stroke-width', '2');
+    poly.setAttribute('stroke', '#222');
+    poly.setAttribute('stroke-width', '3');
         group.appendChild(poly);
         // Add rotate handle (circle)
         let hx = points[0].x + (points[1].x - points[0].x) * 0.5;
@@ -160,7 +160,7 @@ function drawTriangles() {
             label.setAttribute('fill', '#222');
             label.setAttribute('font-size', '1.5em');
             label.setAttribute('font-family', 'Segoe UI, Arial, sans-serif');
-            label.setAttribute('font-weight', 'bold');
+            label.setAttribute('font-weight', 'normal');
             label.setAttribute('text-anchor', 'middle');
             label.setAttribute('dominant-baseline', 'middle');
             label.textContent = labelTexts[j];

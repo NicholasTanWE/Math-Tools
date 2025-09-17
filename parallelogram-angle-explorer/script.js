@@ -49,20 +49,36 @@ function renderParallelogram() {
   poly.setAttribute('stroke-width', 3);
   svg.appendChild(poly);
 
-  // Draw draggable sides (invisible lines for dragging)
+  // Draw draggable sides (invisible lines for dragging) and visible sides with color
   for (let i = 0; i < 4; i++) {
     const p1 = points[i];
     const p2 = points[(i+1)%4];
-    const line = document.createElementNS(svgNS, 'line');
-    line.setAttribute('x1', p1.x);
-    line.setAttribute('y1', p1.y);
-    line.setAttribute('x2', p2.x);
-    line.setAttribute('y2', p2.y);
-    line.setAttribute('stroke', 'rgba(0,0,0,0)'); // Invisible
-    line.setAttribute('stroke-width', 20);
-    line.setAttribute('cursor', 'grab');
-    line.addEventListener('pointerdown', e => startSideDrag(e, i));
-    svg.appendChild(line);
+    // Visible side
+    const sideLine = document.createElementNS(svgNS, 'line');
+    sideLine.setAttribute('x1', p1.x);
+    sideLine.setAttribute('y1', p1.y);
+    sideLine.setAttribute('x2', p2.x);
+    sideLine.setAttribute('y2', p2.y);
+    // AD (3-0) and BC (1-2) in red, others default
+    if ((i === 3) || (i === 1)) {
+      sideLine.setAttribute('stroke', '#d32f2f'); // Red
+    } else {
+      sideLine.setAttribute('stroke', '#1976d2'); // Default blue
+    }
+  sideLine.setAttribute('stroke-width', 3);
+    svg.appendChild(sideLine);
+
+    // Invisible line for dragging
+    const dragLine = document.createElementNS(svgNS, 'line');
+    dragLine.setAttribute('x1', p1.x);
+    dragLine.setAttribute('y1', p1.y);
+    dragLine.setAttribute('x2', p2.x);
+    dragLine.setAttribute('y2', p2.y);
+    dragLine.setAttribute('stroke', 'rgba(0,0,0,0)'); // Invisible
+    dragLine.setAttribute('stroke-width', 20);
+    dragLine.setAttribute('cursor', 'grab');
+    dragLine.addEventListener('pointerdown', e => startSideDrag(e, i));
+    svg.appendChild(dragLine);
   }
 
   // Draw angle markers (arcs) for internal angles
@@ -138,13 +154,13 @@ function renderParallelogram() {
     if (i === 2) { offsetX = 15; offsetY = 25; }   // C: bottom-right
     if (i === 3) { offsetX = -25; offsetY = 25; }  // D: bottom-left
     
-    label.setAttribute('x', p.x + offsetX);
-    label.setAttribute('y', p.y + offsetY);
-    label.setAttribute('fill', angleColors[i]);
-    label.setAttribute('font-size', '1.4rem');
-    label.setAttribute('font-family', 'inherit');
-    label.setAttribute('font-weight', 'bold');
-    label.textContent = `${angleLabels[i]}`;
+  label.setAttribute('x', p.x + offsetX);
+  label.setAttribute('y', p.y + offsetY);
+  label.setAttribute('fill', angleColors[i]);
+  label.setAttribute('font-size', '1.4rem');
+  label.setAttribute('font-family', 'inherit');
+  label.setAttribute('font-weight', 'normal');
+  label.textContent = `${angleLabels[i]}`;
     svg.appendChild(label);
     
     // Add angle measurement near the angle arc
@@ -153,12 +169,13 @@ function renderParallelogram() {
     const prev = points[(i+3)%4];
     const dx = (next.x + prev.x)/2 - p.x;
     const dy = (next.y + prev.y)/2 - p.y;
-    angleLabel.setAttribute('x', p.x + dx*0.4);
-    angleLabel.setAttribute('y', p.y + dy*0.4);
-    angleLabel.setAttribute('fill', '#333');
-    angleLabel.setAttribute('font-size', '0.9rem');
-    angleLabel.setAttribute('font-family', 'inherit');
-    angleLabel.textContent = `${angles[i]}°`;
+  angleLabel.setAttribute('x', p.x + dx*0.4);
+  angleLabel.setAttribute('y', p.y + dy*0.4);
+  angleLabel.setAttribute('fill', '#333');
+  angleLabel.setAttribute('font-size', '0.9rem');
+  angleLabel.setAttribute('font-family', 'inherit');
+  angleLabel.setAttribute('font-weight', 'normal');
+  angleLabel.textContent = `${angles[i]}°`;
     svg.appendChild(angleLabel);
   });
 

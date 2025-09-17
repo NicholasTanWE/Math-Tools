@@ -1,6 +1,10 @@
 /* Parallelogram Angle Explorer Styles */
-body, header.main-header h1, .instructions, .controls, .controls label, .controls input[type="number"], .controls input[readonly], button, .btn, .prompt, .canvas-wrapper {
-    font-family: 'Segoe UI', 'Arial', sans-serif !important;
+body {
+  background: #f9f9f9;
+  color: var(--text-main);
+  font-family: 'Segoe UI', 'Arial', sans-serif !important;
+  margin: 0;
+  padding: 0;
 }
 .parallelogram-container {
   display: flex;
@@ -8,21 +12,46 @@ body, header.main-header h1, .instructions, .controls, .controls label, .control
   align-items: center;
   margin: 2rem 0;
 }
-.instructions {
-  background: #fffbe7;
+#svg-wrapper {
+  background: #fff;
   border-radius: 8px;
-  padding: 1rem 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border: 2px solid #ccc;
+  padding: 2rem 2rem 2rem 2rem;
+  margin-bottom: 1.2rem;
+  width: 600px;
+  min-height: 520px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#angle-equations {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border: 2px solid #ccc;
+  padding: 1rem;
+  margin-bottom: 1.2rem;
+  width: 600px;
+  box-sizing: border-box;
+}
+.instructions {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 1rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 2px 8px #0001;
-  max-width: 600px;
+  font-size: 1.1rem;
 }
 .controls {
-  background: #f0f8ff;
+  background: #fff;
   border-radius: 8px;
-  padding: 1rem 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 1rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 2px 8px #0001;
   text-align: center;
+  border: 2px solid #ccc;
 }
 .control-group {
   margin: 1rem 0;
@@ -37,8 +66,8 @@ body, header.main-header h1, .instructions, .controls, .controls label, .control
   text-align: right;
 }
 .control-group button {
-  background: #1976d2;
-  color: white;
+  background: var(--primary-green);
+  color: var(--text-light);
   border: none;
   border-radius: 4px;
   width: 40px;
@@ -49,9 +78,10 @@ body, header.main-header h1, .instructions, .controls, .controls label, .control
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background 0.2s;
 }
 .control-group button:hover {
-  background: #1565c0;
+  background: var(--primary-blue);
 }
 .reset-button {
   background: #d32f2f;

@@ -150,18 +150,25 @@
           });
         }
         // SVG markup
-  let svg = `<svg width="320" height="280" class="triangle-svg">
-          <polygon points="${points.map(p=>p.join(',')).join(' ')}" fill="#ffe066" stroke="#2a6edb" stroke-width="3" />`;
+        // Use red, blue, green fills for triangles, cycling for each triangle
+        const fillColors = [
+          'var(--primary-red)',
+          'var(--primary-blue)',
+          'var(--primary-green)'
+        ];
+        let colorIdx = scale === 0.7 ? 0 : (scale === 1.0 ? 1 : 2);
+        let svg = `<svg width="320" height="280" class="triangle-svg">
+          <polygon points="${points.map(p=>p.join(',')).join(' ')}" fill="${fillColors[colorIdx]}" stroke="#000" stroke-width="3" />`;
         // Highlight equal sides
         if (highlightSides) {
           // Sides AB and AC are equal
-          svg += `<line x1="${points[0][0]}" y1="${points[0][1]}" x2="${points[2][0]}" y2="${points[2][1]}" class="side-highlight" />`;
-          svg += `<line x1="${points[1][0]}" y1="${points[1][1]}" x2="${points[2][0]}" y2="${points[2][1]}" class="side-highlight" />`;
+          svg += `<line x1="${points[0][0]}" y1="${points[0][1]}" x2="${points[2][0]}" y2="${points[2][1]}" stroke="#d32f2f" stroke-width="3" />`;
+          svg += `<line x1="${points[1][0]}" y1="${points[1][1]}" x2="${points[2][0]}" y2="${points[2][1]}" stroke="#d32f2f" stroke-width="3" />`;
         }
-        // Angle labels
-        svg += `<text x="${points[0][0]}" y="${points[0][1]+25}" class="angle-label">${angles[0].toFixed(1)}°</text>`;
-        svg += `<text x="${points[1][0]}" y="${points[1][1]+25}" class="angle-label">${angles[1].toFixed(1)}°</text>`;
-        svg += `<text x="${points[2][0]}" y="${points[2][1]-15}" class="angle-label">${angles[2].toFixed(1)}°</text>`;
+        // Angle labels (not bold)
+        svg += `<text x="${points[0][0]}" y="${points[0][1]+25}" class="angle-label" style="font-weight:normal;">${angles[0].toFixed(1)}°</text>`;
+        svg += `<text x="${points[1][0]}" y="${points[1][1]+25}" class="angle-label" style="font-weight:normal;">${angles[1].toFixed(1)}°</text>`;
+        svg += `<text x="${points[2][0]}" y="${points[2][1]-15}" class="angle-label" style="font-weight:normal;">${angles[2].toFixed(1)}°</text>`;
         svg += '</svg>';
         return svg;
       }

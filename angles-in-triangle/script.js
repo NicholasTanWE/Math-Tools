@@ -21,30 +21,17 @@ function drawTriangle() {
   ctx.lineTo(vertices[1].x, vertices[1].y);
   ctx.lineTo(vertices[2].x, vertices[2].y);
   ctx.closePath();
-  ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue('--primary-blue');
+  ctx.strokeStyle = '#000';
   ctx.lineWidth = 3;
   ctx.stroke();
-  ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--primary-yellow');
-  ctx.globalAlpha = 0.2;
+  ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--primary-red');
   ctx.fill();
-  ctx.globalAlpha = 1;
-  // Draw vertices
-  vertices.forEach((v, i) => {
-    ctx.beginPath();
-    ctx.arc(v.x, v.y, 10, 0, 2 * Math.PI);
-    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--primary-green');
-    ctx.fill();
-    ctx.strokeStyle = '#222';
-    ctx.stroke();
-    ctx.fillStyle = '#222';
-    ctx.font = '16px Arial';
-    ctx.fillText(String.fromCharCode(65 + i), v.x - 12, v.y - 12);
-  });
+  // Do NOT draw vertices or green circles
   // Draw angles
   const angles = getAngles();
   vertices.forEach((v, i) => {
-    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--primary-red');
-    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = '#000';
+    ctx.font = '16px Arial';
     ctx.fillText(angles[i].toFixed(1) + '°', v.x + 12, v.y - 12);
   });
   // Show angle info

@@ -1,4 +1,12 @@
-/* colors.css: Primary color palette and usage */
+:root {
+  /* STYLE GUIDE REQUIREMENTS FOR MINI PROJECTS (from isosceles-triangle-explorer):
+    - Main background color: #f9f9f9
+    - Input boxes: background #fff, border-radius: 8px, box-shadow: 0 2px 8px rgba(0,0,0,0.07), border: 1px solid #ccc, font-size: 1.1rem, padding: 0.5em
+    - Figure areas (SVG, Canvas, etc.): background #fff, border-radius: 8px, box-shadow: 0 2px 8px rgba(0,0,0,0.07), border: 2px solid #ccc, padding: 1rem
+    - Use 'Segoe UI', 'Arial', sans-serif for all text
+    - Use the color palette below for fills and accents
+  */
+}
 :root {
   --primary-blue: #2a6edb;
   --primary-green: #3bb273;
@@ -27,6 +35,8 @@ a {
 
 .project-table td {
   background: var(--background-light);
+    - All generated figures must use a line thickness of 3px for outlines (SVG stroke-width or Canvas lineWidth).
+    - All displayed angle values in generated figures must use normal font weight (not bold).
 }
 
 button, .btn {

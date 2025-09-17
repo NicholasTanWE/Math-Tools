@@ -1,4 +1,10 @@
 /* components.css: Buttons, cards, forms, navigation */
+/*
+STYLE GUIDE REQUIREMENTS FOR MINI PROJECTS:
+1. All user buttons must use the green box style (see .btn, button).
+2. All figures (SVG, Canvas, etc.) must use a black outline by default.
+3. Internal color fills for figures must use the same red, blue, and green as defined in colors.css (var(--primary-red), var(--primary-blue), var(--primary-green)).
+*/
 .btn, button {
   display: inline-block;
   padding: 0.5em 1.2em;
