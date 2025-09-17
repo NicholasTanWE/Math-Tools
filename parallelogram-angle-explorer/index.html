@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parallelogram Angle Explorer</title>
+  <!-- Import style guide -->
+  <link rel="stylesheet" href="../style-guide/colors.css">
+  <link rel="stylesheet" href="../style-guide/typography.css">
+  <link rel="stylesheet" href="../style-guide/layout.css">
+  <link rel="stylesheet" href="../style-guide/components.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="main-header">
+    <h1>Parallelogram Angle Explorer</h1>
+  </header>
+  <main>
+    <section class="instructions">
+      <h2>Explore Parallelogram Angles</h2>
+      <p>Drag the corners to change the shape. Notice how opposite angles stay equal and adjacent angles always add up to 180°!</p>
+      <ul>
+        <li>Angle A and Angle C are always equal.</li>
+        <li>Angle B and Angle D are always equal.</li>
+        <li>Any two adjacent angles add up to 180°.</li>
+      </ul>
+    </section>
+    <section class="controls">
+      <h3>Adjust Side Lengths</h3>
+      <div class="control-group">
+        <label>AB & CD (Horizontal sides):</label>
+        <button id="ab-minus">-</button>
+        <button id="ab-plus">+</button>
+      </div>
+      <div class="control-group">
+        <label>AD & BC (Vertical sides):</label>
+        <button id="ad-minus">-</button>
+        <button id="ad-plus">+</button>
+      </div>
+      <button id="reset-btn" class="reset-button">Reset Parallelogram</button>
+    </section>
+    <section class="parallelogram-container">
+      <!-- SVG Parallelogram will be rendered here -->
+      <div id="svg-wrapper"></div>
+      <div id="angle-equations" class="equations"></div>
+    </section>
+  </main>
+  <footer>
+    <p>&copy; Nicholas Tan</p>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>

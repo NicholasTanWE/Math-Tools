@@ -1,0 +1,92 @@
+/* Parallelogram Angle Explorer Styles */
+.parallelogram-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2rem 0;
+}
+.instructions {
+  background: #fffbe7;
+  border-radius: 8px;
+  padding: 1rem 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px #0001;
+  max-width: 600px;
+}
+.controls {
+  background: #f0f8ff;
+  border-radius: 8px;
+  padding: 1rem 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px #0001;
+  text-align: center;
+}
+.control-group {
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+.control-group label {
+  font-weight: bold;
+  min-width: 180px;
+  text-align: right;
+}
+.control-group button {
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 40px;
+  height: 30px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.control-group button:hover {
+  background: #1565c0;
+}
+.reset-button {
+  background: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+.reset-button:hover {
+  background: #c62828;
+}
+.eq-row {
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+  color: #333;
+  background: #e3f2fd;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  display: inline-block;
+}
+ #svg-wrapper {
+   margin-bottom: 1.5rem;
+   width: 700px;
+   height: 500px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+ }
+@media (max-width: 600px) {
+  .instructions {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+  #svg-wrapper svg {
+    width: 100% !important;
+    height: auto !important;
+  }
+}
