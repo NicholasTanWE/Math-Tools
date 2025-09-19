@@ -1,0 +1,33 @@
+/* Math Dungeon Adventure - project-specific styles
+   This file complements the shared style-guide CSS in ../style-guide/ */
+
+body {
+  background: #2d232e;
+  color: #f3e9dc;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+.container {
+  max-width: 900px;
+  margin: 2rem auto;
+  background: #3e2c41;
+  box-shadow: 0 4px 24px #0006;
+  padding: 2rem;
+}
+h1 { font-family: 'Cinzel', 'Georgia', serif; font-size:2.2rem; color:#ffe066; margin-bottom:0.2em; }
+.subtitle { font-size:1.2rem; color:#f3e9dc; margin-bottom:1.5em; }
+.operation-btn { font-size:1.1rem; padding:0.7em 1.5em; margin:0.5em; border-radius:8px; border:none; background:#ffe066; color:#3e2c41; font-weight:bold; cursor:pointer; }
+.operation-btn.selected { background:#e94f37; color:#fff; border:2px solid #ffe066; }
+.start-btn { font-size:1.2rem; padding:0.8em 2em; border-radius:10px; border:none; background:#e94f37; color:#fff; font-weight:bold; cursor:pointer; }
+
+/* Ensure the start button sits below the monster-count dropdown and doesn't overlap */
+#start-btn { display:block; margin-top:1.25rem; }
+.checkbox-group { display:flex; flex-wrap:wrap; gap:0.5em; margin-bottom:1em; }
+.checkbox-group label { background:#4b384c; border-radius:6px; padding:0.4em 0.8em; color:#ffe066; }
+
+/* small responsive tweak */
+@media (max-width:640px){ .container{margin:1rem;padding:1rem;} }
+
+/* Ensure monster images scale to fill the larger container */
+#monster-img img { max-width:100%; max-height:100%; display:block; }

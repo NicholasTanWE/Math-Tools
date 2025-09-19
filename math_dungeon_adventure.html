@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Dungeon Adventure</title>
+  <style>
+    body {
+      background: #2d232e;
+      color: #f3e9dc;
+      font-family: 'Segoe UI', 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 2rem auto;
+      background: #3e2c41;
+      border      let tableResults = [];
+      const label = gameMode === 'mult' ? 'times table' : 'divisor';
+      Object.keys(tableStats).sort((a,b)=>a-b).forEach(x=>{
+        const correct = tableStats[x].total - tableStats[x].missed;
+        const percent = Math.round(correct/tableStats[x].total*100);
+        tableResults.push(`<strong>${x} ${label}:</strong> ${correct}/${tableStats[x].total} correct (${percent}%)`);
+      });
+      const sectionTitle = gameMode === 'mult' ? 'Score by Times Table' : 'Score by Divisor';
+      resultHtml += `<div style='margin-top:1em;'><strong style='color:#3bb273;'>${sectionTitle}:</strong><ul>`;: 16px;
+      box-shadow: 0 4px 24px #0006;
+      padding: 2rem;
+    }
+    h1 {
+      font-family: 'Cinzel', 'Georgia', serif;
+      font-size: 2.2rem;
+      color: #ffe066;
+      margin-bottom: 0.2em;
+      text-shadow: 0 2px 8px #000a;
+    }
+    h2 {
+      font-family: 'Cinzel', 'Georgia', serif;
+      color: #e94f37;
+      margin-top: 0.5em;
+    }
+    .subtitle {
+      font-size: 1.2rem;
+      color: #f3e9dc;
+      margin-bottom: 1.5em;
+    }
+    .start-section {
+      margin-bottom: 2em;
+    }
+    .operation-btn {
+      font-size: 1.1rem;
+      padding: 0.7em 1.5em;
+      margin: 0.5em;
+      border-radius: 8px;
+      border: none;
+      background: #ffe066;
+      color: #3e2c41;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #0002;
+      transition: background 0.2s, color 0.2s;
+    }
+    .operation-btn.selected {
+      background: #e94f37;
+      color: #fff;
+      border: 2px solid #ffe066;
+    }
+    .operation-btn.disabled {
+      background: #888;
+      color: #eee;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5em;
+      margin-bottom: 1em;
+    }
+    .checkbox-group label {
+      background: #4b384c;
+      border-radius: 6px;
+      padding: 0.4em 0.8em;
+      color: #ffe066;
+      font-size: 1rem;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 0.3em;
+    }
+    .checkbox-group input[type="checkbox"] {
+      accent-color: #e94f37;
+      width: 1.1em;
+      height: 1.1em;
+    }
+    .start-btn {
+      font-size: 1.2rem;
+      padding: 0.8em 2em;
+      border-radius: 10px;
+      border: none;
+  background: #e94f37;
+  color: #fff;
+      font-weight: bold;
+      box-shadow: 0 2px 12px #0003;
+      cursor: pointer;
+      margin-top: 1em;
+      transition: background 0.2s;
+    }
+    .start-btn:hover {
+  background: #7c5e3c;
+  color: #fff;
+    }
+    .dropdown, .radio-group {
+      margin-bottom: 1em;
+    }
+    .footer {
+      text-align: center;
+      color: #ffe066;
+      margin-top: 2em;
+      font-size: 1rem;
+    }
+    .coming-soon {
+      font-size: 1rem;
+      color: #ffe066;
+      margin-top: 0.5em;
+      background: #4b384c;
+      border-radius: 6px;
+      padding: 0.5em 1em;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="start-screen">
+    <h1>Welcome to Math Dungeon Adventure!</h1>
+  <div class="subtitle">Choose your weapon to defeat the monsters.</div>
+    <div class="start-section">
+      <h2>Choose Operation</h2>
+      <div id="operation-buttons">
+        <button class="operation-btn selected" id="op-mult">
+          <span style="font-size:1.3em;vertical-align:middle;">🔨</span> × Multiplication
+        </button>
+        <button class="operation-btn" id="op-add">
+          <span style="font-size:1.3em;vertical-align:middle;">🗡️</span> + Addition
+        </button>
+        <button class="operation-btn" id="op-sub">
+          <span style="font-size:1.3em;vertical-align:middle;">🪓</span> − Subtraction
+        </button>
+        <button class="operation-btn" id="op-div">
+          <span style="font-size:1.3em;vertical-align:middle;">⚒️</span> ÷ Division
+        </button>
+      </div>
+      <div id="coming-soon-add" class="coming-soon" style="display:none;">Coming Soon! Addition battles will be available in the next update!</div>
+      <div id="coming-soon-sub" class="coming-soon" style="display:none;">Coming Soon! Subtraction quests will be available in the next update!</div>
+      <div id="coming-soon-div" class="coming-soon" style="display:none;">Coming Soon! Division challenges will be available in the next update!</div>
+      <div id="multiplication-controls" style="display:block;">
+        <h2>Which Times Table?</h2>
+        <div class="checkbox-group" id="times-table-group">
+          <!-- JS will generate checkboxes 1-10 -->
+        </div>
+        <div style="font-size:0.95em;color:#ffe066;margin-bottom:1em;">Select up to 5 times tables to practice. Each will test up to ×12.</div>
+        <div class="dropdown">
+          <label for="monster-count">Number of monsters to defeat:</label>
+          <select id="monster-count">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+          </select>
+        </div>
+      </div>
+      <div id="addition-controls" style="display:none;">
+        <h2>Addition Difficulty</h2>
+        <div class="radio-group" id="addition-difficulty">
+          <label><input type="radio" name="add-diff" value="100" checked> numbers up to 100</label>
+          <label><input type="radio" name="add-diff" value="10000"> numbers up to 10 000</label>
+          <label><input type="radio" name="add-diff" value="1000000"> numbers up to 1 000 000</label>
+        </div>
+        <div style="font-size:0.95em;color:#ffe066;margin-bottom:1em;">Pick difficulty for addition problems.</div>
+        <div class="dropdown">
+          <label for="addition-monster-count">Number of monsters to defeat:</label>
+          <select id="addition-monster-count">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+          </select>
+        </div>
+      </div>
+      <div id="subtraction-controls" style="display:none;">
+        <h2>Subtraction Difficulty</h2>
+        <div class="radio-group" id="subtraction-difficulty">
+          <label><input type="radio" name="sub-diff" value="100" checked> numbers up to 100</label>
+          <label><input type="radio" name="sub-diff" value="10000"> numbers up to 10 000</label>
+          <label><input type="radio" name="sub-diff" value="1000000"> numbers up to 1 000 000</label>
+        </div>
+        <div style="font-size:0.95em;color:#ffe066;margin-bottom:1em;">Pick difficulty for subtraction problems.</div>
+        <div class="dropdown">
+          <label for="subtraction-monster-count">Number of monsters to defeat:</label>
+          <select id="subtraction-monster-count">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+          </select>
+        </div>
+      </div>
+      <div id="division-controls" style="display:none;">
+        <h2>Which Divisor?</h2>
+        <div class="checkbox-group" id="divisor-group">
+          <!-- JS will generate checkboxes 1-10 -->
+        </div>
+        <div style="font-size:0.95em;color:#ffe066;margin-bottom:1em;">Select up to 5 divisors to practice. Each will test division by 1-12.</div>
+        <div class="dropdown">
+          <label for="division-monster-count">Number of monsters to defeat:</label>
+          <select id="division-monster-count">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+          </select>
+        </div>
+      </div>
+      <button class="start-btn" id="start-btn">Enter the Dungeon!</button>
+    </div>
+    <div class="footer">&copy; Nicholas Tan</div>
+  </div>
+
+  <!-- Main Game Screen -->
+  <div class="container" id="game-screen" style="display:none; background: #f5ecd6; border: 4px solid #7c5e3c; box-shadow: 0 0 0 8px #c2b280;">
+    <div style="display:flex; gap:2rem; align-items:flex-start;">
+      <div style="flex:1; min-width:160px;">
+        <div id="monster-name" style="font-family:'Press Start 2P',monospace; font-size:1.1rem; color:#7c5e3c; margin-bottom:0.5em;"></div>
+        <div id="monster-img" style="width:128px; height:128px; background:#d8cbb3; border:3px solid #7c5e3c; border-radius:12px; margin-bottom:1em; display:flex; align-items:center; justify-content:center; font-size:3rem; color:#7c5e3c;">?</div>
+      </div>
+      <div style="flex:2;">
+        <div id="question-area" style="font-family:'Cinzel',serif; font-size:2.2rem; color:#7c5e3c; margin-bottom:1em; text-shadow:0 2px 8px #c2b280;">7 × 8 = ?</div>
+        <input id="answer-input" type="text" autocomplete="off" style="font-size:1.5rem; padding:0.5em 1em; border:2px solid #7c5e3c; border-radius:8px; background:#fffbe6; color:#7c5e3c; margin-bottom:1em; width:120px;">
+        <div style="margin-bottom:1em;">
+          <button id="submit-btn" class="start-btn" style="background:#7c5e3c; color:#ffe066;">Submit Answer</button>
+          <button id="giveup-btn" class="start-btn" style="background:#c2b280; color:#7c5e3c;">Give Up</button>
+        </div>
+        <div id="feedback" style="font-size:1.2rem; min-height:2em; color:#e94f37;"></div>
+        <div style="margin-top:1em; font-size:1rem; color:#7c5e3c;">
+          <span id="monster-counter">Monster 1 of 10</span> | 
+          <span id="attempts-remaining">Attempts left: 3</span> | 
+          <span id="score-tracker">Score: 0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // --- START SCREEN LOGIC ---
+    const timesTableGroup = document.getElementById('times-table-group');
+    for(let i=1;i<=10;i++){
+      const label = document.createElement('label');
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.value = i;
+      cb.name = 'times-table';
+      label.appendChild(cb);
+      label.appendChild(document.createTextNode(i + ' times table'));
+      timesTableGroup.appendChild(label);
+    }
+    timesTableGroup.addEventListener('change', function(e){
+      const checked = timesTableGroup.querySelectorAll('input[type="checkbox"]:checked');
+      if(checked.length>5){
+        e.target.checked = false;
+        alert('You can select up to 5 times tables only.');
+      }
+    });
+    const multiplicationControls = document.getElementById('multiplication-controls');
+  const additionControls = document.getElementById('addition-controls');
+    document.getElementById('op-mult').addEventListener('click',()=>{
+  multiplicationControls.style.display = 'block';
+  divisionControls.style.display = 'none';
+  additionControls.style.display = 'none';
+  document.getElementById('op-mult').classList.add('selected');
+  const opAddBtn = document.getElementById('op-add');
+  opAddBtn.classList.remove('selected');
+  document.getElementById('op-sub').classList.remove('selected');
+  document.getElementById('op-div').classList.remove('selected');
+    });
+    document.getElementById('op-add').addEventListener('click',()=>{
+      multiplicationControls.style.display = 'none';
+      divisionControls.style.display = 'none';
+      document.getElementById('coming-soon-add').style.display='none';
+      document.getElementById('op-mult').classList.remove('selected');
+      // enable and highlight the addition button
+      const opAddBtn = document.getElementById('op-add');
+      opAddBtn.classList.remove('disabled');
+      opAddBtn.classList.add('selected');
+      document.getElementById('op-sub').classList.remove('selected');
+      document.getElementById('op-div').classList.remove('selected');
+      additionControls.style.display = 'block';
+    });
+    document.getElementById('op-sub').addEventListener('click',()=>{
+      multiplicationControls.style.display = 'none';
+      additionControls.style.display = 'none';
+      divisionControls.style.display = 'none';
+      document.getElementById('coming-soon-sub').style.display='none';
+      document.getElementById('op-mult').classList.remove('selected');
+      // enable and highlight subtraction button
+      const opSubBtn = document.getElementById('op-sub');
+      opSubBtn.classList.remove('disabled');
+      opSubBtn.classList.add('selected');
+      // ensure op-add returns to normal
+      const opAddBtn2 = document.getElementById('op-add');
+      opAddBtn2.classList.remove('selected');
+      document.getElementById('op-div').classList.remove('selected');
+      document.getElementById('subtraction-controls').style.display = 'block';
+    });
+    const divisorGroup = document.getElementById('divisor-group');
+for(let i=1;i<=10;i++){
+  const label = document.createElement('label');
+  const cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.value = i;
+  cb.name = 'divisor';
+  label.appendChild(cb);
+  label.appendChild(document.createTextNode(i + ' divisor'));
+  divisorGroup.appendChild(label);
+}
+divisorGroup.addEventListener('change', function(e){
+  const checked = divisorGroup.querySelectorAll('input[type="checkbox"]:checked');
+  if(checked.length>5){
+    e.target.checked = false;
+    alert('You can select up to 5 divisors only.');
+  }
+});
+const divisionControls = document.getElementById('division-controls');
+document.getElementById('op-div').addEventListener('click',()=>{
+  divisionControls.style.display = 'block';
+  multiplicationControls.style.display = 'none';
+  additionControls.style.display = 'none';
+  document.getElementById('coming-soon-div').style.display='none';
+  document.getElementById('op-mult').classList.remove('selected');
+  const opAddBtn = document.getElementById('op-add');
+  opAddBtn.classList.remove('selected');
+  document.getElementById('op-sub').classList.remove('selected');
+  document.getElementById('op-div').classList.add('selected');
+});
+
+    // --- GAME LOGIC ---
+    const monsterNames = [
+      "Goblin Grumpus", "Dragon Mathicus", "Troll Calculon", "Orc Numberton",
+      "Skeleton Subtractor", "Wizard Multiplicius", "Beast Dividor", "Demon Digitron",
+      "Giant Equator", "Spider Sumnor", "Wolf Problemius", "Snake Solutius"
+    ];
+    function getRandomMonster() {
+      const idx = Math.floor(Math.random()*monsterNames.length);
+      return { name: monsterNames[idx], img: "?" };
+    }
+    function getSelectedTables() {
+      return Array.from(timesTableGroup.querySelectorAll('input[type="checkbox"]:checked')).map(cb=>parseInt(cb.value));
+    }
+    function getMonsterCount() {
+      return parseInt(document.getElementById('monster-count').value);
+    }
+    // Generate multiplication problems
+    function generateProblems(tables, count) {
+      let pool = [];
+      tables.forEach(table => {
+        for(let i=1;i<=12;i++){
+          pool.push({x:table, y:i});
+        }
+      });
+      // Shuffle pool
+      for(let i=pool.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [pool[i],pool[j]]=[pool[j],pool[i]];
+      }
+      return pool.slice(0,count);
+    }
+    // Generate division problems
+    function generateDivisionProblems(divisors, count) {
+      let pool = [];
+      divisors.forEach(divisor => {
+        for(let i=1;i<=9;i++){
+          pool.push({x:divisor*i, y:divisor}); // x ÷ y = i, i is 1-digit
+        }
+      });
+      // Shuffle pool
+      for(let i=pool.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [pool[i],pool[j]]=[pool[j],pool[i]];
+      }
+      return pool.slice(0,count);
+    }
+    // Generate addition problems
+function generateAdditionProblems(maxValue, count){
+  let pool = [];
+  for(let i=0;i<count*3;i++){
+    const a = Math.floor(Math.random()* (maxValue+1));
+    const b = Math.floor(Math.random()* (maxValue+1));
+    pool.push({x:a, y:b});
+  }
+  // Shuffle and take count
+  for(let i=pool.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [pool[i],pool[j]]=[pool[j],pool[i]];
+  }
+  return pool.slice(0,count);
+}
+// Generate subtraction problems (ensure non-negative results)
+function generateSubtractionProblems(maxValue, count){
+  let pool = [];
+  for(let i=0;i<count*3;i++){
+    const a = Math.floor(Math.random()*(maxValue+1));
+    const b = Math.floor(Math.random()*(maxValue+1));
+    // to keep it simple, let x be the larger so result is non-negative
+    const x = Math.max(a,b);
+    const y = Math.min(a,b);
+    pool.push({x:x, y:y});
+  }
+  // Shuffle and take count
+  for(let i=pool.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [pool[i],pool[j]]=[pool[j],pool[i]];
+  }
+  return pool.slice(0,count);
+}
+    // --- GAME STATE ---
+  let problems = [], currentIdx = 0, attemptsLeft = 3, score = 0, errorFacts = {}, attemptedFacts = {};
+  // For addition regrouping detection: store one example wrong answer per fact
+  let wrongExample = {}; // key -> example wrong numeric answer
+    let monster = null;
+    let gameMode = 'mult'; // 'mult' or 'div'
+    // --- UI ELEMENTS ---
+    const startScreen = document.getElementById('start-screen');
+    const gameScreen = document.getElementById('game-screen');
+    const monsterNameEl = document.getElementById('monster-name');
+    const monsterImgEl = document.getElementById('monster-img');
+    const questionArea = document.getElementById('question-area');
+    const answerInput = document.getElementById('answer-input');
+    const submitBtn = document.getElementById('submit-btn');
+    const giveupBtn = document.getElementById('giveup-btn');
+    const feedbackEl = document.getElementById('feedback');
+    const monsterCounterEl = document.getElementById('monster-counter');
+    const attemptsRemainingEl = document.getElementById('attempts-remaining');
+    const scoreTrackerEl = document.getElementById('score-tracker');
+
+    function startGame() {
+      let mode = 'mult';
+      if (divisionControls.style.display === 'block') mode = 'div';
+      if (document.getElementById('addition-controls').style.display === 'block') mode = 'add';
+      if (document.getElementById('subtraction-controls').style.display === 'block') mode = 'sub';
+      gameMode = mode;
+      if (mode === 'mult') {
+        const tables = getSelectedTables();
+        if(tables.length===0){
+          alert('Select at least one times table!');
+          return;
+        }
+        const count = getMonsterCount();
+        problems = generateProblems(tables, count);
+      } else if (mode === 'div') {
+        const divisors = Array.from(divisorGroup.querySelectorAll('input[type="checkbox"]:checked')).map(cb=>parseInt(cb.value));
+        if(divisors.length===0){
+          alert('Select at least one divisor!');
+          return;
+        }
+        const count = parseInt(document.getElementById('division-monster-count').value);
+        problems = generateDivisionProblems(divisors, count);
+      } else if (mode === 'add') {
+        // addition mode
+        const radios = document.getElementsByName('add-diff');
+        let maxVal = 100;
+        for(const r of radios) if(r.checked) maxVal = parseInt(r.value);
+        // read addition-specific monster count if present
+        const addCountEl = document.getElementById('addition-monster-count');
+        const count = addCountEl ? parseInt(addCountEl.value) : getMonsterCount();
+        problems = generateAdditionProblems(maxVal, count);
+      }
+      else if (mode === 'sub') {
+        const radios = document.getElementsByName('sub-diff');
+        let maxVal = 100;
+        for(const r of radios) if(r.checked) maxVal = parseInt(r.value);
+        // read subtraction-specific monster count if present
+        const subCountEl = document.getElementById('subtraction-monster-count');
+        const count = subCountEl ? parseInt(subCountEl.value) : getMonsterCount();
+        problems = generateSubtractionProblems(maxVal, count);
+      }
+      currentIdx = 0;
+      score = 0;
+      errorFacts = {};
+      attemptedFacts = {};
+      startScreen.style.display = 'none';
+      gameScreen.style.display = '';
+      nextQuestion();
+    }
+    document.getElementById('start-btn').addEventListener('click', startGame);
+
+    function nextQuestion() {
+      if(currentIdx>=problems.length){
+        showResults();
+        return;
+      }
+      attemptsLeft = 3;
+      monster = getRandomMonster();
+      const prob = problems[currentIdx];
+      monsterNameEl.textContent = monster.name;
+      monsterImgEl.textContent = monster.img;
+  const operator = gameMode === 'mult' ? '×' : (gameMode === 'div' ? '÷' : (gameMode === 'sub' ? '−' : '+'));
+      questionArea.textContent = `${prob.x} ${operator} ${prob.y} = ?`;
+      answerInput.value = '';
+      feedbackEl.textContent = '';
+      monsterCounterEl.textContent = `Monster ${currentIdx+1} of ${problems.length}`;
+      attemptsRemainingEl.textContent = `Attempts left: ${attemptsLeft}`;
+      scoreTrackerEl.textContent = `Score: ${score}`;
+      answerInput.focus();
+      const factKey = gameMode === 'mult' ? `${prob.x}×${prob.y}` : (gameMode === 'div' ? `${prob.x}÷${prob.y}` : (gameMode === 'sub' ? `${prob.x}-${prob.y}` : `${prob.x}+${prob.y}`));
+      attemptedFacts[factKey] = (attemptedFacts[factKey]||0)+1;
+    }
+    function checkAnswer() {
+      const prob = problems[currentIdx];
+      let correct;
+      if(gameMode === 'mult') correct = prob.x * prob.y;
+      else if(gameMode === 'div') correct = prob.x / prob.y;
+      else if(gameMode === 'sub') correct = prob.x - prob.y;
+      else correct = prob.x + prob.y; // addition
+      const userAns = parseInt(answerInput.value);
+      if(userAns===correct){
+        score++;
+        feedbackEl.textContent = 'Monster defeated!';
+        feedbackEl.style.color = '#3bb273';
+        gameScreen.classList.add('monster-defeat');
+        setTimeout(()=>{
+          gameScreen.classList.remove('monster-defeat');
+          currentIdx++;
+          nextQuestion();
+        },700);
+      }else{
+        attemptsLeft--;
+        feedbackEl.textContent = attemptsLeft>0 ? `Try again! (${attemptsLeft} attempts left)` : `Monster escapes! The correct answer was ${correct}.`;
+        feedbackEl.style.color = attemptsLeft>0 ? '#e94f37' : '#7c5e3c';
+        attemptsRemainingEl.textContent = `Attempts left: ${attemptsLeft}`;
+        const factKey = gameMode === 'mult' ? `${prob.x}×${prob.y}` : (gameMode === 'div' ? `${prob.x}÷${prob.y}` : (gameMode === 'sub' ? `${prob.x}-${prob.y}` : `${prob.x}+${prob.y}`));
+        errorFacts[factKey] = (errorFacts[factKey]||0)+1;
+        if(gameMode === 'add' || gameMode === 'sub') {
+          const parsed = parseInt(answerInput.value);
+          if(!isNaN(parsed)) wrongExample[factKey] = parsed;
+        }
+        if(attemptsLeft<=0){
+          setTimeout(()=>{
+            currentIdx++;
+            nextQuestion();
+          },900);
+        }else{
+          gameScreen.classList.add('shake');
+          setTimeout(()=>gameScreen.classList.remove('shake'),400);
+        }
+      }
+    }
+    submitBtn.addEventListener('click', checkAnswer);
+    answerInput.addEventListener('keydown', function(e){
+      if(e.key==='Enter') checkAnswer();
+    });
+    giveupBtn.addEventListener('click', function(){
+      const prob = problems[currentIdx];
+  let correct;
+  if(gameMode === 'mult') correct = prob.x * prob.y;
+  else if(gameMode === 'div') correct = prob.x / prob.y;
+  else if(gameMode === 'sub') correct = prob.x - prob.y;
+  else correct = prob.x + prob.y;
+      feedbackEl.textContent = `Monster escapes! The correct answer was ${correct}.`;
+      feedbackEl.style.color = '#7c5e3c';
+      const factKey = gameMode === 'mult' ? `${prob.x}×${prob.y}` : (gameMode === 'div' ? `${prob.x}÷${prob.y}` : (gameMode === 'sub' ? `${prob.x}-${prob.y}` : `${prob.x}+${prob.y}`));
+      errorFacts[factKey] = (errorFacts[factKey]||0)+1;
+      if(gameMode === 'add' || gameMode === 'sub') {
+        // Record give-up example as well
+        wrongExample[factKey] = correct; // store correct as fallback example
+      }
+      setTimeout(()=>{
+        currentIdx++;
+        nextQuestion();
+      },900);
+    });
+
+    // --- RESULTS SCREEN ---
+    function showResults(){
+      gameScreen.style.display = 'none';
+      // Determine effective mode: prefer detected operators in attempted/error facts (robust if gameMode wasn't set)
+      let mode = gameMode;
+      const attemptedKeys = Object.keys(attemptedFacts || {});
+      const errorKeys = Object.keys(errorFacts || {});
+      const combined = attemptedKeys.concat(errorKeys);
+      if(combined.length>0){
+        if(combined.some(k=>k.includes('-'))) mode = 'sub';
+        else if(combined.some(k=>k.includes('+'))) mode = 'add';
+        else if(combined.some(k=>k.includes('÷') || k.includes('/'))) mode = 'div';
+        else if(combined.some(k=>k.includes('×') || k.includes('*'))) mode = 'mult';
+      }
+      let resultHtml = `<div class='container' style='background:#f5ecd6; border:4px solid #7c5e3c; box-shadow:0 0 0 8px #c2b280;'>`;
+      resultHtml += `<h2 style='font-family:Cinzel,serif;color:#e94f37;'>Dungeon Results</h2>`;
+      // Overall score
+  resultHtml += `<div style='font-size:1.3rem;color:#e94f37;font-weight:bold;text-shadow:1px 1px 0 #fff;'>Score: ${score} / ${problems.length} (${Math.round(score/problems.length*100)}%)</div>`;
+      // Score breakdown (group by times-table for multiplication, by divisor for division, generic for addition/subtraction)
+      let tableStats = {};
+      problems.forEach(prob => {
+        let key;
+        if(mode === 'mult') key = prob.x; // multiplicand
+        else if(mode === 'div') key = prob.y; // divisor
+        else if(mode === 'add') key = 'addition';
+        else if(mode === 'sub') key = 'subtraction';
+        else key = 'addition'; // fallback
+        if (!tableStats[key]) tableStats[key] = { total: 0, missed: 0 };
+        tableStats[key].total++;
+        const factKey = mode === 'mult' ? `${prob.x}×${prob.y}` : (mode === 'div' ? `${prob.x}÷${prob.y}` : (mode === 'sub' ? `${prob.x}-${prob.y}` : `${prob.x}+${prob.y}`));
+        if (errorFacts[factKey]) tableStats[key].missed++;
+      });
+  let tableResults = [];
+  const label = mode === 'mult' ? 'times table' : (mode === 'div' ? 'divisor' : (mode === 'sub' ? 'subtraction' : 'addition'));
+  Object.keys(tableStats).sort((a,b)=>{
+        // ensure numeric sort for numeric keys, otherwise keep string order
+        const na = isNaN(parseInt(a)) ? a : parseInt(a);
+        const nb = isNaN(parseInt(b)) ? b : parseInt(b);
+        if(typeof na === 'number' && typeof nb === 'number') return na - nb;
+        return (''+na).localeCompare(''+nb);
+      }).forEach(k=>{
+        const correct = tableStats[k].total - tableStats[k].missed;
+        const percent = Math.round(correct/tableStats[k].total*100);
+        let displayTitle;
+        if(gameMode === 'mult' || gameMode === 'div') displayTitle = `${k} ${label}`;
+        else displayTitle = label.charAt(0).toUpperCase() + label.slice(1);
+        tableResults.push(`<strong>${displayTitle}:</strong> ${correct}/${tableStats[k].total} correct (${percent}%)`);
+      });
+  const sectionTitle = mode === 'mult' ? 'Score by Times Table' : (mode === 'div' ? 'Score by Divisor' : (mode === 'sub' ? 'Subtraction Summary' : 'Score Summary'));
+      resultHtml += `<div style='margin-top:1em;'><strong style='color:#3bb273;'>${sectionTitle}:</strong><ul>`;
+      tableResults.forEach(s=>{resultHtml+=`<li style='color:#3bb273;font-weight:bold;'>${s}</li>`;});
+      resultHtml += `</ul></div>`;
+      // Suggestions for improvement
+      let errorTables = {};
+      Object.keys(errorFacts).forEach(fact=>{
+        const operator = mode === 'mult' ? '×' : (mode === 'div' ? '÷' : (mode === 'sub' ? '-' : '+'));
+        const parts = fact.split(operator);
+        let key;
+        if(mode === 'mult') key = parseInt(parts[0]);
+        else if(mode === 'div') key = parseInt(parts[1]);
+        else if(mode === 'add') key = 'addition';
+        else if(mode === 'sub') key = 'subtraction';
+        else key = 'addition';
+        errorTables[key] = (errorTables[key]||0)+errorFacts[fact];
+      });
+      let suggestions = [];
+  const skillType = mode === 'mult' ? 'times table' : (mode === 'div' ? 'division' : (mode === 'sub' ? 'subtraction' : 'addition'));
+  const operatorSymbol = mode === 'mult' ? '×' : (mode === 'div' ? '÷' : (mode === 'sub' ? '−' : '+'));
+
+      Object.keys(errorTables).sort((a,b)=>errorTables[b]-errorTables[a]).forEach(x=>{
+        if(errorTables[x]>1) {
+          // Array of engaging feedback phrases
+          let feedbackPhrases = [];
+          if(gameMode === 'add'){
+            feedbackPhrases = [
+              `Work on regrouping when adding larger ${skillType} to speed up your answers.`,
+              `Practice calculating the ${skillType} carefully to avoid place-value mistakes.`,
+              `Sharpen your ${skillType} strategies (regrouping, column addition) to slay more monsters!`,
+              `Focus on column addition technique for ${skillType} to improve accuracy.`
+            ];
+            // Look for regrouping patterns in wrongExample entries for addition facts
+            // If many wrong examples show digits that suggest missing carries, add a targeted suggestion
+            const regroupingDetected = Object.keys(wrongExample).some(factKey => {
+              if(!factKey.includes('+')) return false;
+              const parts = factKey.split('+');
+              const a = parseInt(parts[0]);
+              const b = parseInt(parts[1]);
+              const correct = a + b;
+              const user = wrongExample[factKey];
+              if(typeof user !== 'number' || isNaN(user)) return false;
+              // Simple heuristic: check per-digit from right; compare user's digits to digitwise sum without carry
+              let aa = String(Math.abs(a)).split('').reverse();
+              let bb = String(Math.abs(b)).split('').reverse();
+              const maxLen = Math.max(aa.length, bb.length);
+              let withoutCarry = [];
+              for(let i=0;i<maxLen;i++){
+                const da = parseInt(aa[i]||'0');
+                const db = parseInt(bb[i]||'0');
+                withoutCarry.push((da+db)%10);
+              }
+              const userStr = String(Math.abs(user)).split('').reverse();
+              let matches = 0;
+              for(let i=0;i<withoutCarry.length;i++){
+                const ud = parseInt(userStr[i]||'0');
+                if(ud === withoutCarry[i]) matches++;
+              }
+              return matches >= 2 && String(correct) !== String(user);
+            });
+            if(regroupingDetected){
+              feedbackPhrases.unshift('We detected likely regrouping (carry) errors in some addition mistakes — practice column addition and carrying.');
+            }
+          } else if (gameMode === 'sub') {
+            // Subtraction-specific feedback and borrowing detection
+            feedbackPhrases = [
+              `Work on column subtraction and borrowing when solving ${skillType} problems.`,
+              `Practice borrowing across zeros and place-value columns to avoid common mistakes.`,
+              `Use column subtraction (right-to-left) and check for necessary borrows to defeat more monsters!`,
+              `Review subtraction strategies (borrowing, regrouping) for more accurate answers.`
+            ];
+            const borrowingDetected = Object.keys(wrongExample).some(factKey => {
+              if(!factKey.includes('-')) return false;
+              const parts = factKey.split('-');
+              const a = parseInt(parts[0]);
+              const b = parseInt(parts[1]);
+              const correct = a - b;
+              const user = wrongExample[factKey];
+              if(typeof user !== 'number' || isNaN(user)) return false;
+              // Heuristic: compute digitwise subtraction without borrow (mod 10) and compare to user's digits
+              let aa = String(Math.abs(a)).split('').reverse();
+              let bb = String(Math.abs(b)).split('').reverse();
+              const maxLen = Math.max(aa.length, bb.length);
+              let withoutBorrow = [];
+              for(let i=0;i<maxLen;i++){
+                const da = parseInt(aa[i]||'0');
+                const db = parseInt(bb[i]||'0');
+                // simulate subtraction digit-wise without borrowing
+                withoutBorrow.push(((da - db) + 10) % 10);
+              }
+              const userStr = String(Math.abs(user)).split('').reverse();
+              let matches = 0;
+              for(let i=0;i<withoutBorrow.length;i++){
+                const ud = parseInt(userStr[i]||'0');
+                if(ud === withoutBorrow[i]) matches++;
+              }
+              return matches >= 2 && String(correct) !== String(user);
+            });
+            if(borrowingDetected){
+              feedbackPhrases.unshift('We detected likely borrowing (missing-borrow) errors in some subtraction mistakes — practice column subtraction and borrowing.');
+            }
+          } else {
+            feedbackPhrases = [
+              `Sharpen your ${x} ${skillType} skills to slay more monsters!`,
+              `Hone your ${x} ${skillType} mastery to defeat tougher foes!`,
+              `Practice your ${x} ${skillType} to conquer the dungeon depths!`,
+              `Master the ${x} ${skillType} to vanquish the mathematical beasts!`,
+              `Strengthen your ${x} ${skillType} knowledge to emerge victorious!`,
+              `Train harder with ${x} ${skillType} problems to level up your skills!`,
+              `Focus on ${x} ${skillType} to become an unstoppable warrior!`,
+              `Conquer the ${x} ${skillType} challenges to claim your victory!`
+            ];
+          }
+          
+          // Randomly select an engaging phrase
+          const randomPhrase = feedbackPhrases[Math.floor(Math.random() * feedbackPhrases.length)];
+          suggestions.push(randomPhrase);
+        }
+      });
+      if(suggestions.length===0) suggestions.push('Great job! No major weaknesses detected.');
+  resultHtml += `<div style='margin-top:1em;'><strong style='color:#e94f37;'>Practice Suggestions:</strong><ul>`;
+  suggestions.forEach(s=>{resultHtml+=`<li style='color:#e94f37;font-weight:bold;'>${s}</li>`;});
+      resultHtml += `</ul></div>`;
+      resultHtml += `<button class='start-btn' id='play-again-btn'>Play Again</button>`;
+      resultHtml += `<div class='footer'>&copy; Nicholas Tan</div></div>`;
+      document.body.innerHTML = resultHtml;
+      document.getElementById('play-again-btn').onclick = ()=>location.reload();
+    }
+  </script>
+  <!-- Automated quick-tests -->
+  <div style="position:fixed; right:12px; bottom:12px; z-index:9999;">
+    <button id="run-tests-btn" class="start-btn" style="padding:0.4em 0.8em; font-size:0.9rem; background:#444;">Run Quick Tests</button>
+    <div id="test-results" style="margin-top:0.5em; color:#ffe066; font-size:0.9rem;"></div>
+  </div>
+  <script>
+    function runQuickTests(){
+      // Simulate entering a small game and answering problems to reach results screen.
+  const testMode = document.getElementById('op-add').classList.contains('selected') ? 'add'
+         : (document.getElementById('op-sub').classList.contains('selected') ? 'sub'
+         : (document.getElementById('op-div').classList.contains('selected') ? 'div' : 'mult'));
+      gameMode = testMode;
+      // choose defaults if user hasn't selected any tables/divisors
+      let problemsToUse = [];
+      if(gameMode === 'mult'){
+        const tables = getSelectedTables();
+        const useTables = tables.length ? tables.slice(0,2) : [2,3];
+        problemsToUse = generateProblems(useTables, 6);
+      } else if (gameMode === 'div'){
+        const divisors = Array.from(document.getElementById('divisor-group').querySelectorAll('input[type="checkbox"]:checked')).map(cb=>parseInt(cb.value));
+        const useDivs = divisors.length ? divisors.slice(0,2) : [3,4];
+        problemsToUse = generateDivisionProblems(useDivs, 6);
+      } else {
+        // addition or subtraction - respect the selected difficulty radios for each
+        let maxVal = 100;
+        if(gameMode === 'add'){
+          const radios = document.getElementsByName('add-diff');
+          for(const r of radios) if(r.checked) maxVal = parseInt(r.value);
+          problemsToUse = generateAdditionProblems(maxVal, 6);
+        } else {
+          const radios = document.getElementsByName('sub-diff');
+          for(const r of radios) if(r.checked) maxVal = parseInt(r.value);
+          problemsToUse = generateSubtractionProblems(maxVal, 6);
+        }
+      }
+
+      // init game state and show game screen
+      problems = problemsToUse;
+      currentIdx = 0;
+      score = 0;
+      errorFacts = {};
+      attemptedFacts = {};
+      startScreen.style.display = 'none';
+      gameScreen.style.display = '';
+
+      // Simulate answers: alternate wrong/right so we get some errors
+      for(let i=0;i<problems.length;i++){
+        const prob = problems[i];
+        let correct;
+        let factKey;
+        if(gameMode === 'mult'){
+          correct = prob.x * prob.y;
+          factKey = `${prob.x}×${prob.y}`;
+        } else if(gameMode === 'div'){
+          correct = prob.x / prob.y;
+          factKey = `${prob.x}÷${prob.y}`;
+        } else if(gameMode === 'add') { // add
+          correct = prob.x + prob.y;
+          factKey = `${prob.x}+${prob.y}`;
+        } else { // sub
+          correct = prob.x - prob.y;
+          factKey = `${prob.x}-${prob.y}`;
+        }
+        const giveWrong = (i % 2 === 0); // wrong on even indices
+        if(giveWrong){
+          // record as wrong
+          errorFacts[factKey] = (errorFacts[factKey]||0)+1;
+          // record example wrong for add/sub
+          if(gameMode === 'add' || gameMode === 'sub') wrongExample[factKey] = Math.max(0, correct - 10);
+        }else{
+          score++;
+        }
+        currentIdx = i+1;
+      }
+
+      // Navigate to results
+      showResults();
+      document.getElementById('test-results').innerHTML = 'Simulation complete — results shown.';
+    }
+    document.getElementById('run-tests-btn').addEventListener('click', runQuickTests);
+  </script>
+</body>
+</html>
