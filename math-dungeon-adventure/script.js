@@ -69,23 +69,52 @@ timesTableGroup.addEventListener('change', function(e){
   }
 });
 
+// New: separate mode for scale multiplication/division (10/100/1000)
+const scaleMultiplicationControls = document.getElementById('scale-multiplication-controls');
+const scaleDivisionControls = document.getElementById('scale-division-controls');
+
 // operation buttons behavior
 document.getElementById('op-mult').addEventListener('click',()=>{
   multiplicationControls.style.display = 'block';
+  scaleMultiplicationControls.style.display = 'none';
+  scaleDivisionControls.style.display = 'none';
   divisionControls.style.display = 'none';
   additionControls.style.display = 'none';
   subtractionControls.style.display = 'none';
+  ['op-mult','op-add','op-sub','op-div','op-scale-mult','op-scale-div'].forEach(id=>document.getElementById(id).classList.remove('selected'));
   document.getElementById('op-mult').classList.add('selected');
-  document.getElementById('op-add').classList.remove('selected');
-  document.getElementById('op-sub').classList.remove('selected');
-  document.getElementById('op-div').classList.remove('selected');
+});
+// new button: Multiply by 10/100/1000 (separate from standard multiplication)
+document.getElementById('op-scale-mult').addEventListener('click', ()=>{
+  multiplicationControls.style.display = 'none';
+  scaleMultiplicationControls.style.display = 'block';
+  divisionControls.style.display = 'none';
+  scaleDivisionControls.style.display = 'none';
+  additionControls.style.display = 'none';
+  subtractionControls.style.display = 'none';
+  // manage selected classes
+  ['op-mult','op-add','op-sub','op-div','op-scale-mult','op-scale-div'].forEach(id=>document.getElementById(id).classList.remove('selected'));
+  document.getElementById('op-scale-mult').classList.add('selected');
+});
+// new button: Division of 10/100/1000 (placeholder)
+document.getElementById('op-scale-div').addEventListener('click', ()=>{
+  multiplicationControls.style.display = 'none';
+  scaleMultiplicationControls.style.display = 'none';
+  divisionControls.style.display = 'none';
+  scaleDivisionControls.style.display = 'block';
+  additionControls.style.display = 'none';
+  subtractionControls.style.display = 'none';
+  ['op-mult','op-add','op-sub','op-div','op-scale-mult','op-scale-div'].forEach(id=>document.getElementById(id).classList.remove('selected'));
+  document.getElementById('op-scale-div').classList.add('selected');
 });
 document.getElementById('op-add').addEventListener('click',()=>{
   multiplicationControls.style.display = 'none';
+  scaleMultiplicationControls.style.display = 'none';
+  scaleDivisionControls.style.display = 'none';
   divisionControls.style.display = 'none';
   subtractionControls.style.display = 'none';
   document.getElementById('coming-soon-add').style.display='none';
-  document.getElementById('op-mult').classList.remove('selected');
+  ['op-mult','op-add','op-sub','op-div','op-scale-mult','op-scale-div'].forEach(id=>document.getElementById(id).classList.remove('selected'));
   const opAddBtn = document.getElementById('op-add');
   opAddBtn.classList.remove('disabled');
   opAddBtn.classList.add('selected');
@@ -95,16 +124,15 @@ document.getElementById('op-add').addEventListener('click',()=>{
 });
 document.getElementById('op-sub').addEventListener('click',()=>{
   multiplicationControls.style.display = 'none';
+  scaleMultiplicationControls.style.display = 'none';
+  scaleDivisionControls.style.display = 'none';
   additionControls.style.display = 'none';
   divisionControls.style.display = 'none';
   document.getElementById('coming-soon-sub').style.display='none';
-  document.getElementById('op-mult').classList.remove('selected');
+  ['op-mult','op-add','op-sub','op-div','op-scale-mult','op-scale-div'].forEach(id=>document.getElementById(id).classList.remove('selected'));
   const opSubBtn = document.getElementById('op-sub');
   opSubBtn.classList.remove('disabled');
   opSubBtn.classList.add('selected');
-  const opAddBtn2 = document.getElementById('op-add');
-  opAddBtn2.classList.remove('selected');
-  document.getElementById('op-div').classList.remove('selected');
   subtractionControls.style.display = 'block';
 });
 const divisorGroup = document.getElementById('divisor-group');
@@ -128,12 +156,12 @@ divisorGroup.addEventListener('change', function(e){
 document.getElementById('op-div').addEventListener('click',()=>{
   divisionControls.style.display = 'block';
   multiplicationControls.style.display = 'none';
+  scaleMultiplicationControls.style.display = 'none';
+  scaleDivisionControls.style.display = 'none';
   additionControls.style.display = 'none';
   subtractionControls.style.display = 'none';
   document.getElementById('coming-soon-div').style.display='none';
-  document.getElementById('op-mult').classList.remove('selected');
-  document.getElementById('op-add').classList.remove('selected');
-  document.getElementById('op-sub').classList.remove('selected');
+  ['op-mult','op-add','op-sub','op-div','op-scale-mult','op-scale-div'].forEach(id=>document.getElementById(id).classList.remove('selected'));
   document.getElementById('op-div').classList.add('selected');
 });
 
@@ -143,6 +171,10 @@ function getSelectedTables(){
 }
 function getMonsterCount(){
   return parseInt(document.getElementById('monster-count').value);
+}
+function getScaleMonsterCount(){
+  const el = document.getElementById('scale-monster-count');
+  return el ? parseInt(el.value,10) : 10;
 }
 
 // generators
@@ -162,23 +194,203 @@ function generateDivisionProblems(divisors, count) {
   for(let i=pool.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
   return pool.slice(0,count);
 }
+// generate problems for scale multiplication (×10, ×100, ×1000)
+function generateScaleMultiplicationProblems(scales, count){
+  // whole numbers should not exceed 1000
+  const pool = [];
+  for(let s of scales){
+    for(let i=0;i<Math.ceil(count*2);i++){
+      const whole = Math.floor(Math.random()*1001); // 0..1000
+      pool.push({x: whole, y: parseInt(s,10)});
+    }
+  }
+  // shuffle
+  for(let i=pool.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  return pool.slice(0,count);
+}
+// multiples of 10/100/1000 × whole number (e.g., 30 × 7)
+function generateScaleMultiplesTimesWhole(scales, count){
+  const pool = [];
+  for(let s of scales){
+    for(let i=0;i<Math.ceil(count*2);i++){
+      // multiple should be a single digit times the scale: 1..9
+      const digit = Math.floor(Math.random()*9) + 1; // 1..9
+      const multiple = digit * parseInt(s,10);
+      // wholes may be larger here (allow up to 9999 to match examples like 9023)
+      const whole = Math.floor(Math.random()*9999) + 1; // 1..9999
+      pool.push({x: multiple, y: whole});
+      // Note: stored as x=multiple, y=whole to follow other generators (x op y)
+    }
+  }
+  for(let i=pool.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  return pool.slice(0,count);
+}
+// 10/100/1000 × decimals (e.g., 10 × 3.75)
+function generateScaleTimesDecimals(scales, count, decimalPlaces){
+  const pool = [];
+  for(let s of scales){
+    for(let i=0;i<Math.ceil(count*2);i++){
+      // randomly pick decimal places 1..3 for each question
+      const dp = Math.floor(Math.random()*3) + 1; // 1..3
+      const factor = Math.pow(10, dp);
+      // generate a decimal number in range 0.001 .. 9999.999 depending on dp; keep it reasonable (0..1000)
+      const val = Math.round((Math.random()*1000) * factor) / factor;
+      // store as x = scale (integer), y = val (decimal), and record decimalPlaces
+      pool.push({x: parseInt(s,10), y: val, decimalPlaces: dp});
+    }
+  }
+  for(let i=pool.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  return pool.slice(0,count);
+}
+// multiples × decimals (e.g., 30 × 3.5)
+function generateScaleMultiplesTimesDecimals(scales, count){
+  const pool = [];
+  for(let s of scales){
+    for(let i=0;i<Math.ceil(count*2);i++){
+      // multiple should be a single-digit times the scale: 1..9
+      const digit = Math.floor(Math.random()*9) + 1; // 1..9
+      const multiple = digit * parseInt(s,10);
+      // random decimal places 1..3
+      const dp = Math.floor(Math.random()*3) + 1;
+      const factor = Math.pow(10, dp);
+      // allow decimal factor to be up to 9999.999
+      const val = Math.round((Math.random()*9999) * factor) / factor;
+      // store as x = multiple (integer), y = decimal value
+      pool.push({x: multiple, y: val, decimalPlaces: dp});
+    }
+  }
+  for(let i=pool.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  return pool.slice(0,count);
+}
+// generate division problems for scales: e.g. 120 ÷ 10, where dividend is whole*scale
+function generateScaleDivisionProblems(scales, count){
+  const pool = [];
+  for(let s of scales){
+    for(let i=0;i<Math.ceil(count*2);i++){
+      const whole = Math.floor(Math.random()*1001); // 0..1000
+      pool.push({x: whole * parseInt(s,10), y: parseInt(s,10)});
+    }
+  }
+  for(let i=pool.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  return pool.slice(0,count);
+}
+// generate scale division variants
+// 1) whole ÷ scale  -> ensure integer answers
+function generateScaleWholeDivides(scales, count){
+  const pool = [];
+  for(let s of scales){
+    for(let i=0;i<Math.ceil(count*2);i++){
+      // pick a whole quotient up to 1000, then multiply by scale to make dividend
+      const quotient = Math.floor(Math.random()*1001); // 0..1000
+      const dividend = quotient * parseInt(s,10);
+      pool.push({x: dividend, y: parseInt(s,10)});
+    }
+  }
+  for(let i=pool.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  return pool.slice(0,count);
+}
+// 2) whole ÷ multiples of scale (e.g., 450 ÷ 50) -> ensure integer answers
+function generateScaleWholeDividesByMultiples(scales, count){
+  const pool = [];
+  for(let s of scales){
+    for(let i=0;i<Math.ceil(count*2);i++){
+      const digit = Math.floor(Math.random()*9) + 1; // 1..9
+      const multiple = digit * parseInt(s,10); // e.g., 50, 200, 3000
+      // choose quotient up to 1000
+      const quotient = Math.floor(Math.random()*1001); // 0..1000
+      const dividend = quotient * multiple;
+      pool.push({x: dividend, y: multiple});
+    }
+  }
+  for(let i=pool.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  return pool.slice(0,count);
+}
+// 3) decimals and whole ÷ scale -> allow decimal answers up to 3 dp
+function generateScaleDecimalsDividedByScale(scales, count){
+  const pool = [];
+  for(let s of scales){
+    for(let i=0;i<Math.ceil(count*2);i++){
+      // allow dividend to be whole or decimal; to produce quotient with <=3 dp, we'll pick
+      // a numerator that is a multiple of (scale / 10^k) where k <=3
+      const dp = Math.floor(Math.random()*4); // 0..3 decimal places for dividend
+      const factor = Math.pow(10, dp);
+      // choose a quotient up to 1000 with up to 3 dp
+      const quotient = Math.round((Math.random()*1000) * Math.pow(10, Math.floor(Math.random()*3)))/Math.pow(10, Math.floor(Math.random()*3));
+      // dividend = quotient * scale
+      const dividend = Math.round(quotient * parseInt(s,10) * factor) / factor;
+      pool.push({x: dividend, y: parseInt(s,10), decimalPlaces: Math.min(3, dp)});
+    }
+  }
+  for(let i=pool.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  return pool.slice(0,count);
+}
+// 4) decimals and whole ÷ multiples of scale -> allow decimal answers up to 3 dp
+function generateScaleDecimalsDividedByMultiples(scales, count){
+  const pool = [];
+  for(let s of scales){
+    for(let i=0;i<Math.ceil(count*2);i++){
+      const digit = Math.floor(Math.random()*9) + 1; // 1..9
+      const multiple = digit * parseInt(s,10);
+      const dp = Math.floor(Math.random()*4); // 0..3
+      const factor = Math.pow(10, dp);
+      const quotient = Math.round((Math.random()*1000) * Math.pow(10, Math.floor(Math.random()*3)))/Math.pow(10, Math.floor(Math.random()*3));
+      const dividend = Math.round(quotient * multiple * factor) / factor;
+      pool.push({x: dividend, y: multiple, decimalPlaces: Math.min(3, dp)});
+    }
+  }
+  for(let i=pool.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  return pool.slice(0,count);
+}
 function generateAdditionProblems(maxValue, count){
   let pool = [];
+  // support integer ranges or decimal-up-to-3 option (maxValue may be a float like 999.999)
+  const isDecimalMode = String(maxValue).includes('.');
+  // determine decimal places from the UI when in decimal mode
+  const decimalPlacesEl = document.getElementById('addition-decimal-places');
+  const defaultPlaces = 3;
+  const places = decimalPlacesEl ? parseInt(decimalPlacesEl.value, 10) : defaultPlaces;
   for(let i=0;i<count*3;i++){
-    const a = Math.floor(Math.random()*(maxValue+1));
-    const b = Math.floor(Math.random()*(maxValue+1));
-    pool.push({x:a,y:b});
+    if(isDecimalMode){
+      // generate two numbers where each has a random decimal length between 1 and 'places'
+      const max = parseFloat(maxValue);
+      const ka = Math.floor(Math.random()*places) + 1; // 1..places
+      const kb = Math.floor(Math.random()*places) + 1; // 1..places
+      const factorA = Math.pow(10, ka);
+      const factorB = Math.pow(10, kb);
+      const a = Math.round(Math.random() * max * factorA) / factorA;
+      const b = Math.round(Math.random() * max * factorB) / factorB;
+      const probPlaces = Math.max(ka, kb);
+      pool.push({x:a,y:b, decimalPlaces:probPlaces});
+    } else {
+      const a = Math.floor(Math.random()*(parseInt(maxValue)+1));
+      const b = Math.floor(Math.random()*(parseInt(maxValue)+1));
+      pool.push({x:a,y:b});
+    }
   }
   for(let i=pool.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
   return pool.slice(0,count);
 }
 function generateSubtractionProblems(maxValue, count){
   let pool = [];
+  const isDecimalMode = String(maxValue).includes('.');
+  // determine decimal places from UI when in decimal mode
+  const decimalPlacesEl = document.getElementById('subtraction-decimal-places');
+  const defaultPlaces = 3;
+  const places = decimalPlacesEl ? parseInt(decimalPlacesEl.value, 10) : defaultPlaces;
   for(let i=0;i<count*3;i++){
-    const a = Math.floor(Math.random()*(maxValue+1));
-    const b = Math.floor(Math.random()*(maxValue+1));
-    const x = Math.max(a,b); const y = Math.min(a,b);
-    pool.push({x:x,y:y});
+    if(isDecimalMode){
+      const max = parseFloat(maxValue);
+      const factor = Math.pow(10, places);
+      const a = Math.round(Math.random() * max * factor) / factor;
+      const b = Math.round(Math.random() * max * factor) / factor;
+      const x = Math.max(a,b); const y = Math.min(a,b);
+      pool.push({x:x,y:y, decimalPlaces:places});
+    } else {
+      const a = Math.floor(Math.random()*(parseInt(maxValue)+1));
+      const b = Math.floor(Math.random()*(parseInt(maxValue)+1));
+      const x = Math.max(a,b); const y = Math.min(a,b);
+      pool.push({x:x,y:y});
+    }
   }
   for(let i=pool.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
   return pool.slice(0,count);
@@ -193,24 +405,45 @@ let gameMode = 'mult';
 // --- Game flow ---
 function startGame(){
   let mode = 'mult';
-  if(divisionControls.style.display === 'block') mode = 'div';
-  if(additionControls.style.display === 'block') mode = 'add';
-  if(subtractionControls.style.display === 'block') mode = 'sub';
+  if(scaleMultiplicationControls.style.display === 'block') mode = 'scale-mult';
+  else if(scaleDivisionControls.style.display === 'block') mode = 'scale-div';
+  else if(divisionControls.style.display === 'block') mode = 'div';
+  else if(additionControls.style.display === 'block') mode = 'add';
+  else if(subtractionControls.style.display === 'block') mode = 'sub';
   gameMode = mode;
   if(mode === 'mult'){
     const tables = getSelectedTables(); if(tables.length===0){ alert('Select at least one times table!'); return; }
     const count = getMonsterCount(); problems = generateProblems(tables, count);
+  } else if(mode === 'scale-mult'){
+    // By default test all three scales: 10, 100, 1000
+    const scales = [10,100,1000];
+    const count = getScaleMonsterCount();
+    // read difficulty
+    const sd = document.getElementsByName('scale-diff'); let scaleDiff = 'scale-whole'; for(const r of sd) if(r.checked) scaleDiff = r.value;
+  if(scaleDiff === 'scale-whole') problems = generateScaleMultiplicationProblems(scales, count);
+  else if(scaleDiff === 'scale-mults') problems = generateScaleMultiplesTimesWhole(scales, count);
+  else if(scaleDiff === 'scale-dec') problems = generateScaleTimesDecimals(scales, count);
+  else if(scaleDiff === 'scale-mult-dec') problems = generateScaleMultiplesTimesDecimals(scales, count);
+  } else if(mode === 'scale-div'){
+    const scales = [10,100,1000];
+    const count = parseInt(document.getElementById('scale-div-monster-count') ? document.getElementById('scale-div-monster-count').value : 10,10);
+    // read difficulty selection for scale division
+    const sdd = document.getElementsByName('scale-div-diff'); let scaleDivDiff = 'scale-div-whole'; for(const r of sdd) if(r.checked) scaleDivDiff = r.value;
+    if(scaleDivDiff === 'scale-div-whole') problems = generateScaleWholeDivides(scales, count);
+    else if(scaleDivDiff === 'scale-div-mults') problems = generateScaleWholeDividesByMultiples(scales, count);
+    else if(scaleDivDiff === 'scale-div-dec') problems = generateScaleDecimalsDividedByScale(scales, count);
+    else if(scaleDivDiff === 'scale-div-mult-dec') problems = generateScaleDecimalsDividedByMultiples(scales, count);
   } else if(mode === 'div'){
     const divisors = Array.from(document.getElementById('divisor-group').querySelectorAll('input[type="checkbox"]:checked')).map(cb=>parseInt(cb.value));
     if(divisors.length===0){ alert('Select at least one divisor!'); return; }
     const count = parseInt(document.getElementById('division-monster-count').value);
     problems = generateDivisionProblems(divisors, count);
   } else if(mode === 'add'){
-    const radios = document.getElementsByName('add-diff'); let maxVal = 100; for(const r of radios) if(r.checked) maxVal = parseInt(r.value);
+    const radios = document.getElementsByName('add-diff'); let maxVal = 100; for(const r of radios) if(r.checked) maxVal = parseFloat(r.value);
     const addCountEl = document.getElementById('addition-monster-count'); const count = addCountEl ? parseInt(addCountEl.value) : getMonsterCount();
     problems = generateAdditionProblems(maxVal, count);
   } else if(mode === 'sub'){
-    const radios = document.getElementsByName('sub-diff'); let maxVal = 100; for(const r of radios) if(r.checked) maxVal = parseInt(r.value);
+    const radios = document.getElementsByName('sub-diff'); let maxVal = 100; for(const r of radios) if(r.checked) maxVal = parseFloat(r.value);
     const subCountEl = document.getElementById('subtraction-monster-count'); const count = subCountEl ? parseInt(subCountEl.value) : getMonsterCount();
     problems = generateSubtractionProblems(maxVal, count);
   }
@@ -225,31 +458,58 @@ function nextQuestion(){
   attemptsLeft = 3; monster = getRandomMonster(); const prob = problems[currentIdx];
   monsterNameEl.textContent = monster.name;
   monsterImgEl.innerHTML = monster.img;
-  const operator = gameMode === 'mult' ? '×' : (gameMode === 'div' ? '÷' : (gameMode === 'sub' ? '−' : '+'));
-  questionArea.textContent = `${prob.x} ${operator} ${prob.y} = ?`;
+  const operator = (gameMode === 'mult' || gameMode === 'scale-mult') ? '×' : ((gameMode === 'div' || gameMode === 'scale-div') ? '÷' : (gameMode === 'sub' ? '−' : '+'));
+  // helper to format values according to problem precision
+  const formatForProblem = (val, p) => {
+    if(typeof val !== 'number') return String(val);
+    // Only apply decimal padding when the value is not an integer.
+    // This prevents showing scales like 10/100/1000 as 10.00/100.00/1000.00
+    if(p && p.decimalPlaces && !Number.isInteger(val)){
+      return val.toFixed(p.decimalPlaces);
+    }
+    return String(val);
+  };
+  questionArea.textContent = `${formatForProblem(prob.x, prob)} ${operator} ${formatForProblem(prob.y, prob)} = ?`;
   answerInput.value = ''; feedbackEl.textContent = '';
   monsterCounterEl.textContent = `Monster ${currentIdx+1} of ${problems.length}`;
   attemptsRemainingEl.textContent = `Attempts left: ${attemptsLeft}`; scoreTrackerEl.textContent = `Score: ${score}`;
   answerInput.focus();
-  const factKey = gameMode === 'mult' ? `${prob.x}×${prob.y}` : (gameMode === 'div' ? `${prob.x}÷${prob.y}` : (gameMode === 'sub' ? `${prob.x}-${prob.y}` : `${prob.x}+${prob.y}`));
+  const factKey = (gameMode === 'mult' || gameMode === 'scale-mult') ? `${prob.x}×${prob.y}` : ((gameMode === 'div' || gameMode === 'scale-div') ? `${prob.x}÷${prob.y}` : (gameMode === 'sub' ? `${prob.x}-${prob.y}` : `${prob.x}+${prob.y}`));
   attemptedFacts[factKey] = (attemptedFacts[factKey]||0)+1;
 }
 
 function checkAnswer(){
   const prob = problems[currentIdx]; let correct;
-  if(gameMode === 'mult') correct = prob.x * prob.y;
-  else if(gameMode === 'div') correct = prob.x / prob.y;
+  if(gameMode === 'mult' || gameMode === 'scale-mult') correct = prob.x * prob.y;
+  else if(gameMode === 'div' || gameMode === 'scale-div') correct = prob.x / prob.y;
   else if(gameMode === 'sub') correct = prob.x - prob.y;
   else correct = prob.x + prob.y;
-  const userAns = parseInt(answerInput.value);
-  if(userAns===correct){ score++; feedbackEl.textContent = 'Monster defeated!'; feedbackEl.style.color = '#3bb273';
+  // parse user answer: allow integer or float (for decimal addition mode)
+  const raw = answerInput.value.trim();
+  const userAns = raw === '' ? NaN : (raw.includes('.') ? parseFloat(raw) : parseInt(raw, 10));
+  // determine epsilon based on decimal places (if present on problem)
+  const eps = (prob && prob.decimalPlaces) ? Math.pow(10, -prob.decimalPlaces) / 2 : 1e-3;
+  const nearlyEqual = (a,b,epsVal=eps)=> Math.abs(a-b) <= epsVal;
+  if((typeof correct === 'number') && !isNaN(userAns) && (Number.isInteger(correct) ? userAns === correct : nearlyEqual(userAns, correct))){ score++; feedbackEl.textContent = 'Monster defeated!'; feedbackEl.style.color = '#3bb273';
     gameScreen.classList.add('monster-defeat'); setTimeout(()=>{ gameScreen.classList.remove('monster-defeat'); currentIdx++; nextQuestion(); },700);
   } else {
-    attemptsLeft--; feedbackEl.textContent = attemptsLeft>0 ? `Try again! (${attemptsLeft} attempts left)` : `Monster escapes! The correct answer was ${correct}.`;
+    attemptsLeft--;
+    // format answers: when decimalPlaces is provided, show the minimal representation
+    const formatAns = (val, p) => {
+      if(p && typeof p.decimalPlaces === 'number'){
+        // use toFixed for consistent rounding then trim unnecessary trailing zeros
+        const fixed = Number(val).toFixed(p.decimalPlaces);
+        // trim trailing zeros after decimal point, then remove trailing dot if any
+        const trimmed = fixed.replace(/(\.\d*?[1-9])0+$/,'$1').replace(/\.0+$/,'').replace(/\.$/,'');
+        return trimmed;
+      }
+      return Number.isInteger(val) ? String(val) : String(val);
+    };
+    feedbackEl.textContent = attemptsLeft>0 ? `Try again! (${attemptsLeft} attempts left)` : `Monster escapes! The correct answer was ${formatAns(correct, prob)}.`;
     feedbackEl.style.color = attemptsLeft>0 ? '#e94f37' : '#7c5e3c'; attemptsRemainingEl.textContent = `Attempts left: ${attemptsLeft}`;
-    const factKey = gameMode === 'mult' ? `${prob.x}×${prob.y}` : (gameMode === 'div' ? `${prob.x}÷${prob.y}` : (gameMode === 'sub' ? `${prob.x}-${prob.y}` : `${prob.x}+${prob.y}`));
+  const factKey = (gameMode === 'mult' || gameMode === 'scale-mult') ? `${prob.x}×${prob.y}` : ((gameMode === 'div' || gameMode === 'scale-div') ? `${prob.x}÷${prob.y}` : (gameMode === 'sub' ? `${prob.x}-${prob.y}` : `${prob.x}+${prob.y}`));
     errorFacts[factKey] = (errorFacts[factKey]||0)+1;
-    if(gameMode === 'add' || gameMode === 'sub'){ const parsed = parseInt(answerInput.value); if(!isNaN(parsed)) wrongExample[factKey] = parsed; }
+  if(gameMode === 'add' || gameMode === 'sub'){ const parsed = raw.includes('.') ? parseFloat(raw) : parseInt(raw,10); if(!isNaN(parsed)) wrongExample[factKey] = parsed; }
     if(attemptsLeft<=0){ setTimeout(()=>{ currentIdx++; nextQuestion(); },900); } else { gameScreen.classList.add('shake'); setTimeout(()=>gameScreen.classList.remove('shake'),400); }
   }
 }
@@ -258,9 +518,18 @@ answerInput.addEventListener('keydown', function(e){ if(e.key==='Enter') checkAn
 
 giveupBtn.addEventListener('click', function(){
   const prob = problems[currentIdx]; let correct;
-  if(gameMode === 'mult') correct = prob.x * prob.y; else if(gameMode === 'div') correct = prob.x / prob.y; else if(gameMode === 'sub') correct = prob.x - prob.y; else correct = prob.x + prob.y;
-  feedbackEl.textContent = `Monster escapes! The correct answer was ${correct}.`; feedbackEl.style.color = '#7c5e3c';
-  const factKey = gameMode === 'mult' ? `${prob.x}×${prob.y}` : (gameMode === 'div' ? `${prob.x}÷${prob.y}` : (gameMode === 'sub' ? `${prob.x}-${prob.y}` : `${prob.x}+${prob.y}`));
+  if(gameMode === 'mult' || gameMode === 'scale-mult') correct = prob.x * prob.y; else if(gameMode === 'div' || gameMode === 'scale-div') correct = prob.x / prob.y; else if(gameMode === 'sub') correct = prob.x - prob.y; else correct = prob.x + prob.y;
+  // format correct answer according to precision if present
+  const formatAns = (val, p) => {
+    if(p && typeof p.decimalPlaces === 'number'){
+      const fixed = Number(val).toFixed(p.decimalPlaces);
+      const trimmed = fixed.replace(/(\.\d*?[1-9])0+$/,'$1').replace(/\.0+$/,'').replace(/\.$/,'');
+      return trimmed;
+    }
+    return Number.isInteger(val) ? String(val) : String(val);
+  };
+  feedbackEl.textContent = `Monster escapes! The correct answer was ${formatAns(correct, prob)}.`; feedbackEl.style.color = '#7c5e3c';
+  const factKey = (gameMode === 'mult' || gameMode === 'scale-mult') ? `${prob.x}×${prob.y}` : ((gameMode === 'div' || gameMode === 'scale-div') ? `${prob.x}÷${prob.y}` : (gameMode === 'sub' ? `${prob.x}-${prob.y}` : `${prob.x}+${prob.y}`));
   errorFacts[factKey] = (errorFacts[factKey]||0)+1; if(gameMode === 'add' || gameMode === 'sub') wrongExample[factKey] = correct;
   setTimeout(()=>{ currentIdx++; nextQuestion(); },900);
 });
@@ -270,14 +539,18 @@ function showResults(){
   gameScreen.style.display = 'none';
   // determine effective mode from recorded keys if possible
   let mode = gameMode;
+  // normalize scale modes to base modes so results use correct labels
+  if(mode === 'scale-mult') mode = 'mult';
+  if(mode === 'scale-div') mode = 'div';
   const attemptedKeys = Object.keys(attemptedFacts || {});
   const errorKeys = Object.keys(errorFacts || {});
   const combined = attemptedKeys.concat(errorKeys);
   if(combined.length>0){
-    if(combined.some(k=>k.includes('-'))) mode = 'sub';
-    else if(combined.some(k=>k.includes('+'))) mode = 'add';
+    // prefer multiplication/division indicators over +/- when mixed keys exist
+    if(combined.some(k=>k.includes('×')||k.includes('*'))) mode = 'mult';
     else if(combined.some(k=>k.includes('÷')||k.includes('/'))) mode = 'div';
-    else if(combined.some(k=>k.includes('×')||k.includes('*'))) mode = 'mult';
+    else if(combined.some(k=>k.includes('+'))) mode = 'add';
+    else if(combined.some(k=>k.includes('-'))) mode = 'sub';
   }
   let resultHtml = `<div class='container' style='background:#f5ecd6; border:4px solid #7c5e3c; box-shadow:0 0 0 8px #c2b280;'>`;
   resultHtml += `<h2 style='font-family:Cinzel,serif;color:#e94f37;'>Dungeon Results</h2>`;
@@ -371,29 +644,49 @@ function showResults(){
 
 // --- Quick tests ---
 function runQuickTests(){
-  const testMode = document.getElementById('op-add').classList.contains('selected') ? 'add'
+  const testMode = document.getElementById('op-scale-mult').classList.contains('selected') ? 'scale-mult'
+                 : (document.getElementById('op-scale-div').classList.contains('selected') ? 'scale-div'
+                 : (document.getElementById('op-add').classList.contains('selected') ? 'add'
                  : (document.getElementById('op-sub').classList.contains('selected') ? 'sub'
-                 : (document.getElementById('op-div').classList.contains('selected') ? 'div' : 'mult'));
+                 : (document.getElementById('op-div').classList.contains('selected') ? 'div' : 'mult'))));
   gameMode = testMode;
   let problemsToUse = [];
   if(gameMode === 'mult'){
     const tables = getSelectedTables(); const useTables = tables.length ? tables.slice(0,2) : [2,3]; problemsToUse = generateProblems(useTables, 6);
+  } else if(gameMode === 'scale-mult'){
+    const scales = [10,100,1000];
+  const sd = document.getElementsByName('scale-diff'); let scaleDiff = 'scale-whole'; for(const r of sd) if(r.checked) scaleDiff = r.value;
+  if(scaleDiff === 'scale-whole') problemsToUse = generateScaleMultiplicationProblems(scales, 6);
+  else if(scaleDiff === 'scale-mults') problemsToUse = generateScaleMultiplesTimesWhole(scales, 6);
+  else if(scaleDiff === 'scale-dec') problemsToUse = generateScaleTimesDecimals(scales, 6);
+  else problemsToUse = generateScaleMultiplesTimesDecimals(scales, 6);
+  } else if(gameMode === 'scale-div'){
+    const scales = [10,100,1000];
+    const sdd = document.getElementsByName('scale-div-diff'); let scaleDivDiff = 'scale-div-whole'; for(const r of sdd) if(r.checked) scaleDivDiff = r.value;
+    if(scaleDivDiff === 'scale-div-whole') problemsToUse = generateScaleWholeDivides(scales, 6);
+    else if(scaleDivDiff === 'scale-div-mults') problemsToUse = generateScaleWholeDividesByMultiples(scales, 6);
+    else if(scaleDivDiff === 'scale-div-dec') problemsToUse = generateScaleDecimalsDividedByScale(scales, 6);
+    else problemsToUse = generateScaleDecimalsDividedByMultiples(scales, 6);
   } else if(gameMode === 'div'){
     const divisors = Array.from(document.getElementById('divisor-group').querySelectorAll('input[type="checkbox"]:checked')).map(cb=>parseInt(cb.value)); const useDivs = divisors.length ? divisors.slice(0,2) : [3,4]; problemsToUse = generateDivisionProblems(useDivs, 6);
   } else {
     let maxVal = 100;
-    if(gameMode === 'add'){ const radios = document.getElementsByName('add-diff'); for(const r of radios) if(r.checked) maxVal = parseInt(r.value); problemsToUse = generateAdditionProblems(maxVal, 6); }
-    else { const radios = document.getElementsByName('sub-diff'); for(const r of radios) if(r.checked) maxVal = parseInt(r.value); problemsToUse = generateSubtractionProblems(maxVal, 6); }
+  if(gameMode === 'add'){ const radios = document.getElementsByName('add-diff'); for(const r of radios) if(r.checked) maxVal = parseFloat(r.value); problemsToUse = generateAdditionProblems(maxVal, 6); }
+  else { const radios = document.getElementsByName('sub-diff'); for(const r of radios) if(r.checked) maxVal = parseFloat(r.value); problemsToUse = generateSubtractionProblems(maxVal, 6); }
   }
   problems = problemsToUse; currentIdx = 0; score = 0; errorFacts = {}; attemptedFacts = {}; startScreen.style.display='none'; gameScreen.style.display='';
   for(let i=0;i<problems.length;i++){
     const prob = problems[i]; let correct; let factKey;
-    if(gameMode === 'mult'){ correct = prob.x * prob.y; factKey = `${prob.x}×${prob.y}`; }
-    else if(gameMode === 'div'){ correct = prob.x / prob.y; factKey = `${prob.x}÷${prob.y}`; }
+    if(gameMode === 'mult' || gameMode === 'scale-mult'){ correct = prob.x * prob.y; factKey = `${prob.x}×${prob.y}`; }
+    else if(gameMode === 'div' || gameMode === 'scale-div'){ correct = prob.x / prob.y; factKey = `${prob.x}÷${prob.y}`; }
     else if(gameMode === 'add'){ correct = prob.x + prob.y; factKey = `${prob.x}+${prob.y}`; }
     else { correct = prob.x - prob.y; factKey = `${prob.x}-${prob.y}`; }
     const giveWrong = (i%2===0);
-    if(giveWrong){ errorFacts[factKey] = (errorFacts[factKey]||0)+1; if(gameMode === 'add' || gameMode === 'sub') wrongExample[factKey]=Math.max(0, correct-10); }
+    if(giveWrong){ errorFacts[factKey] = (errorFacts[factKey]||0)+1; if(gameMode === 'add' || gameMode === 'sub'){
+        if(prob.decimalPlaces){ wrongExample[factKey] = Math.max(0, Math.round((correct - 10) * Math.pow(10, prob.decimalPlaces)) / Math.pow(10, prob.decimalPlaces)); }
+        else { wrongExample[factKey] = Math.max(0, correct-10); }
+      }
+    }
     else score++; currentIdx = i+1;
   }
   showResults(); document.getElementById('test-results').innerHTML = 'Simulation complete — results shown.';
