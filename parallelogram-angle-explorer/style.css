@@ -123,3 +123,24 @@ body {
     height: auto !important;
   }
 }
+
+/* Visual indicator when shape is clamped at bounds */
+.clamped {
+  box-shadow: 0 0 18px rgba(211,47,47,0.25), 0 2px 8px rgba(0,0,0,0.08) !important;
+  border-color: #d32f2f !important;
+}
+
+/* Visual hint for the anchored side during trapezium drag */
+.anchored {
+  opacity: 0.45 !important;
+  transition: opacity 0.12s;
+}
+
+/* Arrow markers to indicate parallel sides in trapezium mode */
+.parallel-arrow {
+  fill: rgba(25,118,210,0.95);
+  stroke: rgba(25,118,210,0.95);
+  stroke-width: 0.5px;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.12));
+  pointer-events: none;
+}

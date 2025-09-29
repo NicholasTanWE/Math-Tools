@@ -122,6 +122,18 @@ document.getElementById('op-add').addEventListener('click',()=>{
   document.getElementById('op-div').classList.remove('selected');
   additionControls.style.display = 'block';
 });
+// show/hide addition decimal select only when decimal radio is selected
+{
+  const addRadios = document.getElementsByName('add-diff');
+  const addDecimalEl = document.getElementById('addition-decimal-places').parentElement;
+  function updateAddDecimalVisibility(){
+    let isDecimal = false; for(const r of addRadios) if(r.checked && r.value === '999.999') isDecimal = true;
+    addDecimalEl.style.display = isDecimal ? 'block' : 'none';
+  }
+  addRadios.forEach(r=>r.addEventListener('change', updateAddDecimalVisibility));
+  // initial state
+  updateAddDecimalVisibility();
+}
 document.getElementById('op-sub').addEventListener('click',()=>{
   multiplicationControls.style.display = 'none';
   scaleMultiplicationControls.style.display = 'none';
@@ -135,6 +147,18 @@ document.getElementById('op-sub').addEventListener('click',()=>{
   opSubBtn.classList.add('selected');
   subtractionControls.style.display = 'block';
 });
+// show/hide subtraction decimal select only when decimal radio is selected
+{
+  const subRadios = document.getElementsByName('sub-diff');
+  const subDecimalEl = document.getElementById('subtraction-decimal-places').parentElement;
+  function updateSubDecimalVisibility(){
+    let isDecimal = false; for(const r of subRadios) if(r.checked && r.value === '999.999') isDecimal = true;
+    subDecimalEl.style.display = isDecimal ? 'block' : 'none';
+  }
+  subRadios.forEach(r=>r.addEventListener('change', updateSubDecimalVisibility));
+  // initial state
+  updateSubDecimalVisibility();
+}
 const divisorGroup = document.getElementById('divisor-group');
 for(let i=1;i<=10;i++){
   const label = document.createElement('label');
