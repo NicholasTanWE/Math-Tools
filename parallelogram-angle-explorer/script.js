@@ -138,7 +138,7 @@ function renderParallelogram() {
 
   // Draw parallel / direction arrows based on the selected shape.
   // - Trapezium: arrows on AB (A->B) and CD (D->C => flipped)
-  // - Rhombus: arrows on AD (A->D) and BC (B->C)
+  // - Rhombus: arrows on AB (A->B), CD (D->C flipped), AD (A->D flipped), BC (B->C)
   // - Parallelogram: arrows on AB (A->B), CD (D->C flipped), AD (A->D flipped), BC (B->C)
   if (currentShape === 'trapezium' || currentShape === 'rhombus' || currentShape === 'parallelogram'){
     const arrowBase = Math.min(bounds.width, bounds.height);
@@ -149,10 +149,11 @@ function renderParallelogram() {
       sideIndices = [0,2];
       dirMul[0] = 1; dirMul[2] = -1; // flip CD
     } else if (currentShape === 'rhombus'){
+      // AB (A->B) is side index 0, CD (D->C) is side index 2 (flipped)
       // AD (A->D) corresponds to side index 3 but we want A->D so flip side3
       // BC is side index 1 and keeps natural direction B->C
-      sideIndices = [3,1];
-      dirMul[3] = -1; dirMul[1] = 1;
+      sideIndices = [0,2,3,1];
+      dirMul[0] = 1; dirMul[2] = -1; dirMul[3] = -1; dirMul[1] = 1;
     } else {
       // parallelogram: AB (0) A->B, CD (2) D->C (flip), AD (3) A->D (flip), BC (1) B->C
       sideIndices = [0,2,3,1];
