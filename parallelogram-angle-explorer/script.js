@@ -730,61 +730,6 @@ const svgWrapperEl = document.getElementById('svg-wrapper');
 const placeholderNote = document.getElementById('placeholder-note');
 const resetBtn = document.getElementById('reset-btn');
 
-// Angle input elements (added in HTML)
-const angleACInput = document.getElementById('angle-ac'); // Angle BAD and DCB (A & C)
-const angleBDInput = document.getElementById('angle-bd'); // Angle ABC and ADC (B & D)
-const updateACBtn = document.getElementById('update-ac');
-const updateBDBtn = document.getElementById('update-bd');
-
-// Helper: convert degrees to radians
-function deg2rad(d){ return d * Math.PI / 180; }
-
-// Build a parallelogram given A position, side lengths AB and AD, and angle at A (between AB and AD)
-// Points order: A (0), B (1), C (2), D (3)
-function buildParallelogramFromA(A, lenAB, lenAD, angleAdeg){
-  const ang = deg2rad(angleAdeg);
-  const B = { x: A.x + lenAB, y: A.y }; // build AB horizontally then rotate whole shape to match angle
-  // Instead we'll place AB along +x and AD at angle ang from AB
-  const B2 = { x: A.x + lenAB, y: A.y };
-  const D = { x: A.x + lenAD * Math.cos(ang), y: A.y + lenAD * Math.sin(ang) };
-  const C = { x: B2.x + (D.x - A.x), y: B2.y + (D.y - A.y) };
-  return [A, B2, C, D];
-}
-
-// Given desired opposite angles at A and C, update the current parallelogram while preserving parallelism
-function updateParallelogramByAC(angleAdeg, angleCdeg){
-  // For a parallelogram, angleA + angleB = 180 and opposite angles equal: angleA == angleC
-  // We will enforce angleAdeg and angleCdeg to be equal by averaging; but user supplies both - we'll check and use average
-  let a = clamp(Number(angleAdeg) || 0, 1, 179);
-  let c = clamp(Number(angleCdeg) || 0, 1, 179);
-  const avg = Math.round((a + c)/2);
-  a = c = avg;
-  // Keep A near its current position (points[0]). Determine side lengths from current AB and AD
-  const A = { x: points[0].x, y: points[0].y };
-  let lenAB = distance(points[0], points[1]);
-  let lenAD = distance(points[0], points[3]);
-  // Rebuild using angle at A
-  points = buildParallelogramFromA(A, lenAB, lenAD, a);
-  renderParallelogram();
-}
-
-// Given desired opposite angles at B and D, update parallelogram
-function updateParallelogramByBD(angleBdeg, angleDdeg){
-  // Opposite B and D should be equal; average inputs
-  let b = clamp(Number(angleBdeg) || 0, 1, 179);
-  let d = clamp(Number(angleDdeg) || 0, 1, 179);
-  const avg = Math.round((b + d)/2);
-  b = d = avg;
-  // Use relationship angleA = 180 - angleB
-  const angleA = 180 - b;
-  // Use current side lengths
-  const A = { x: points[0].x, y: points[0].y };
-  let lenAB = distance(points[0], points[1]);
-  let lenAD = distance(points[0], points[3]);
-  points = buildParallelogramFromA(A, lenAB, lenAD, angleA);
-  renderParallelogram();
-}
-
 function setControlsEnabled(enabled){
   ['ab-plus','ab-minus','ad-plus','ad-minus'].forEach(id=>{
     const el = document.getElementById(id); if(!el) return;
@@ -873,22 +818,3 @@ btnTrap.addEventListener('click', ()=>{
 
 // Ensure controls are initially disabled and svg hidden until selection
 setControlsEnabled(false);
-
-// Wire up new angle update buttons if present
-if (updateACBtn) {
-  updateACBtn.addEventListener('click', ()=>{
-    const val = Number(angleACInput.value);
-    if (!val || val < 1 || val > 179) { angleACInput.classList.add('invalid'); return; }
-    angleACInput.classList.remove('invalid');
-    // Update only in parallelogram or rhombus mode
-    if (currentShape === 'parallelogram' || currentShape === 'rhombus') updateParallelogramByAC(val, val);
-  });
-}
-if (updateBDBtn) {
-  updateBDBtn.addEventListener('click', ()=>{
-    const val = Number(angleBDInput.value);
-    if (!val || val < 1 || val > 179) { angleBDInput.classList.add('invalid'); return; }
-    angleBDInput.classList.remove('invalid');
-    if (currentShape === 'parallelogram' || currentShape === 'rhombus') updateParallelogramByBD(val, val);
-  });
-}
