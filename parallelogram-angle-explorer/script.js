@@ -66,6 +66,299 @@ function clamp(val, min, max) {
   return Math.max(min, Math.min(max, val));
 }
 
+// Draw a single parallel-direction arrow for a side defined by p1->p2.
+// svg: SVG element to append into
+// p1,p2: endpoints
+// arrowLen: visual length used for sizing the arrow
+// id: element id
+// dm: direction multiplier (1 or -1) to flip the arrow direction
+function drawParallelArrow(svg, p1, p2, arrowLen, id, dm = 1) {
+  const mid = { x: (p1.x + p2.x)/2, y: (p1.y + p2.y)/2 };
+  const vx = p2.x - p1.x; const vy = p2.y - p1.y;
+  const mag = Math.sqrt(vx*vx + vy*vy) || 1;
+  const ux = vx / mag; const uy = vy / mag;
+  const perp = { x: -uy, y: ux };
+  const tip = { x: mid.x + ux * (arrowLen/2) * dm, y: mid.y + uy * (arrowLen/2) * dm };
+  const baseCenter = { x: mid.x - ux * (arrowLen/2) * dm, y: mid.y - uy * (arrowLen/2) * dm };
+  const left = { x: baseCenter.x + perp.x * (arrowLen/4), y: baseCenter.y + perp.y * (arrowLen/4) };
+  const right = { x: baseCenter.x - perp.x * (arrowLen/4), y: baseCenter.y - perp.y * (arrowLen/4) };
+  const arrow = document.createElementNS(svgNS, 'polygon');
+  arrow.setAttribute('points', `${tip.x},${tip.y} ${left.x},${left.y} ${right.x},${right.y}`);
+  arrow.setAttribute('class', 'parallel-arrow');
+  arrow.setAttribute('pointer-events','none');
+  arrow.setAttribute('id', id);
+  svg.appendChild(arrow);
+}
+
+// Drag state (kept global for compatibility with render logic)
+let dragSideIdx = null;
+let dragStart = null;
+let dragVec = null;
+
+// DragManager groups the side-drag logic (start, move, end)
+const DragManager = {
+  start(e, sideIdx) {
+    dragSideIdx = sideIdx;
+    dragStart = {x: e.clientX, y: e.clientY, points: JSON.parse(JSON.stringify(points))};
+    const p1 = dragStart.points[sideIdx];
+    const p2 = dragStart.points[(sideIdx+1)%4];
+    dragVec = {x: p2.x - p1.x, y: p2.y - p1.y};
+    document.addEventListener('pointermove', DragManager.onMove);
+    document.addEventListener('pointerup', DragManager.end);
+    if (currentShape === 'trapezium'){
+      let anchoredIdx = (sideIdx === 0) ? 2 : (sideIdx === 2 ? 0 : null);
+      if (anchoredIdx !== null){
+        const anchoredEl = document.getElementById(`side-${anchoredIdx}`);
+        if (anchoredEl) anchoredEl.classList.add('anchored');
+      }
+    }
+  },
+  onMove(e) {
+    if (dragSideIdx === null) return;
+    // The body below is identical to the previous onSideDrag implementation
+    let dx = e.clientX - dragStart.x;
+    let dy = e.clientY - dragStart.y;
+    let tempPoints = dragStart.points.map(p => ({...p}));
+    let i1 = dragSideIdx;
+    let i2 = (dragSideIdx+1)%4;
+    const b = getBounds(40);
+    const allowedDxMin = Math.max(b.minX - dragStart.points[i1].x, b.minX - dragStart.points[i2].x);
+    const allowedDxMax = Math.min(b.maxX - dragStart.points[i1].x, b.maxX - dragStart.points[i2].x);
+    const allowedDyMin = Math.max(b.minY - dragStart.points[i1].y, b.minY - dragStart.points[i2].y);
+    const allowedDyMax = Math.min(b.maxY - dragStart.points[i1].y, b.maxY - dragStart.points[i2].y);
+    const ndx = clamp(dx, allowedDxMin, allowedDxMax);
+    const ndy = clamp(dy, allowedDyMin, allowedDyMax);
+    const tentativeA = { x: dragStart.points[i1].x + ndx, y: dragStart.points[i1].y + ndy };
+    const tentativeB = { x: dragStart.points[i2].x + ndx, y: dragStart.points[i2].y + ndy };
+    const anchorAIdx = (i1+3)%4;
+    const anchorBIdx = (i2+1)%4;
+    const anchorA = dragStart.points[anchorAIdx];
+    const anchorB = dragStart.points[anchorBIdx];
+    const lenA = distance(dragStart.points[i1], anchorA);
+    const lenB = distance(dragStart.points[i2], anchorB);
+    const newA = projectToCircle(tentativeA, anchorA, lenA);
+    const newB = projectToCircle(tentativeB, anchorB, lenB);
+    tempPoints[i1] = newA;
+    tempPoints[i2] = newB;
+    let opp1 = (dragSideIdx+2)%4;
+    let opp2 = (dragSideIdx+3)%4;
+    tempPoints[opp1] = dragStart.points[opp1];
+    tempPoints[opp2] = dragStart.points[opp2];
+
+    if (currentShape === 'rhombus'){
+      const Aidx = i1; const Bidx = i2; const Cidx = opp1; const Didx = opp2;
+      const Apos = tempPoints[Aidx]; const Bpos = tempPoints[Bidx];
+      const Cpos = dragStart.points[Cidx]; const Dpos = dragStart.points[Didx];
+      const sideLen = Math.max(30, Math.sqrt((Bpos.x - Apos.x)**2 + (Bpos.y - Apos.y)**2));
+      const oppDir = { x: (Cpos.x - Dpos.x), y: (Cpos.y - Dpos.y) };
+      const oppMag = Math.sqrt(oppDir.x*oppDir.x + oppDir.y*oppDir.y) || 1;
+      const oppUnit = { x: oppDir.x/oppMag, y: oppDir.y/oppMag };
+      const newD = { x: Apos.x + oppUnit.x * sideLen, y: Apos.y + oppUnit.y * sideLen };
+      const newC = { x: Bpos.x + oppUnit.x * sideLen, y: Bpos.y + oppUnit.y * sideLen };
+      tempPoints[Aidx] = Apos; tempPoints[Bidx] = Bpos; tempPoints[Cidx] = newC; tempPoints[Didx] = newD;
+    }
+
+    if (currentShape === 'trapezium'){
+      if (i1 === 0) {
+        let A_tent = tempPoints[0]; let B_tent = tempPoints[1];
+        const C_anchor = dragStart.points[2]; const D_anchor = dragStart.points[3];
+        const cdDir = { x: C_anchor.x - D_anchor.x, y: C_anchor.y - D_anchor.y };
+        const cdMag = Math.sqrt(cdDir.x*cdDir.x + cdDir.y*cdDir.y) || 1;
+        const cdUnit = { x: cdDir.x / cdMag, y: cdDir.y / cdMag };
+        const normal = { x: -cdUnit.y, y: cdUnit.x };
+        const startDist = (dragStart.points[0].x - D_anchor.x) * normal.x + (dragStart.points[0].y - D_anchor.y) * normal.y;
+        const startSign = Math.sign(startDist) || 1;
+        const currDist = (A_tent.x - D_anchor.x) * normal.x + (A_tent.y - D_anchor.y) * normal.y;
+        const canvasScale = Math.min(b.width, b.height) / 600;
+        const epsilon = Math.max(1, 2 * canvasScale);
+        if (Math.sign(currDist) !== startSign) {
+          const desired = startSign * epsilon; const shift = desired - currDist;
+          A_tent = { x: A_tent.x + normal.x * shift, y: A_tent.y + normal.y * shift };
+          B_tent = { x: B_tent.x + normal.x * shift, y: B_tent.y + normal.y * shift };
+        }
+        const abLenTent = Math.sqrt((B_tent.x - A_tent.x)**2 + (B_tent.y - A_tent.y)**2);
+        const minLen = Math.max(20, 0.05 * Math.min(b.width, b.height));
+        if (abLenTent < minLen) B_tent = { x: A_tent.x + cdUnit.x * minLen, y: A_tent.y + cdUnit.y * minLen };
+        const tVec = { x: B_tent.x - A_tent.x, y: B_tent.y - A_tent.y };
+        const projLen = tVec.x * cdUnit.x + tVec.y * cdUnit.y;
+        const newB = { x: A_tent.x + cdUnit.x * projLen, y: A_tent.y + cdUnit.y * projLen };
+        const clampedA = { x: clamp(A_tent.x, b.minX, b.maxX), y: clamp(A_tent.y, b.minY, b.maxY) };
+        const clampedB = { x: clamp(newB.x, b.minX, b.maxX), y: clamp(newB.y, b.minY, b.maxY) };
+        tempPoints[0] = clampedA; tempPoints[1] = clampedB;
+        tempPoints[2] = { x: C_anchor.x, y: C_anchor.y }; tempPoints[3] = { x: D_anchor.x, y: D_anchor.y };
+        if (clampedA.x !== A_tent.x || clampedA.y !== A_tent.y || clampedB.x !== newB.x || clampedB.y !== newB.y) {
+          const svgWrap = document.getElementById('svg-wrapper'); svgWrap.classList.add('clamped'); setTimeout(()=>svgWrap.classList.remove('clamped'),700);
+        }
+      }
+      if (i1 === 2) {
+        let C_tent = tempPoints[2]; let D_tent = tempPoints[3];
+        const A_anchor = dragStart.points[0]; const B_anchor = dragStart.points[1];
+        const abDir = { x: B_anchor.x - A_anchor.x, y: B_anchor.y - A_anchor.y };
+        const abMag = Math.sqrt(abDir.x*abDir.x + abDir.y*abDir.y) || 1;
+        const abUnit = { x: abDir.x / abMag, y: abDir.y / abMag };
+        const tVec = { x: D_tent.x - C_tent.x, y: D_tent.y - C_tent.y };
+        const projLen = tVec.x * abUnit.x + tVec.y * abUnit.y;
+        const newD = { x: C_tent.x + abUnit.x * projLen, y: C_tent.y + abUnit.y * projLen };
+        const canvasScale = Math.min(b.width, b.height) / 600; const epsilon = Math.max(1, 2 * canvasScale);
+        const abDirCheck = abUnit; const abNormal = { x: -abDirCheck.y, y: abDirCheck.x };
+        const startDistCD = (dragStart.points[2].x - B_anchor.x) * abNormal.x + (dragStart.points[2].y - B_anchor.y) * abNormal.y;
+        const startSignCD = Math.sign(startDistCD) || 1; const currDistC = (C_tent.x - B_anchor.x) * abNormal.x + (C_tent.y - B_anchor.y) * abNormal.y;
+        if (Math.sign(currDistC) !== startSignCD) {
+          const desiredC = startSignCD * epsilon; const shiftC = desiredC - currDistC;
+          C_tent = { x: C_tent.x + abNormal.x * shiftC, y: C_tent.y + abNormal.y * shiftC };
+          newD.x += abNormal.x * shiftC; newD.y += abNormal.y * shiftC;
+        }
+        const cdLenTent = Math.sqrt((newD.x - C_tent.x)**2 + (newD.y - C_tent.y)**2);
+        const minLenCD = Math.max(20, 0.05 * Math.min(b.width, b.height));
+        if (cdLenTent < minLenCD) { newD.x = C_tent.x + abUnit.x * minLenCD; newD.y = C_tent.y + abUnit.y * minLenCD; }
+        const clampedC = { x: clamp(C_tent.x, b.minX, b.maxX), y: clamp(C_tent.y, b.minY, b.maxY) };
+        const clampedD = { x: clamp(newD.x, b.minX, b.maxX), y: clamp(newD.y, b.minY, b.maxY) };
+        tempPoints[2] = clampedC; tempPoints[3] = clampedD; tempPoints[0] = { x: A_anchor.x, y: A_anchor.y }; tempPoints[1] = { x: B_anchor.x, y: B_anchor.y };
+        if (clampedC.x !== C_tent.x || clampedC.y !== C_tent.y || clampedD.x !== newD.x || clampedD.y !== newD.y) { const svgWrap = document.getElementById('svg-wrapper'); svgWrap.classList.add('clamped'); setTimeout(()=>svgWrap.classList.remove('clamped'),700); }
+      }
+    }
+
+    if (currentShape !== 'trapezium') {
+      tempPoints[opp1] = dragStart.points[opp1]; tempPoints[opp2] = dragStart.points[opp2];
+    }
+
+    const tempAngles = [
+      angleAt(tempPoints[0], tempPoints[1], tempPoints[3]),
+      angleAt(tempPoints[1], tempPoints[2], tempPoints[0]),
+      angleAt(tempPoints[2], tempPoints[3], tempPoints[1]),
+      angleAt(tempPoints[3], tempPoints[0], tempPoints[2])
+    ];
+    if (tempAngles.every(a => a >= 30 && a <= 150)) {
+      points = tempPoints; renderParallelogram();
+    }
+  },
+  end() {
+    dragSideIdx = null; dragStart = null; dragVec = null;
+    document.removeEventListener('pointermove', DragManager.onMove);
+    document.removeEventListener('pointerup', DragManager.end);
+    ['side-0','side-1','side-2','side-3'].forEach(id=>{ const el = document.getElementById(id); if (el) el.classList.remove('anchored'); });
+  }
+};
+
+// Draw a visible side line and its invisible drag line. Preserves existing
+// color and drag behavior (trapezium restricts drag to sides 0 and 2).
+function drawSide(svg, p1, p2, i, shape) {
+  // Visible side
+  const sideLine = document.createElementNS(svgNS, 'line');
+  sideLine.setAttribute('id', `side-${i}`);
+  sideLine.setAttribute('x1', p1.x);
+  sideLine.setAttribute('y1', p1.y);
+  sideLine.setAttribute('x2', p2.x);
+  sideLine.setAttribute('y2', p2.y);
+  // AD (3-0) and BC (1-2) in red, others default
+  if ((i === 3) || (i === 1)) {
+    sideLine.setAttribute('stroke', '#d32f2f'); // Red
+  } else {
+    sideLine.setAttribute('stroke', '#1976d2'); // Default blue
+  }
+  sideLine.setAttribute('stroke-width', 3);
+  svg.appendChild(sideLine);
+
+  // Invisible line for dragging
+  const dragLine = document.createElementNS(svgNS, 'line');
+  dragLine.setAttribute('x1', p1.x);
+  dragLine.setAttribute('y1', p1.y);
+  dragLine.setAttribute('x2', p2.x);
+  dragLine.setAttribute('y2', p2.y);
+  dragLine.setAttribute('stroke', 'rgba(0,0,0,0)'); // Invisible
+  dragLine.setAttribute('stroke-width', 20);
+  dragLine.setAttribute('cursor', 'grab');
+  // For trapezium mode, only AB (i===0) and CD (i===2) are draggable
+  if (shape === 'trapezium'){
+    if (i === 0 || i === 2) dragLine.addEventListener('pointerdown', e => DragManager.start(e, i));
+  } else {
+    dragLine.addEventListener('pointerdown', e => DragManager.start(e, i));
+  }
+  svg.appendChild(dragLine);
+}
+
+// Compute internal angles (degrees) for the quadrilateral points in order A,B,C,D
+function computeAngles(pts) {
+  return [
+    angleAt(pts[0], pts[1], pts[3]), // A
+    angleAt(pts[1], pts[2], pts[0]), // B
+    angleAt(pts[2], pts[3], pts[1]), // C
+    angleAt(pts[3], pts[0], pts[2])  // D
+  ];
+}
+
+// Draw a single interior angle arc at vertex p with adjacent vertices prev and next
+function drawAngleArc(svg, p, prev, next, radius = 25) {
+  const v1 = {x: prev.x - p.x, y: prev.y - p.y};
+  const v2 = {x: next.x - p.x, y: next.y - p.y};
+  const angle1 = Math.atan2(v1.y, v1.x);
+  const angle2 = Math.atan2(v2.y, v2.x);
+  let angleDiff = angle2 - angle1;
+  if (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
+  else if (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+  let startAngle, endAngle;
+  if (angleDiff > 0) { startAngle = angle1; endAngle = angle2; }
+  else { startAngle = angle2; endAngle = angle1; angleDiff = -angleDiff; }
+  const largeArcFlag = angleDiff > Math.PI ? 1 : 0;
+  const x1 = p.x + radius * Math.cos(startAngle);
+  const y1 = p.y + radius * Math.sin(startAngle);
+  const x2 = p.x + radius * Math.cos(endAngle);
+  const y2 = p.y + radius * Math.sin(endAngle);
+  const pathData = `M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`;
+  const arc = document.createElementNS(svgNS, 'path');
+  arc.setAttribute('d', pathData);
+  arc.setAttribute('stroke', '#666');
+  arc.setAttribute('stroke-width', 2);
+  arc.setAttribute('fill', 'none');
+  svg.appendChild(arc);
+}
+
+// Draw corner labels (A,B,C,D) and numeric angle labels near arcs
+function drawAngleLabels(svg, pts, angles) {
+  const angleColors = ['#1976d2', '#d32f2f', '#1976d2', '#d32f2f'];
+  const angleLabels = ['A', 'B', 'C', 'D'];
+  pts.forEach((p, i) => {
+    const label = document.createElementNS(svgNS, 'text');
+    let offsetX = 0, offsetY = 0;
+    if (i === 0) { offsetX = -25; offsetY = -10; }
+    if (i === 1) { offsetX = 15; offsetY = -10; }
+    if (i === 2) { offsetX = 15; offsetY = 25; }
+    if (i === 3) { offsetX = -25; offsetY = 25; }
+    label.setAttribute('x', p.x + offsetX);
+    label.setAttribute('y', p.y + offsetY);
+    label.setAttribute('fill', angleColors[i]);
+    label.setAttribute('font-size', '1.4rem');
+    label.setAttribute('font-family', 'inherit');
+    label.setAttribute('font-weight', 'normal');
+    label.textContent = `${angleLabels[i]}`;
+    svg.appendChild(label);
+
+    // numeric angle label
+    const angleLabel = document.createElementNS(svgNS, 'text');
+    const next = pts[(i+1)%4];
+    const prev = pts[(i+3)%4];
+    const dx = (next.x + prev.x)/2 - p.x;
+    const dy = (next.y + prev.y)/2 - p.y;
+    angleLabel.setAttribute('x', p.x + dx*0.4);
+    angleLabel.setAttribute('y', p.y + dy*0.4);
+    angleLabel.setAttribute('fill', '#333');
+    angleLabel.setAttribute('font-size', '0.9rem');
+    angleLabel.setAttribute('font-family', 'inherit');
+    angleLabel.setAttribute('font-weight', 'normal');
+    angleLabel.textContent = `${angles[i]}°`;
+    svg.appendChild(angleLabel);
+  });
+}
+
+function updateEquations(divEl, angles) {
+  divEl.innerHTML = `
+    <div class="eq-row">∠BAD + ∠ABC = <span>${angles[0]}° + ${angles[1]}° = ${angles[0]+angles[1]}°</span></div>
+    <div class="eq-row">∠ABC + ∠BCD = <span>${angles[1]}° + ${angles[2]}° = ${angles[1]+angles[2]}°</span></div>
+    <div class="eq-row">∠BCD + ∠CDA = <span>${angles[2]}° + ${angles[3]}° = ${angles[2]+angles[3]}°</span></div>
+    <div class="eq-row">∠CDA + ∠BAD = <span>${angles[3]}° + ${angles[0]}° = ${angles[3]+angles[0]}°</span></div>
+  `;
+}
+
 // --- Main Render Function ---
 function renderParallelogram() {
   wrapper.innerHTML = '';
@@ -98,42 +391,11 @@ function renderParallelogram() {
   poly.setAttribute('stroke-width', 3);
   svg.appendChild(poly);
 
-  // Draw draggable sides (invisible lines for dragging) and visible sides with color
+  // Draw draggable sides (one helper handles visible and drag lines)
   for (let i = 0; i < 4; i++) {
     const p1 = points[i];
     const p2 = points[(i+1)%4];
-  // Visible side
-  const sideLine = document.createElementNS(svgNS, 'line');
-  sideLine.setAttribute('id', `side-${i}`);
-    sideLine.setAttribute('x1', p1.x);
-    sideLine.setAttribute('y1', p1.y);
-    sideLine.setAttribute('x2', p2.x);
-    sideLine.setAttribute('y2', p2.y);
-    // AD (3-0) and BC (1-2) in red, others default
-    if ((i === 3) || (i === 1)) {
-      sideLine.setAttribute('stroke', '#d32f2f'); // Red
-    } else {
-      sideLine.setAttribute('stroke', '#1976d2'); // Default blue
-    }
-  sideLine.setAttribute('stroke-width', 3);
-    svg.appendChild(sideLine);
-
-  // Invisible line for dragging
-    const dragLine = document.createElementNS(svgNS, 'line');
-    dragLine.setAttribute('x1', p1.x);
-    dragLine.setAttribute('y1', p1.y);
-    dragLine.setAttribute('x2', p2.x);
-    dragLine.setAttribute('y2', p2.y);
-    dragLine.setAttribute('stroke', 'rgba(0,0,0,0)'); // Invisible
-    dragLine.setAttribute('stroke-width', 20);
-    dragLine.setAttribute('cursor', 'grab');
-    // For trapezium mode, only AB (i===0) and CD (i===2) are draggable
-    if (currentShape === 'trapezium'){
-      if (i === 0 || i === 2) dragLine.addEventListener('pointerdown', e => startSideDrag(e, i));
-    } else {
-      dragLine.addEventListener('pointerdown', e => startSideDrag(e, i));
-    }
-    svg.appendChild(dragLine);
+    drawSide(svg, p1, p2, i, currentShape);
   }
 
   // Draw parallel / direction arrows based on the selected shape.
@@ -149,13 +411,9 @@ function renderParallelogram() {
       sideIndices = [0,2];
       dirMul[0] = 1; dirMul[2] = -1; // flip CD
     } else if (currentShape === 'rhombus'){
-      // AB (A->B) is side index 0, CD (D->C) is side index 2 (flipped)
-      // AD (A->D) corresponds to side index 3 but we want A->D so flip side3
-      // BC is side index 1 and keeps natural direction B->C
       sideIndices = [0,2,3,1];
       dirMul[0] = 1; dirMul[2] = -1; dirMul[3] = -1; dirMul[1] = 1;
     } else {
-      // parallelogram: AB (0) A->B, CD (2) D->C (flip), AD (3) A->D (flip), BC (1) B->C
       sideIndices = [0,2,3,1];
       dirMul[0] = 1; dirMul[2] = -1; dirMul[3] = -1; dirMul[1] = 1;
     }
@@ -163,381 +421,20 @@ function renderParallelogram() {
     sideIndices.forEach(i=>{
       const p1 = points[i];
       const p2 = points[(i+1)%4];
-      const mid = { x: (p1.x + p2.x)/2, y: (p1.y + p2.y)/2 };
-      const vx = p2.x - p1.x; const vy = p2.y - p1.y;
-      const mag = Math.sqrt(vx*vx + vy*vy) || 1;
-      const ux = vx / mag; const uy = vy / mag;
-      // perpendicular for base width
-      const perp = { x: -uy, y: ux };
-      const dm = dirMul[i] || 1;
-      const tip = { x: mid.x + ux * (arrowLen/2) * dm, y: mid.y + uy * (arrowLen/2) * dm };
-      const baseCenter = { x: mid.x - ux * (arrowLen/2) * dm, y: mid.y - uy * (arrowLen/2) * dm };
-      const left = { x: baseCenter.x + perp.x * (arrowLen/4), y: baseCenter.y + perp.y * (arrowLen/4) };
-      const right = { x: baseCenter.x - perp.x * (arrowLen/4), y: baseCenter.y - perp.y * (arrowLen/4) };
-      const arrow = document.createElementNS(svgNS, 'polygon');
-      arrow.setAttribute('points', `${tip.x},${tip.y} ${left.x},${left.y} ${right.x},${right.y}`);
-      arrow.setAttribute('class', 'parallel-arrow');
-      arrow.setAttribute('pointer-events','none');
-      arrow.setAttribute('id', `arrow-side-${i}`);
-      svg.appendChild(arrow);
+      drawParallelArrow(svg, p1, p2, arrowLen, `arrow-side-${i}`, dirMul[i] || 1);
     });
   }
 
-  // Draw angle markers (arcs) for internal angles
-  const angleRadius = 25;
-  points.forEach((p, i) => {
-    const prev = points[(i+3)%4]; // Previous vertex
-    const next = points[(i+1)%4]; // Next vertex
-    
-    // Calculate vectors from current vertex to adjacent vertices
-    const v1 = {x: prev.x - p.x, y: prev.y - p.y};
-    const v2 = {x: next.x - p.x, y: next.y - p.y};
-    
-    // Calculate angles
-    const angle1 = Math.atan2(v1.y, v1.x);
-    const angle2 = Math.atan2(v2.y, v2.x);
-    
-    // Calculate the internal angle (always less than π)
-    let angleDiff = angle2 - angle1;
-    
-    // Normalize to get the interior angle
-    if (angleDiff > Math.PI) {
-      angleDiff -= 2 * Math.PI;
-    } else if (angleDiff < -Math.PI) {
-      angleDiff += 2 * Math.PI;
-    }
-    
-    // Determine start and end angles for the arc
-    let startAngle, endAngle;
-    if (angleDiff > 0) {
-      startAngle = angle1;
-      endAngle = angle2;
-    } else {
-      startAngle = angle2;
-      endAngle = angle1;
-      angleDiff = -angleDiff;
-    }
-    
-    // Create the arc path
-    const arc = document.createElementNS(svgNS, 'path');
-    const largeArcFlag = angleDiff > Math.PI ? 1 : 0;
-    
-    const x1 = p.x + angleRadius * Math.cos(startAngle);
-    const y1 = p.y + angleRadius * Math.sin(startAngle);
-    const x2 = p.x + angleRadius * Math.cos(endAngle);
-    const y2 = p.y + angleRadius * Math.sin(endAngle);
-    
-    const pathData = `M ${x1} ${y1} A ${angleRadius} ${angleRadius} 0 ${largeArcFlag} 1 ${x2} ${y2}`;
-    arc.setAttribute('d', pathData);
-    arc.setAttribute('stroke', '#666');
-    arc.setAttribute('stroke-width', 2);
-    arc.setAttribute('fill', 'none');
-    svg.appendChild(arc);
-  });
-
-  // Calculate angles
-  const angles = [
-    angleAt(points[0], points[1], points[3]), // A
-    angleAt(points[1], points[2], points[0]), // B
-    angleAt(points[2], points[3], points[1]), // C
-    angleAt(points[3], points[0], points[2])  // D
-  ];
-
-  // Color coding: A & C blue, B & D red
-  const angleColors = ['#1976d2', '#d32f2f', '#1976d2', '#d32f2f'];
-  const angleLabels = ['A', 'B', 'C', 'D'];
-  // Place angle labels outside parallelogram, beside the corners
-  points.forEach((p, i) => {
-    const label = document.createElementNS(svgNS, 'text');
-    // Position labels outside corners
-    let offsetX = 0, offsetY = 0;
-    if (i === 0) { offsetX = -25; offsetY = -10; } // A: top-left
-    if (i === 1) { offsetX = 15; offsetY = -10; }  // B: top-right
-    if (i === 2) { offsetX = 15; offsetY = 25; }   // C: bottom-right
-    if (i === 3) { offsetX = -25; offsetY = 25; }  // D: bottom-left
-    
-  label.setAttribute('x', p.x + offsetX);
-  label.setAttribute('y', p.y + offsetY);
-  label.setAttribute('fill', angleColors[i]);
-  label.setAttribute('font-size', '1.4rem');
-  label.setAttribute('font-family', 'inherit');
-  label.setAttribute('font-weight', 'normal');
-  label.textContent = `${angleLabels[i]}`;
-    svg.appendChild(label);
-    
-    // Add angle measurement near the angle arc
-    const angleLabel = document.createElementNS(svgNS, 'text');
-    const next = points[(i+1)%4];
-    const prev = points[(i+3)%4];
-    const dx = (next.x + prev.x)/2 - p.x;
-    const dy = (next.y + prev.y)/2 - p.y;
-  angleLabel.setAttribute('x', p.x + dx*0.4);
-  angleLabel.setAttribute('y', p.y + dy*0.4);
-  angleLabel.setAttribute('fill', '#333');
-  angleLabel.setAttribute('font-size', '0.9rem');
-  angleLabel.setAttribute('font-family', 'inherit');
-  angleLabel.setAttribute('font-weight', 'normal');
-  angleLabel.textContent = `${angles[i]}°`;
-    svg.appendChild(angleLabel);
-  });
+  // Draw angle arcs and labels via helpers
+  const angles = computeAngles(points);
+  points.forEach((p, i) => drawAngleArc(svg, p, points[(i+3)%4], points[(i+1)%4], 25));
+  drawAngleLabels(svg, points, angles);
 
   wrapper.appendChild(svg);
-
-  // Display equations with proper angle names
-  eqDiv.innerHTML = `
-    <div class="eq-row">∠BAD + ∠ABC = <span>${angles[0]}° + ${angles[1]}° = ${angles[0]+angles[1]}°</span></div>
-    <div class="eq-row">∠ABC + ∠BCD = <span>${angles[1]}° + ${angles[2]}° = ${angles[1]+angles[2]}°</span></div>
-    <div class="eq-row">∠BCD + ∠CDA = <span>${angles[2]}° + ${angles[3]}° = ${angles[2]+angles[3]}°</span></div>
-    <div class="eq-row">∠CDA + ∠BAD = <span>${angles[3]}° + ${angles[0]}° = ${angles[3]+angles[0]}°</span></div>
-  `;
+  updateEquations(eqDiv, angles);
 }
 
-// --- Dragging Logic ---
-let dragSideIdx = null;
-let dragStart = null;
-let dragVec = null;
-
-function startSideDrag(e, sideIdx) {
-  dragSideIdx = sideIdx;
-  dragStart = {x: e.clientX, y: e.clientY, points: JSON.parse(JSON.stringify(points))};
-  // Calculate direction vector of the side
-  const p1 = dragStart.points[sideIdx];
-  const p2 = dragStart.points[(sideIdx+1)%4];
-  dragVec = {x: p2.x - p1.x, y: p2.y - p1.y};
-  document.addEventListener('pointermove', onSideDrag);
-  document.addEventListener('pointerup', endSideDrag);
-  // If trapezium mode, mark the anchored side visually
-  if (currentShape === 'trapezium'){
-    let anchoredIdx = (sideIdx === 0) ? 2 : (sideIdx === 2 ? 0 : null);
-    if (anchoredIdx !== null){
-      const anchoredEl = document.getElementById(`side-${anchoredIdx}`);
-      if (anchoredEl) anchoredEl.classList.add('anchored');
-    }
-  }
-}
-
-function onSideDrag(e) {
-  if (dragSideIdx === null) return;
-  // Calculate drag delta - allow movement in all directions
-  let dx = e.clientX - dragStart.x;
-  let dy = e.clientY - dragStart.y;
-
-  // Start with original points
-  let tempPoints = dragStart.points.map(p => ({...p}));
-
-  // Move both endpoints of dragged side by the delta, but ensure both endpoints
-  // remain within the allowed SVG bounds together to avoid asymmetric clamping.
-  let i1 = dragSideIdx;
-  let i2 = (dragSideIdx+1)%4;
-  const b = getBounds(40);
-
-  // Compute allowed dx range so both endpoints stay within [minX, maxX]
-  const allowedDxMin = Math.max(b.minX - dragStart.points[i1].x, b.minX - dragStart.points[i2].x);
-  const allowedDxMax = Math.min(b.maxX - dragStart.points[i1].x, b.maxX - dragStart.points[i2].x);
-  const allowedDyMin = Math.max(b.minY - dragStart.points[i1].y, b.minY - dragStart.points[i2].y);
-  const allowedDyMax = Math.min(b.maxY - dragStart.points[i1].y, b.maxY - dragStart.points[i2].y);
-
-  const ndx = clamp(dx, allowedDxMin, allowedDxMax);
-  const ndy = clamp(dy, allowedDyMin, allowedDyMax);
-
-  // Instead of freely moving both endpoints, project their tentative positions
-  // onto circles so their adjacent side lengths remain the same and the
-  // opposite side remains anchored.
-  const tentativeA = { x: dragStart.points[i1].x + ndx, y: dragStart.points[i1].y + ndy };
-  const tentativeB = { x: dragStart.points[i2].x + ndx, y: dragStart.points[i2].y + ndy };
-
-  // anchors: A is connected to prev = (i1+3)%4, B is connected to next = (i2+1)%4
-  const anchorAIdx = (i1+3)%4;
-  const anchorBIdx = (i2+1)%4;
-  const anchorA = dragStart.points[anchorAIdx];
-  const anchorB = dragStart.points[anchorBIdx];
-  const lenA = distance(dragStart.points[i1], anchorA);
-  const lenB = distance(dragStart.points[i2], anchorB);
-
-  const newA = projectToCircle(tentativeA, anchorA, lenA);
-  const newB = projectToCircle(tentativeB, anchorB, lenB);
-
-  tempPoints[i1] = newA;
-  tempPoints[i2] = newB;
-
-  // Opposite side remains anchored at its original positions
-  let opp1 = (dragSideIdx+2)%4;
-  let opp2 = (dragSideIdx+3)%4;
-  tempPoints[opp1] = dragStart.points[opp1];
-  tempPoints[opp2] = dragStart.points[opp2];
-  
-  // The adjacent sides automatically adjust since they share endpoints
-  // Side i1->opp2 and side i2->opp1 will stretch/skew to maintain connections
-  
-  // Prevent degenerate parallelogram (angles 30°-150°)
-  // If rhombus mode, convert tempPoints to nearest rhombus anchored at the dragged side's first vertex
-  if (currentShape === 'rhombus'){
-    // Keep opposite side anchored. We'll derive the new rhombus from the dragged side and the fixed opposite side.
-    const Aidx = i1;
-    const Bidx = i2;
-    const Cidx = opp1; // opposite of i1 is i1+2
-    const Didx = opp2;
-    // Use current dragged positions for A/B (tempPoints[i1], tempPoints[i2])
-    const Apos = tempPoints[Aidx];
-    const Bpos = tempPoints[Bidx];
-    // Opposite side stays at original dragStart positions
-    const Cpos = dragStart.points[Cidx];
-    const Dpos = dragStart.points[Didx];
-    // Desired side length is distance between A and B
-    const sideLen = Math.max(30, Math.sqrt((Bpos.x - Apos.x)**2 + (Bpos.y - Apos.y)**2));
-    // Compute direction from D to C to keep that orientation for opposite side
-    const oppDir = { x: (Cpos.x - Dpos.x), y: (Cpos.y - Dpos.y) };
-    const oppMag = Math.sqrt(oppDir.x*oppDir.x + oppDir.y*oppDir.y) || 1;
-    const oppUnit = { x: oppDir.x/oppMag, y: oppDir.y/oppMag };
-    // Build new D and C from A using the oppUnit scaled to sideLen
-    const newD = { x: Apos.x + oppUnit.x * sideLen, y: Apos.y + oppUnit.y * sideLen };
-    const newC = { x: Bpos.x + oppUnit.x * sideLen, y: Bpos.y + oppUnit.y * sideLen };
-    // Assign: A/B from drag, C/D anchored should remain dragStart positions — but to keep a proper rhombus we place C/D using oppUnit derived from anchored opp side direction
-    tempPoints[Aidx] = Apos;
-    tempPoints[Bidx] = Bpos;
-    tempPoints[Cidx] = newC;
-    tempPoints[Didx] = newD;
-  }
-
-  // Trapezium behavior: only AB (i===0) and CD (i===2) are draggable; keep them parallel
-  if (currentShape === 'trapezium'){
-    // If dragging AB (i1===0), anchor CD (keep both C and D as in dragStart) and make AB parallel to CD
-    if (i1 === 0) {
-      let A_tent = tempPoints[0];
-      let B_tent = tempPoints[1];
-      // anchored CD from dragStart
-      const C_anchor = dragStart.points[2];
-      const D_anchor = dragStart.points[3];
-      // direction of anchored CD (unit)
-      const cdDir = { x: C_anchor.x - D_anchor.x, y: C_anchor.y - D_anchor.y };
-      const cdMag = Math.sqrt(cdDir.x*cdDir.x + cdDir.y*cdDir.y) || 1;
-      const cdUnit = { x: cdDir.x / cdMag, y: cdDir.y / cdMag };
-      // perpendicular (unit) to CD pointing towards AB's side
-      const normal = { x: -cdUnit.y, y: cdUnit.x };
-      // Determine start sign from dragStart so we keep AB on the same side of CD
-      const startDist = (dragStart.points[0].x - D_anchor.x) * normal.x + (dragStart.points[0].y - D_anchor.y) * normal.y;
-      const startSign = Math.sign(startDist) || 1;
-      // Current signed distance of tentative A to anchored CD line
-      const currDist = (A_tent.x - D_anchor.x) * normal.x + (A_tent.y - D_anchor.y) * normal.y;
-      // Allow the perpendicular distance between AB and CD to vary so AD/BC stretch freely.
-      // Only prevent AB from crossing the anchored CD: if the signed distance flipped sign,
-      // nudge AB back to a small epsilon on the original side scaled to the canvas size.
-      const canvasScale = Math.min(b.width, b.height) / 600; // baseline 600 -> scale 1
-      const epsilon = Math.max(1, 2 * canvasScale); // scaled epsilon
-      if (Math.sign(currDist) !== startSign) {
-        const desired = startSign * epsilon;
-        const shift = desired - currDist;
-        A_tent = { x: A_tent.x + normal.x * shift, y: A_tent.y + normal.y * shift };
-        B_tent = { x: B_tent.x + normal.x * shift, y: B_tent.y + normal.y * shift };
-      }
-      // Enforce a minimum AB length relative to canvas so it doesn't become degenerate
-      const abLenTent = Math.sqrt((B_tent.x - A_tent.x)**2 + (B_tent.y - A_tent.y)**2);
-      const minLen = Math.max(20, 0.05 * Math.min(b.width, b.height));
-      if (abLenTent < minLen) {
-        // extend B along cdUnit to meet minLen
-        B_tent = { x: A_tent.x + cdUnit.x * minLen, y: A_tent.y + cdUnit.y * minLen };
-      }
-      // Project the tentative AB vector onto the line parallel to CD through adjusted A_tent
-      const tVec = { x: B_tent.x - A_tent.x, y: B_tent.y - A_tent.y };
-      const projLen = tVec.x * cdUnit.x + tVec.y * cdUnit.y; // signed length along cdUnit
-      const newB = { x: A_tent.x + cdUnit.x * projLen, y: A_tent.y + cdUnit.y * projLen };
-      // Clamp A and newB to bounds so they stay visible
-      const clampedA = { x: clamp(A_tent.x, b.minX, b.maxX), y: clamp(A_tent.y, b.minY, b.maxY) };
-      const clampedB = { x: clamp(newB.x, b.minX, b.maxX), y: clamp(newB.y, b.minY, b.maxY) };
-      tempPoints[0] = clampedA;
-      tempPoints[1] = clampedB;
-      // Keep CD anchored exactly at original positions
-      tempPoints[2] = { x: C_anchor.x, y: C_anchor.y };
-      tempPoints[3] = { x: D_anchor.x, y: D_anchor.y };
-      // If clamping occurred, show clamp feedback
-      if (clampedA.x !== A_tent.x || clampedA.y !== A_tent.y || clampedB.x !== newB.x || clampedB.y !== newB.y) {
-        const svgWrap = document.getElementById('svg-wrapper');
-        svgWrap.classList.add('clamped'); setTimeout(()=>svgWrap.classList.remove('clamped'),700);
-      }
-    }
-    // If dragging CD (i1===2), anchor AB (keep A and B as in dragStart) and make CD parallel to AB
-    if (i1 === 2) {
-      let C_tent = tempPoints[2];
-      let D_tent = tempPoints[3];
-      // anchored AB from dragStart
-      const A_anchor = dragStart.points[0];
-      const B_anchor = dragStart.points[1];
-      // direction of anchored AB (unit)
-      const abDir = { x: B_anchor.x - A_anchor.x, y: B_anchor.y - A_anchor.y };
-      const abMag = Math.sqrt(abDir.x*abDir.x + abDir.y*abDir.y) || 1;
-      const abUnit = { x: abDir.x / abMag, y: abDir.y / abMag };
-      // Project the tentative CD vector onto the line parallel to AB through C_tent
-      const tVec = { x: D_tent.x - C_tent.x, y: D_tent.y - C_tent.y };
-      const projLen = tVec.x * abUnit.x + tVec.y * abUnit.y;
-      const newD = { x: C_tent.x + abUnit.x * projLen, y: C_tent.y + abUnit.y * projLen };
-  const canvasScale = Math.min(b.width, b.height) / 600;
-  const epsilon = Math.max(1, 2 * canvasScale);
-      // Ensure CD doesn't cross AB: compute perpendicular from AB and prevent sign flip
-      const abDirCheck = abUnit; // unit
-      const abNormal = { x: -abDirCheck.y, y: abDirCheck.x };
-      const startDistCD = (dragStart.points[2].x - B_anchor.x) * abNormal.x + (dragStart.points[2].y - B_anchor.y) * abNormal.y;
-      const startSignCD = Math.sign(startDistCD) || 1;
-      const currDistC = (C_tent.x - B_anchor.x) * abNormal.x + (C_tent.y - B_anchor.y) * abNormal.y;
-      if (Math.sign(currDistC) !== startSignCD) {
-        const desiredC = startSignCD * epsilon;
-        const shiftC = desiredC - currDistC;
-        // shift C_tent and newD along abNormal
-        C_tent = { x: C_tent.x + abNormal.x * shiftC, y: C_tent.y + abNormal.y * shiftC };
-        newD.x += abNormal.x * shiftC; newD.y += abNormal.y * shiftC;
-      }
-      // Enforce a minimum CD length relative to canvas
-      const cdLenTent = Math.sqrt((newD.x - C_tent.x)**2 + (newD.y - C_tent.y)**2);
-      const minLenCD = Math.max(20, 0.05 * Math.min(b.width, b.height));
-      if (cdLenTent < minLenCD) {
-        newD.x = C_tent.x + abUnit.x * minLenCD; newD.y = C_tent.y + abUnit.y * minLenCD;
-      }
-      // Clamp C and newD to bounds
-      const clampedC = { x: clamp(C_tent.x, b.minX, b.maxX), y: clamp(C_tent.y, b.minY, b.maxY) };
-      const clampedD = { x: clamp(newD.x, b.minX, b.maxX), y: clamp(newD.y, b.minY, b.maxY) };
-      tempPoints[2] = clampedC;
-      tempPoints[3] = clampedD;
-      // Keep AB anchored
-      tempPoints[0] = { x: A_anchor.x, y: A_anchor.y };
-      tempPoints[1] = { x: B_anchor.x, y: B_anchor.y };
-      if (clampedC.x !== C_tent.x || clampedC.y !== C_tent.y || clampedD.x !== newD.x || clampedD.y !== newD.y) {
-        const svgWrap = document.getElementById('svg-wrapper');
-        svgWrap.classList.add('clamped'); setTimeout(()=>svgWrap.classList.remove('clamped'),700);
-      }
-    }
-  }
-
-  // For non-trapezium shapes, restore opposite side anchors so the opposite side is fixed during drag.
-  // In trapezium mode we intentionally let the trapezium logic compute the opposite pair
-  // (so AB and CD can remain parallel while AD/BC stretch to connect), therefore skip
-  // this overwrite when currentShape === 'trapezium'.
-  if (currentShape !== 'trapezium') {
-    tempPoints[opp1] = dragStart.points[opp1];
-    tempPoints[opp2] = dragStart.points[opp2];
-  }
-
-  const tempAngles = [
-    angleAt(tempPoints[0], tempPoints[1], tempPoints[3]),
-    angleAt(tempPoints[1], tempPoints[2], tempPoints[0]),
-    angleAt(tempPoints[2], tempPoints[3], tempPoints[1]),
-    angleAt(tempPoints[3], tempPoints[0], tempPoints[2])
-  ];
-  if (tempAngles.every(a => a >= 30 && a <= 150)) {
-    points = tempPoints;
-    renderParallelogram();
-  }
-}
-
-function endSideDrag() {
-  dragSideIdx = null;
-  dragStart = null;
-  dragVec = null;
-  document.removeEventListener('pointermove', onSideDrag);
-  document.removeEventListener('pointerup', endSideDrag);
-  // Remove anchored visual from any side
-  ['side-0','side-1','side-2','side-3'].forEach(id=>{
-    const el = document.getElementById(id); if (el) el.classList.remove('anchored');
-  });
-}
+// --- Dragging logic now handled by DragManager ---
 
 // --- Length Adjustment Functions ---
 function adjustSideLength(sideType, delta) {
