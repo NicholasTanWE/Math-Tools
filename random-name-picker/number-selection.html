@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Number Selection</title>
+    <link rel="stylesheet" href="../style-guide/colors.css">
+    <link rel="stylesheet" href="../style-guide/typography.css">
+    <link rel="stylesheet" href="../style-guide/layout.css">
+    <link rel="stylesheet" href="../style-guide/components.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav style="margin: 0;">
+        <a href="index.html" style="color:#fff;">← Back to Random Picker</a>
+    </nav>
+    <header class="main-header" style="margin-top:0;">
+        <h1>Random Number Selector</h1>
+    </header>
+    <main>
+        <section>
+            <div class="content-wrapper">
+                <div class="main-content">
+                    <div class="buttons">
+                        <button id="randomize-number-repeat">Randomize (Allow Repeats)</button>
+                        <button id="randomize-number-no-repeat">Randomize (No Repeats)</button>
+                        <button id="clear-history">Clear History</button>
+                    </div>
+                    <div id="display-area" class="display">
+                        <p id="selected-number">Click a button to select a number</p>
+                    </div>
+                </div>
+                <div class="sidebar">
+                    <h2>Generated Numbers</h2>
+                    <ul id="history-list"></ul>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+body {
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    text-align: center;
+    display: flex;
+}
+
+.main {
+    flex-grow: 1;
+}
+
+.sidebar {
+    width: 200px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-left: 1px solid #ddd;
+    text-align: left;
+}
+
+.sidebar h2 {
+    font-size: 18px;
+    margin-top: 0;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.main-header h1 {
+    color: var(--text-light);
+}
+
+.options {
+    margin: 20px 0;
+}
+
+button {
+    display: inline-block;
+    padding: 0.5em 1.2em;
+    border: none;
+    border-radius: 4px;
+    background: var(--primary-green);
+    color: var(--text-light);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+button:hover {
+    background: var(--primary-blue);
+}
+
+.hidden {
+    display: none;
+}
+
+.display {
+    margin-top: 20px;
+    font-size: 24px;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 150px;
+}
+
+#selected-number {
+    font-size: 48px;
+}
+
+#selected-name {
+    font-size: 48px;
+}
+
+.flourish {
+    animation: flourish 0.5s ease-in-out;
+}
+
+@keyframes flourish {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); color: #ff5722; }
+    100% { transform: scale(1); }
+}
+
+.content-wrapper {
+    display: flex;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding-right: 20px;
+}
+
+.sidebar {
+    width: 200px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+.sidebar h2 {
+    font-size: 18px;
+    margin-top: 0;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.display {
+    margin-top: 20px;
+    font-size: 24px;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 150px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    border: 2px solid #ccc;
+    padding: 1rem;
+}

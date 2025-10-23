@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Name Selection</title>
+    <link rel="stylesheet" href="../style-guide/colors.css">
+    <link rel="stylesheet" href="../style-guide/typography.css">
+    <link rel="stylesheet" href="../style-guide/layout.css">
+    <link rel="stylesheet" href="../style-guide/components.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav style="margin: 0;">
+        <a href="index.html" style="color:#fff;">← Back to Random Picker</a>
+    </nav>
+    <header class="main-header" style="margin-top:0;">
+        <h1>Random Name Selector</h1>
+    </header>
+    <main>
+        <section>
+            <div class="content-wrapper">
+                <div class="main-content">
+                    <div class="buttons">
+                        <button id="randomize-repeat">Randomize (Allow Repeats)</button>
+                        <button id="randomize-no-repeat">Randomize (No Repeats)</button>
+                        <button id="upload-new">Upload New CSV</button>
+                        <button id="clear-names">Clear Generated Names</button>
+                    </div>
+                    <div id="display-area" class="display">
+                        <p id="selected-name">Click a button to select a name</p>
+                    </div>
+                </div>
+                <div class="sidebar">
+                    <h2>Selected Names</h2>
+                    <ul id="name-history-list"></ul>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

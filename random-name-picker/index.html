@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Name/Number Picker</title>
+    <link rel="stylesheet" href="../style-guide/colors.css">
+    <link rel="stylesheet" href="../style-guide/typography.css">
+    <link rel="stylesheet" href="../style-guide/layout.css">
+    <link rel="stylesheet" href="../style-guide/components.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav style="margin: 0;">
+        <a href="../index.html" style="color:#fff;">← Back to Landing Page</a>
+    </nav>
+    <header class="main-header" style="margin-top:0;">
+        <h1>Random Name/Number Picker</h1>
+    </header>
+    <main>
+        <section>
+            <div class="options">
+                <button id="numbers-btn">Randomize Numbers</button>
+                <button id="names-btn">Randomize Names</button>
+            </div>
+            <div id="numbers-section" class="hidden">
+                <label for="min-input">From:</label>
+                <input type="number" id="min-input" placeholder="1">
+                <label for="max-input">To:</label>
+                <input type="number" id="max-input" placeholder="100">
+                <button id="proceed-numbers-btn">Proceed</button>
+            </div>
+            <div id="names-section" class="hidden">
+                <input type="file" id="csv-upload" accept=".csv,.xlsx">
+                <button id="upload-btn">Upload CSV</button>
+            </div>
+        </section>
+    </main>
+    <!-- SheetJS (xlsx) for Excel file support -->
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
