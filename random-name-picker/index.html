@@ -31,8 +31,15 @@
                 <button id="proceed-numbers-btn">Proceed</button>
             </div>
             <div id="names-section" class="hidden">
-                <input type="file" id="csv-upload" accept=".csv,.xlsx">
-                <button id="upload-btn">Upload CSV</button>
+                <div>
+                    <input type="file" id="csv-upload" accept=".csv,.xlsx">
+                    <button id="upload-btn">Upload CSV</button>
+                </div>
+                <div style="margin-top:1rem;">
+                    <button id="use-cached-names" class="secondary">Use Cached Names</button>
+                    <button id="clear-cached-names" class="secondary">Clear Cached Names</button>
+                    <span id="cached-names-count" style="margin-left:0.5rem;color:#666;"></span>
+                </div>
             </div>
         </section>
     </main>

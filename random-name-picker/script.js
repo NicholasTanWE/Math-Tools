@@ -24,12 +24,43 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Cached names controls on landing page
+    const useCachedBtn = document.getElementById('use-cached-names');
+    const clearCachedBtn = document.getElementById('clear-cached-names');
+    const cachedCountSpan = document.getElementById('cached-names-count');
+    function refreshCachedCount() {
+        let cached = [];
+        try { cached = JSON.parse(localStorage.getItem('names') || '[]'); } catch(e) { cached = []; }
+        if (cachedCountSpan) cachedCountSpan.textContent = cached.length ? `${cached.length} names cached` : 'No cached names';
+        if (useCachedBtn) useCachedBtn.disabled = !cached.length;
+        if (clearCachedBtn) clearCachedBtn.disabled = !cached.length;
+    }
+    refreshCachedCount();
+    if (useCachedBtn) {
+        useCachedBtn.addEventListener('click', function() {
+            const cached = JSON.parse(localStorage.getItem('names') || '[]');
+            if (!cached || cached.length === 0) {
+                showToast('No cached names available. Please upload a CSV.', 'warn');
+                return;
+            }
+            // navigate to selection page which will read localStorage.names
+            window.location.href = 'selection.html';
+        });
+    }
+    if (clearCachedBtn) {
+        clearCachedBtn.addEventListener('click', function() {
+            localStorage.removeItem('names');
+            refreshCachedCount();
+            showToast('Cached names cleared.', 'success');
+        });
+    }
+
     if (proceedNumbersBtn) {
         proceedNumbersBtn.addEventListener('click', function() {
             const min = parseInt(minInput.value);
             const max = parseInt(maxInput.value);
             if (isNaN(min) || isNaN(max) || min >= max) {
-                alert('Please enter valid range with min < max.');
+                showToast('Please enter valid range with min < max.', 'warn');
             } else {
                 localStorage.setItem('numberRange', JSON.stringify({ min, max }));
                 window.location.href = 'number-selection.html';
@@ -66,9 +97,30 @@ document.addEventListener('DOMContentLoaded', function() {
                     reader.readAsText(file);
                 }
             } else {
-                alert('Please select a CSV file.');
+                showToast('Please select a CSV file.', 'warn');
             }
         });
+    }
+
+    // Toast container and helper
+    let toastContainer = document.querySelector('.toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.className = 'toast-container';
+        document.body.appendChild(toastContainer);
+    }
+    function showToast(message, type = 'info', duration = 3000) {
+        const t = document.createElement('div');
+        t.className = `toast ${type}`;
+        t.textContent = message;
+        toastContainer.appendChild(t);
+        // show
+        requestAnimationFrame(() => t.classList.add('show'));
+        // auto-remove
+        setTimeout(() => {
+            t.classList.remove('show');
+            setTimeout(() => { try { toastContainer.removeChild(t); } catch(e){} }, 220);
+        }, duration);
     }
 
     // --- Persistence: load persisted state for names and numbers ---
@@ -83,8 +135,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const randomizeRepeat = document.getElementById('randomize-repeat');
     const randomizeNoRepeat = document.getElementById('randomize-no-repeat');
     const uploadNew = document.getElementById('upload-new');
+    const toggleAnimationsNamesBtn = document.getElementById('toggle-animations-names');
     const displayArea = document.getElementById('display-area');
-    const selectedName = document.getElementById('selected-name');
+    let selectedName = document.getElementById('selected-name');
 
     let names = [];
     let usedNames = [];
@@ -100,6 +153,18 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
         usedNames = JSON.parse(localStorage.getItem('usedNames') || '[]');
     } catch (e) { usedNames = []; }
+
+    // animation toggle for names (persisted)
+    let animationsEnabledNames = true;
+    try { const v = localStorage.getItem('animationsEnabledNames'); if (v !== null) animationsEnabledNames = JSON.parse(v); } catch(e){}
+    if (toggleAnimationsNamesBtn) {
+        toggleAnimationsNamesBtn.textContent = animationsEnabledNames ? 'Disable Animations' : 'Enable Animations';
+        toggleAnimationsNamesBtn.addEventListener('click', function() {
+            animationsEnabledNames = !animationsEnabledNames;
+            localStorage.setItem('animationsEnabledNames', JSON.stringify(animationsEnabledNames));
+            toggleAnimationsNamesBtn.textContent = animationsEnabledNames ? 'Disable Animations' : 'Enable Animations';
+        });
+    }
 
     function updateNameHistory() {
         const list = document.getElementById('name-history-list');
@@ -119,43 +184,213 @@ document.addEventListener('DOMContentLoaded', function() {
     if (randomizeRepeat || randomizeNoRepeat) {
         names = JSON.parse(localStorage.getItem('names')) || [];
         if (names.length === 0) {
-            alert('No names loaded. Please upload a CSV first.');
+            showToast('No names loaded. Please upload a CSV first.', 'warn');
             window.location.href = 'index.html';
+        }
+    }
+
+    // helper to enable/disable controls during flicker
+    function setNameControlsEnabled(enabled) {
+        [randomizeRepeat, randomizeNoRepeat, uploadNew, clearNamesBtn].forEach(btn => {
+            if (btn) btn.disabled = !enabled;
+        });
+    }
+    // slot-roll animation helper
+    function slotRoll(items, finalValue, duration = 1500, itemHeight = 56) {
+        return new Promise(resolve => {
+            // build slot DOM
+            const container = document.createElement('div');
+            container.className = 'slot-container';
+            const list = document.createElement('div');
+            list.className = 'slot-list';
+
+            const steps = 30; // how many random steps before final
+            const seq = [];
+            for (let i = 0; i < steps; i++) {
+                seq.push(items[Math.floor(Math.random() * items.length)]);
+            }
+            seq.push(finalValue);
+
+            seq.forEach(v => {
+                const it = document.createElement('div');
+                it.className = 'slot-item';
+                it.textContent = v;
+                list.appendChild(it);
+            });
+
+            container.appendChild(list);
+            // replace display content
+            displayArea.innerHTML = '';
+            displayArea.appendChild(container);
+
+            // trigger transition
+            const totalTranslate = (seq.length - 1) * itemHeight;
+            // ensure starting position
+            list.style.transform = 'translateY(0px)';
+            list.style.transition = 'none';
+            // force reflow
+            // eslint-disable-next-line no-unused-expressions
+            list.offsetHeight;
+            list.style.transition = `transform ${duration}ms cubic-bezier(0.2,0.8,0.2,1)`;
+            requestAnimationFrame(() => {
+                list.style.transform = `translateY(-${totalTranslate}px)`;
+            });
+
+            list.addEventListener('transitionend', function handler() {
+                list.removeEventListener('transitionend', handler);
+                // cleanup and show final — replace the slot container in-place to avoid flash
+                const p = document.createElement('p');
+                // keep same id where possible
+                p.id = (typeof finalValue === 'number') ? 'selected-number' : 'selected-name';
+                p.textContent = finalValue;
+                try {
+                    if (container.parentNode === displayArea) {
+                        displayArea.replaceChild(p, container);
+                    } else {
+                        // fallback
+                        displayArea.innerHTML = '';
+                        displayArea.appendChild(p);
+                    }
+                } catch (e) {
+                    // fallback
+                    displayArea.innerHTML = '';
+                    displayArea.appendChild(p);
+                }
+                resolve(finalValue);
+            });
+        });
+    }
+
+    // Helpers to reliably set the displayed name/number even if slotRoll replaced DOM
+    function setDisplayedName(value) {
+        let el = document.getElementById('selected-name');
+        if (!el) {
+            // recreate element inside displayArea
+            displayArea.innerHTML = '';
+            el = document.createElement('p');
+            el.id = 'selected-name';
+            displayArea.appendChild(el);
+        }
+        el.textContent = value;
+        return el;
+    }
+
+    function setDisplayedNumber(value) {
+        let el = document.getElementById('selected-number');
+        if (!el) {
+            displayArea.innerHTML = '';
+            el = document.createElement('p');
+            el.id = 'selected-number';
+            displayArea.appendChild(el);
+        }
+        el.textContent = value;
+        return el;
+    }
+
+    // Compute an itemHeight (px) for name items to accommodate wrapping (maxLines default 2)
+    function computeItemHeightForNames(namesArray, maxLines = 2) {
+        try {
+            // create hidden measurer
+            const measurer = document.createElement('div');
+            measurer.style.position = 'absolute';
+            measurer.style.visibility = 'hidden';
+            measurer.style.width = `${displayArea.clientWidth}px`;
+            measurer.style.fontSize = '48px';
+            measurer.style.lineHeight = '1';
+            measurer.style.padding = '0.25rem 0.5rem';
+            measurer.style.boxSizing = 'border-box';
+            measurer.style.whiteSpace = 'normal';
+            measurer.style.overflowWrap = 'break-word';
+            measurer.style.textAlign = 'center';
+            // clamp lines by capping max-height
+            const lineHeightPx = 48; // approximate because font-size 48px with line-height ~1
+            const maxHeight = lineHeightPx * maxLines + 8; // padding allowance
+            measurer.style.maxHeight = `${maxHeight}px`;
+            document.body.appendChild(measurer);
+
+            // test a few longest candidates
+            const candidates = namesArray.slice().sort((a,b) => b.length - a.length).slice(0,5);
+            let maxMeasured = 56;
+            candidates.forEach(c => {
+                measurer.textContent = c;
+                const h = Math.min(measurer.scrollHeight, maxHeight);
+                if (h > maxMeasured) maxMeasured = h;
+            });
+            document.body.removeChild(measurer);
+            return Math.ceil(maxMeasured);
+        } catch (e) {
+            return 56; // fallback
         }
     }
 
     if (randomizeRepeat) {
         randomizeRepeat.addEventListener('click', function() {
-            if (names.length > 0) {
-                const randomIndex = Math.floor(Math.random() * names.length);
-                selectedName.textContent = names[randomIndex];
-                selectedNames.push(names[randomIndex]);
+            if (names.length === 0) return;
+            const finalIdx = Math.floor(Math.random() * names.length);
+            const finalName = names[finalIdx];
+            if (!animationsEnabledNames) {
+                // instant
+                setDisplayedName(finalName);
+                selectedNames.push(finalName);
                 try { localStorage.setItem('selectedNames', JSON.stringify(selectedNames)); } catch(e){}
                 updateNameHistory();
                 displayArea.classList.add('flourish');
                 setTimeout(() => displayArea.classList.remove('flourish'), 500);
+            } else {
+                setNameControlsEnabled(false);
+                const itemH = computeItemHeightForNames(names, 2);
+                slotRoll(names, finalName, undefined, itemH).then(name => {
+                    selectedNames.push(name);
+                    try { localStorage.setItem('selectedNames', JSON.stringify(selectedNames)); } catch(e){}
+                    updateNameHistory();
+                    // rebind cached selectedName to the newly-created element
+                    selectedName = document.getElementById('selected-name');
+                    displayArea.classList.add('flourish');
+                    setTimeout(() => displayArea.classList.remove('flourish'), 500);
+                    setNameControlsEnabled(true);
+                });
             }
         });
     }
 
     if (randomizeNoRepeat) {
         randomizeNoRepeat.addEventListener('click', function() {
+            if (names.length === 0) return;
             if (usedNames.length >= names.length) {
-                alert('All names have been used. Resetting.');
+                showToast('All names have been used. Resetting.', 'info');
                 usedNames = [];
+                try { localStorage.removeItem('usedNames'); } catch(e){}
             }
             let availableNames = names.filter(name => !usedNames.includes(name));
-            if (availableNames.length > 0) {
-                const randomIndex = Math.floor(Math.random() * availableNames.length);
-                const selected = availableNames[randomIndex];
-                selectedName.textContent = selected;
-                usedNames.push(selected);
-                selectedNames.push(selected);
+            if (availableNames.length === 0) return;
+            // slot-roll over available names
+            const finalIdx = Math.floor(Math.random() * availableNames.length);
+            const finalName = availableNames[finalIdx];
+            if (!animationsEnabledNames) {
+                // instant
+                setDisplayedName(finalName);
+                usedNames.push(finalName);
+                selectedNames.push(finalName);
                 try { localStorage.setItem('usedNames', JSON.stringify(usedNames)); } catch(e){}
                 try { localStorage.setItem('selectedNames', JSON.stringify(selectedNames)); } catch(e){}
                 updateNameHistory();
                 displayArea.classList.add('flourish');
                 setTimeout(() => displayArea.classList.remove('flourish'), 500);
+            } else {
+                setNameControlsEnabled(false);
+                const itemH2 = computeItemHeightForNames(availableNames, 2);
+                slotRoll(availableNames, finalName, undefined, itemH2).then(name => {
+                    usedNames.push(name);
+                    selectedNames.push(name);
+                    try { localStorage.setItem('usedNames', JSON.stringify(usedNames)); } catch(e){}
+                    try { localStorage.setItem('selectedNames', JSON.stringify(selectedNames)); } catch(e){}
+                    updateNameHistory();
+                    // rebind cached selectedName to the newly-created element
+                    selectedName = document.getElementById('selected-name');
+                    displayArea.classList.add('flourish');
+                    setTimeout(() => displayArea.classList.remove('flourish'), 500);
+                    setNameControlsEnabled(true);
+                });
             }
         });
     }
@@ -178,15 +413,16 @@ document.addEventListener('DOMContentLoaded', function() {
             selectedNames = [];
             try { localStorage.removeItem('selectedNames'); } catch(e){}
             updateNameHistory();
-            alert('Generated names cleared.');
+            showToast('Generated names cleared.', 'success');
         });
     }
 
     // Number selection page logic
     const randomizeNumberRepeat = document.getElementById('randomize-number-repeat');
     const randomizeNumberNoRepeat = document.getElementById('randomize-number-no-repeat');
+    const toggleAnimationsNumbersBtn = document.getElementById('toggle-animations-numbers');
     const clearHistory = document.getElementById('clear-history');
-    const selectedNumber = document.getElementById('selected-number');
+    let selectedNumber = document.getElementById('selected-number');
 
     let range = {};
     let usedNumbers = [];
@@ -207,32 +443,95 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // animation toggle for numbers (persisted)
+    let animationsEnabledNumbers = true;
+    try { const v = localStorage.getItem('animationsEnabledNumbers'); if (v !== null) animationsEnabledNumbers = JSON.parse(v); } catch(e){}
+    if (toggleAnimationsNumbersBtn) {
+        toggleAnimationsNumbersBtn.textContent = animationsEnabledNumbers ? 'Disable Animations' : 'Enable Animations';
+        toggleAnimationsNumbersBtn.addEventListener('click', function() {
+            animationsEnabledNumbers = !animationsEnabledNumbers;
+            localStorage.setItem('animationsEnabledNumbers', JSON.stringify(animationsEnabledNumbers));
+            toggleAnimationsNumbersBtn.textContent = animationsEnabledNumbers ? 'Disable Animations' : 'Enable Animations';
+        });
+    }
+
+    // Range update controls on number-selection page
+    const currentRangeSpan = document.getElementById('current-range');
+    const rangeMinInput = document.getElementById('range-min-input');
+    const rangeMaxInput = document.getElementById('range-max-input');
+    const updateRangeBtn = document.getElementById('update-range-btn');
+    function refreshCurrentRangeUI() {
+        if (currentRangeSpan) currentRangeSpan.textContent = (range && typeof range.min === 'number' && typeof range.max === 'number') ? `${range.min} — ${range.max}` : 'Not set';
+        if (rangeMinInput) rangeMinInput.value = (range && typeof range.min === 'number') ? range.min : '';
+        if (rangeMaxInput) rangeMaxInput.value = (range && typeof range.max === 'number') ? range.max : '';
+    }
+    refreshCurrentRangeUI();
+    if (updateRangeBtn) {
+        updateRangeBtn.addEventListener('click', function() {
+            const newMin = parseInt(rangeMinInput.value);
+            const newMax = parseInt(rangeMaxInput.value);
+            if (isNaN(newMin) || isNaN(newMax) || newMin >= newMax) {
+                showToast('Please enter a valid min < max range.', 'warn');
+                return;
+            }
+            range = { min: newMin, max: newMax };
+            try { localStorage.setItem('numberRange', JSON.stringify(range)); } catch(e){}
+            refreshCurrentRangeUI();
+            showToast('Number range updated.', 'success');
+        });
+    }
+
     if (randomizeNumberRepeat || randomizeNumberNoRepeat) {
         range = JSON.parse(localStorage.getItem('numberRange')) || {};
         if (!range.min || !range.max) {
-            alert('No range set. Please set range first.');
+            showToast('No range set. Please set range first.', 'warn');
             window.location.href = 'index.html';
         }
     }
 
     if (randomizeNumberRepeat) {
         randomizeNumberRepeat.addEventListener('click', function() {
-            const num = Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
-            selectedNumber.textContent = num;
-            generatedNumbers.push(num);
-            try { localStorage.setItem('generatedNumbers', JSON.stringify(generatedNumbers)); } catch(e){}
-            updateHistory();
-            displayArea.classList.add('flourish');
-            setTimeout(() => displayArea.classList.remove('flourish'), 500);
+            if (!range || typeof range.min !== 'number' || typeof range.max !== 'number') return;
+            const finalNum = Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
+            if (!animationsEnabledNumbers) {
+                // instant
+                setDisplayedNumber(finalNum);
+                generatedNumbers.push(finalNum);
+                try { localStorage.setItem('generatedNumbers', JSON.stringify(generatedNumbers)); } catch(e){}
+                updateHistory();
+                displayArea.classList.add('flourish');
+                setTimeout(() => displayArea.classList.remove('flourish'), 500);
+            } else {
+                // disable number controls
+                [randomizeNumberRepeat, randomizeNumberNoRepeat, clearHistory].forEach(btn => { if (btn) btn.disabled = true; });
+                // build a sampled items array for visual rolling
+                const items = [];
+                const sampleCount = Math.min(40, range.max - range.min + 1);
+                for (let i = 0; i < sampleCount; i++) {
+                    items.push(Math.floor(Math.random() * (range.max - range.min + 1)) + range.min);
+                }
+                slotRoll(items, finalNum).then(num => {
+                    generatedNumbers.push(num);
+                    try { localStorage.setItem('generatedNumbers', JSON.stringify(generatedNumbers)); } catch(e){}
+                    updateHistory();
+                    // rebind cached selectedNumber after animation replaced DOM
+                    selectedNumber = document.getElementById('selected-number');
+                    displayArea.classList.add('flourish');
+                    setTimeout(() => displayArea.classList.remove('flourish'), 500);
+                    [randomizeNumberRepeat, randomizeNumberNoRepeat, clearHistory].forEach(btn => { if (btn) btn.disabled = false; });
+                });
+            }
         });
     }
 
     if (randomizeNumberNoRepeat) {
         randomizeNumberNoRepeat.addEventListener('click', function() {
+            if (!range || typeof range.min !== 'number' || typeof range.max !== 'number') return;
             const totalNumbers = range.max - range.min + 1;
             if (usedNumbers.length >= totalNumbers) {
-                alert('All numbers have been used. Clearing history.');
+                showToast('All numbers have been used. Clearing history.', 'info');
                 usedNumbers = [];
+                try { localStorage.removeItem('usedNumbers'); } catch(e){}
             }
             let availableNumbers = [];
             for (let i = range.min; i <= range.max; i++) {
@@ -240,17 +539,33 @@ document.addEventListener('DOMContentLoaded', function() {
                     availableNumbers.push(i);
                 }
             }
-            if (availableNumbers.length > 0) {
-                const randomIndex = Math.floor(Math.random() * availableNumbers.length);
-                const selected = availableNumbers[randomIndex];
-                selectedNumber.textContent = selected;
-                usedNumbers.push(selected);
-                generatedNumbers.push(selected);
+            if (availableNumbers.length === 0) return;
+            const finalIdx = Math.floor(Math.random() * availableNumbers.length);
+            const finalNum = availableNumbers[finalIdx];
+            if (!animationsEnabledNumbers) {
+                setDisplayedNumber(finalNum);
+                usedNumbers.push(finalNum);
+                generatedNumbers.push(finalNum);
                 try { localStorage.setItem('usedNumbers', JSON.stringify(usedNumbers)); } catch(e){}
                 try { localStorage.setItem('generatedNumbers', JSON.stringify(generatedNumbers)); } catch(e){}
                 updateHistory();
                 displayArea.classList.add('flourish');
                 setTimeout(() => displayArea.classList.remove('flourish'), 500);
+            } else {
+                const duration = 1500;
+                [randomizeNumberRepeat, randomizeNumberNoRepeat, clearHistory].forEach(btn => { if (btn) btn.disabled = true; });
+                slotRoll(availableNumbers, finalNum, duration).then(num => {
+                    usedNumbers.push(num);
+                    generatedNumbers.push(num);
+                    try { localStorage.setItem('usedNumbers', JSON.stringify(usedNumbers)); } catch(e){}
+                    try { localStorage.setItem('generatedNumbers', JSON.stringify(generatedNumbers)); } catch(e){}
+                    updateHistory();
+                    // rebind cached selectedNumber after animation replaced DOM
+                    selectedNumber = document.getElementById('selected-number');
+                    displayArea.classList.add('flourish');
+                    setTimeout(() => displayArea.classList.remove('flourish'), 500);
+                    [randomizeNumberRepeat, randomizeNumberNoRepeat, clearHistory].forEach(btn => { if (btn) btn.disabled = false; });
+                });
             }
         });
     }
@@ -262,7 +577,7 @@ document.addEventListener('DOMContentLoaded', function() {
             try { localStorage.removeItem('usedNumbers'); } catch(e){}
             try { localStorage.removeItem('generatedNumbers'); } catch(e){}
             updateHistory();
-            alert('History cleared.');
+            showToast('History cleared.', 'success');
         });
     }
 });

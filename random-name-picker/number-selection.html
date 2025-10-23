@@ -24,8 +24,18 @@
                     <div class="buttons">
                         <button id="randomize-number-repeat">Randomize (Allow Repeats)</button>
                         <button id="randomize-number-no-repeat">Randomize (No Repeats)</button>
+                        <button id="toggle-animations-numbers">Disable Animations</button>
                         <button id="clear-history">Clear History</button>
                     </div>
+                        <div style="margin-top:1rem; display:flex; gap:0.5rem; align-items:center; justify-content:center; flex-wrap:wrap;">
+                            <label style="font-size:0.9rem; color:#555;">Current range:</label>
+                            <span id="current-range" style="font-weight:600; color:#222;">—</span>
+                            <label for="range-min-input" style="margin-left:0.5rem;">Min</label>
+                            <input id="range-min-input" type="number" style="width:80px;padding:4px 6px;" />
+                            <label for="range-max-input">Max</label>
+                            <input id="range-max-input" type="number" style="width:80px;padding:4px 6px;" />
+                            <button id="update-range-btn">Update Range</button>
+                        </div>
                     <div id="display-area" class="display">
                         <p id="selected-number">Click a button to select a number</p>
                     </div>
