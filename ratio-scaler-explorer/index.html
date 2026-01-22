@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ratio Scaler Explorer</title>
+  <!-- Import repository style guide CSS -->
+  <link rel="stylesheet" href="../style-guide/colors.css">
+  <link rel="stylesheet" href="../style-guide/typography.css">
+  <link rel="stylesheet" href="../style-guide/layout.css">
+  <link rel="stylesheet" href="../style-guide/components.css">
+  <!-- Project specific styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav style="margin: 0;">
+    <a href="../index.html" style="font-size: 1.1rem; text-decoration: underline; color:#fff;">← Back to Landing Page</a>
+  </nav>
+  <header class="main-header" style="margin-top: 0;">
+    <h1>Ratio Scaler Explorer</h1>
+    <nav>Discover why multiplying matters more than adding in Ratios</nav>
+  </header>
+  <main>
+    <section>
+      <div class="instructions">
+        <h2>Instructions</h2>
+        <ol>
+          <li>Name your two items and set a base ratio (e.g., 1:2 for Syrup:Water)</li>
+          <li>Use the scaling slider to multiply both parts of the ratio</li>
+          <li>Switch to "Addition Test" mode to see what happens when you add instead of multiply</li>
+          <li>Observe how the "Result Mix" visualization changes differently in each mode</li>
+        </ol>
+        <p style="color: var(--primary-blue);"><strong>Key Learning:</strong> Multiplying keeps ratios equivalent; adding changes them!</p>
+      </div>
+
+      <!-- Setup Section -->
+      <div class="setup-grid">
+        <div class="input-section">
+          <h3>1. Name Your Items</h3>
+          <div class="input-row">
+            <input type="text" id="labelA" value="Syrup" class="item-input">
+            <span class="separator">&</span>
+            <input type="text" id="labelB" value="Water" class="item-input">
+          </div>
+
+          <h3 style="margin-top: 1.5rem;">2. Set Base Ratio</h3>
+          <div class="ratio-inputs">
+            <input type="number" id="baseA" value="1" min="1" max="5" class="ratio-number">
+            <span class="ratio-colon">:</span>
+            <input type="number" id="baseB" value="2" min="1" max="5" class="ratio-number">
+          </div>
+          <p class="hint">Max 5:5 base ratio recommended for visualization</p>
+        </div>
+        
+        <div class="preview-section">
+          <div class="preview-container">
+            <div class="preview-box">
+              <div id="basePreview" class="mix-visual">
+                <div id="baseItemBLevel" class="itemB-bg level"></div>
+                <div id="baseItemALevel" class="itemA-bg level"></div>
+              </div>
+              <span class="preview-label">Original<br>Result Mix</span>
+            </div>
+
+            <div class="preview-box">
+              <div id="scalingPreview" class="mix-visual">
+                <div id="scaleItemBLevel" class="itemB-bg level"></div>
+                <div id="scaleItemALevel" class="itemA-bg level"></div>
+              </div>
+              <span class="preview-label scaling">Scaling<br>Result</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interaction Controls -->
+      <div class="controls-section">
+        <div class="mode-controls">
+          <span class="scale-label">Scaling Factor: <span id="scaleLabel">x1</span></span>
+          <div class="mode-buttons">
+            <button onclick="changeMode('multiply')" id="btnMult" class="mode-btn active">MULTIPLY</button>
+            <button onclick="changeMode('add')" id="btnAdd" class="mode-btn">ADDITION TEST</button>
+          </div>
+        </div>
+        <input type="range" id="multiplier" min="1" max="10" value="1" class="slider">
+        <div class="slider-labels">
+          <span>Min (x1)</span>
+          <span>Scale Up</span>
+        </div>
+      </div>
+
+      <!-- Visual Output -->
+      <div class="output-section">
+        <div class="units-container">
+          <div class="units-header">
+            <span><span class="displayNameA">Syrup</span> Units: <span id="countA">1</span></span>
+          </div>
+          <div id="containerA" class="blocks-container itemA-container"></div>
+        </div>
+
+        <div class="units-container">
+          <div class="units-header">
+            <span><span class="displayNameB">Water</span> Units: <span id="countB">2</span></span>
+          </div>
+          <div id="containerB" class="blocks-container itemB-container"></div>
+        </div>
+      </div>
+
+      <!-- Analysis Message -->
+      <div id="statusBox" class="status-box">
+        Enter values to see the ratio analysis.
+      </div>
+
+      <div class="reset-section">
+        <button onclick="resetTool()" class="btn">Reset Tool</button>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <p>&copy; Nicholas Tan</p>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>
