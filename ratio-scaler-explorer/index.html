@@ -1,130 +1,301 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ratio Scaler Explorer</title>
-  <!-- Import repository style guide CSS -->
-  <link rel="stylesheet" href="../style-guide/colors.css">
-  <link rel="stylesheet" href="../style-guide/typography.css">
-  <link rel="stylesheet" href="../style-guide/layout.css">
-  <link rel="stylesheet" href="../style-guide/components.css">
-  <!-- Project specific styles -->
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ratio Scaler Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; }
+
+        .ratio-bar-container {
+            height: 60px;
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            position: relative;
+            background: #f1f5f9;
+        }
+
+        .segment {
+            height: 100%;
+            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .red-segment { background-color: #ef4444; }
+        .blue-segment { background-color: #3b82f6; }
+
+        .overlay-marker {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background-color: rgba(255, 255, 255, 0.7);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .scaling-card {
+            transition: border-color 0.4s ease, box-shadow 0.4s ease;
+            border-width: 6px;
+        }
+
+        .unit-circle {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        /* Custom Input Styling */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
 </head>
-<body>
-  <nav style="margin: 0;">
-    <a href="../index.html" style="font-size: 1.1rem; text-decoration: underline; color:#fff;">← Back to Landing Page</a>
-  </nav>
-  <header class="main-header" style="margin-top: 0;">
-    <h1>Ratio Scaler Explorer</h1>
-    <nav>Visualize how ratios work with multiplication and addition</nav>
-  </header>
-  <main>
-    <section>
-      <div class="instructions">
-        <h2>Instructions</h2>
-        <ol>
-          <li>Enter labels for your two items (e.g., A and B)</li>
-          <li>Set the base ratio between them</li>
-          <li>Choose Multiplication or Addition mode</li>
-          <li>Use the slider to see how the ratio changes</li>
-          <li>Watch the visual bars and circles to understand equivalent ratios</li>
-        </ol>
-        <p style="color: var(--primary-blue);"><strong>Key Learning:</strong> Multiplying keeps ratios equivalent; adding changes them!</p>
-      </div>
+<body class="bg-[#f8fafc] min-h-screen p-4 md:p-10">
 
-      <!-- Input Section -->
-      <div class="input-section">
-        <h3>1. Name Your Items</h3>
-        <div class="input-row">
-          <input type="text" id="labelA" value="A" maxlength="20" class="item-input">
-          <span class="separator">&</span>
-          <input type="text" id="labelB" value="B" maxlength="20" class="item-input">
-        </div>
-
-        <h3 style="margin-top: 1.5rem;">2. Set Base Ratio</h3>
-        <div class="ratio-inputs">
-          <input type="number" id="baseA" value="1" min="1" max="12" class="ratio-number">
-          <span class="ratio-colon">:</span>
-          <input type="number" id="baseB" value="2" min="1" max="12" class="ratio-number">
-        </div>
-        <p class="hint">Enter whole numbers from 1 to 12</p>
-      </div>
-
-      <!-- Bars Section -->
-      <div class="bars-section">
-        <h3>Visual Comparison</h3>
-        <div class="bars-container">
-          <!-- Original Bar -->
-          <div class="bar-wrapper">
-            <h4>Original Result Mix</h4>
-            <div class="ratio-bar" id="originalBar">
-              <div class="bar-segment bar-a" id="originalSegmentA"></div>
-              <div class="bar-segment bar-b" id="originalSegmentB"></div>
+    <div class="max-w-6xl mx-auto space-y-6">
+        
+        <!-- Premium Header -->
+        <header class="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div>
+                <h1 class="text-3xl font-800 text-slate-900 tracking-tight">Ratio Scaler <span class="text-indigo-600">Explorer</span></h1>
+                <p class="text-slate-500 font-500 text-sm uppercase tracking-widest mt-1">Multiplicative vs Additive Reasoning</p>
             </div>
-            <p class="bar-label" id="originalLabel">1 : 2</p>
-          </div>
-
-          <!-- Scaling Bar -->
-          <div class="bar-wrapper">
-            <h4>Scaling Result</h4>
-            <div class="ratio-bar" id="scalingBar">
-              <div class="bar-segment bar-a" id="scalingSegmentA"></div>
-              <div class="bar-segment bar-b" id="scalingSegmentB"></div>
+            <div class="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+                <button id="modeMult" onclick="setMode('multiply')" class="px-6 py-2 rounded-xl text-xs font-800 transition-all bg-white shadow-sm text-slate-900">MULTIPLICATION</button>
+                <button id="modeAdd" onclick="setMode('add')" class="px-6 py-2 rounded-xl text-xs font-800 transition-all text-slate-400 hover:text-slate-600">ADDITION</button>
             </div>
-            <p class="bar-label" id="scalingLabel">1 : 2</p>
-          </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left Panel: Inputs -->
+            <aside class="lg:col-span-4 space-y-6">
+                <!-- Base Settings -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-6">
+                    <h2 class="text-[11px] font-800 text-slate-400 uppercase tracking-widest">1. Base Ratio Setup</h2>
+                    
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="text" id="labelA" value="Red Paint" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-600 outline-none focus:ring-2 focus:ring-red-500">
+                            <input type="text" id="labelB" value="Blue Paint" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-600 outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="flex items-center justify-between bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                            <input type="number" id="baseA" value="1" min="1" class="w-16 bg-transparent text-2xl font-800 text-center text-red-600">
+                            <span class="text-2xl font-800 text-slate-300">:</span>
+                            <input type="number" id="baseB" value="2" min="1" class="w-16 bg-transparent text-2xl font-800 text-center text-blue-600">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scaling Factor -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-[11px] font-800 text-slate-400 uppercase tracking-widest">2. Scale Amounts</h2>
+                        <span id="scaleDisplay" class="text-lg font-800 text-indigo-600">× 1</span>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase">
+                                <span class="displayNameA">Item A</span>
+                                <span id="valA">1</span>
+                            </div>
+                            <input type="range" id="factorA" min="1" max="10" value="1" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-red-500">
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase">
+                                <span class="displayNameB">Item B</span>
+                                <span id="valB">1</span>
+                            </div>
+                            <input type="range" id="factorB" min="1" max="10" value="1" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                        </div>
+                    </div>
+                    <button onclick="syncFactors()" class="w-full py-2 bg-slate-900 text-white text-[10px] font-800 rounded-xl tracking-widest uppercase hover:bg-slate-800 transition-all">Link Factors</button>
+                </div>
+            </aside>
+
+            <!-- Right Panel: Visualization -->
+            <main class="lg:col-span-8 space-y-6">
+                
+                <!-- Bars View -->
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 space-y-10">
+                    
+                    <!-- Original Bar -->
+                    <div class="space-y-3">
+                        <h3 class="text-xs font-800 text-slate-400 uppercase tracking-widest">Original Result Mix</h3>
+                        <div class="ratio-bar-container border-4 border-white shadow-sm">
+                            <div id="baseBarA" class="segment red-segment"></div>
+                            <div id="baseBarB" class="segment blue-segment"></div>
+                        </div>
+                    </div>
+
+                    <!-- Scaling Result Bar -->
+                    <div class="space-y-3">
+                        <h3 class="text-xs font-800 text-slate-400 uppercase tracking-widest">Scaling Result</h3>
+                        <div id="scalingCard" class="ratio-bar-container border-white shadow-xl bg-white">
+                            <div id="overlayMarker" class="overlay-marker"></div>
+                            <div id="scaleBarA" class="segment red-segment"></div>
+                            <div id="scaleBarB" class="segment blue-segment"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Unit Illustration -->
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 space-y-8">
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                            <span class="text-xs font-800 text-slate-500 uppercase tracking-widest"><span class="displayNameA">Item A</span> Units: <span id="finalCountA" class="text-red-600 font-900">1</span></span>
+                        </div>
+                        <div id="illustrationA" class="flex flex-wrap gap-2 min-h-[30px]"></div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                            <span class="text-xs font-800 text-slate-500 uppercase tracking-widest"><span class="displayNameB">Item B</span> Units: <span id="finalCountB" class="text-blue-600 font-900">2</span></span>
+                        </div>
+                        <div id="illustrationB" class="flex flex-wrap gap-2 min-h-[30px]"></div>
+                    </div>
+                </div>
+
+                <!-- Final Verification -->
+                <div id="verificationBox" class="p-6 rounded-3xl text-center font-800 text-lg transition-all duration-500 shadow-sm border-2">
+                    Start adjusting values to verify the ratio.
+                </div>
+            </main>
         </div>
-      </div>
 
-      <!-- Controls Section -->
-      <div class="controls-section">
-        <h3>3. Choose Scaling Mode</h3>
-        <div class="mode-buttons">
-          <button onclick="changeMode('multiply')" id="btnMultiply" class="mode-btn active">Multiplication</button>
-          <button onclick="changeMode('add')" id="btnAdd" class="mode-btn">Addition</button>
-        </div>
+        <footer class="text-center py-6 text-slate-400 text-[10px] font-700 uppercase tracking-[0.2em]">
+            Primary Math Lab • Ratio Visualization Heuristics
+        </footer>
+    </div>
 
-        <h3 style="margin-top: 1.5rem;">4. Adjust Scale Factor</h3>
-        <div class="slider-container">
-          <label id="scaleLabel" class="scale-label">Scale Factor: x1</label>
-          <input type="range" id="scaleSlider" min="1" max="15" value="1" class="slider">
-          <div class="slider-values">
-            <span>1</span>
-            <span>15</span>
-          </div>
-        </div>
-      </div>
+    <script>
+        let mode = 'multiply';
+        let factorsSynced = false;
 
-      <!-- Visual Circles Section -->
-      <div class="circles-section">
-        <h3>Item Breakdown</h3>
-        <div class="circles-container">
-          <div class="circle-group">
-            <h4><span id="labelADisplay1">A</span>: <span id="countA">1</span></h4>
-            <div id="circlesA" class="circles-wrapper"></div>
-          </div>
-          <div class="circle-group">
-            <h4><span id="labelBDisplay1">B</span>: <span id="countB">2</span></h4>
-            <div id="circlesB" class="circles-wrapper"></div>
-          </div>
-        </div>
-      </div>
+        const baseA = document.getElementById('baseA');
+        const baseB = document.getElementById('baseB');
+        const factorA = document.getElementById('factorA');
+        const factorB = document.getElementById('factorB');
+        const labelA = document.getElementById('labelA');
+        const labelB = document.getElementById('labelB');
 
-      <!-- Confirmation Box -->
-      <div id="confirmationBox" class="confirmation-box">
-        <div id="confirmationMessage"></div>
-      </div>
+        function setMode(newMode) {
+            mode = newMode;
+            document.getElementById('modeMult').className = mode === 'multiply' ? 'px-6 py-2 rounded-xl text-xs font-800 transition-all bg-white shadow-sm text-slate-900' : 'px-6 py-2 rounded-xl text-xs font-800 transition-all text-slate-400 hover:text-slate-600';
+            document.getElementById('modeAdd').className = mode === 'add' ? 'px-6 py-2 rounded-xl text-xs font-800 transition-all bg-white shadow-sm text-rose-600 border border-rose-100' : 'px-6 py-2 rounded-xl text-xs font-800 transition-all text-slate-400 hover:text-slate-600';
+            
+            // Reset factors on mode change
+            factorA.value = mode === 'multiply' ? 1 : 1;
+            factorB.value = mode === 'multiply' ? 1 : 1;
+            update();
+        }
 
-      <div class="reset-section">
-        <button onclick="resetTool()" class="btn">Reset Tool</button>
-      </div>
-    </section>
-  </main>
-  <footer>
-    <p>&copy; Nicholas Tan</p>
-  </footer>
-  <script src="script.js"></script>
+        function syncFactors() {
+            factorsSynced = !factorsSynced;
+            if (factorsSynced) factorB.value = factorA.value;
+            update();
+        }
+
+        function update(e) {
+            if (factorsSynced && e) {
+                if (e.target.id === 'factorA') factorB.value = factorA.value;
+                if (e.target.id === 'factorB') factorA.value = factorB.value;
+            }
+
+            const bA = parseInt(baseA.value) || 1;
+            const bB = parseInt(baseB.value) || 1;
+            const fA = parseInt(factorA.value);
+            const fB = parseInt(factorB.value);
+
+            // Update Labels
+            document.querySelectorAll('.displayNameA').forEach(el => el.innerText = labelA.value);
+            document.querySelectorAll('.displayNameB').forEach(el => el.innerText = labelB.value);
+            document.getElementById('valA').innerText = mode === 'multiply' ? '×' + fA : '+' + (fA-1);
+            document.getElementById('valB').innerText = mode === 'multiply' ? '×' + fB : '+' + (fB-1);
+
+            // Calculate Totals
+            let finalA, finalB;
+            if (mode === 'multiply') {
+                finalA = bA * fA;
+                finalB = bB * fB;
+            } else {
+                finalA = bA + (fA - 1);
+                finalB = bB + (fB - 1);
+            }
+
+            document.getElementById('finalCountA').innerText = finalA;
+            document.getElementById('finalCountB').innerText = finalB;
+
+            // Bar Percentages
+            const baseTotal = bA + bB;
+            const basePercentA = (bA / baseTotal) * 100;
+            document.getElementById('baseBarA').style.width = basePercentA + '%';
+            document.getElementById('baseBarB').style.width = (100 - basePercentA) + '%';
+            document.getElementById('overlayMarker').style.left = basePercentA + '%';
+
+            const scaleTotal = finalA + finalB;
+            const scalePercentA = (finalA / scaleTotal) * 100;
+            document.getElementById('scaleBarA').style.width = scalePercentA + '%';
+            document.getElementById('scaleBarB').style.width = (100 - scalePercentA) + '%';
+
+            // Verification Logic
+            const originalRatio = bA / bB;
+            const scaledRatio = finalA / finalB;
+            const isEquivalent = Math.abs(originalRatio - scaledRatio) < 0.0001;
+
+            const vBox = document.getElementById('verificationBox');
+            const sCard = document.getElementById('scalingCard');
+
+            if (isEquivalent) {
+                vBox.innerText = `Equivalent Ratios: ${finalA}:${finalB} is same as ${bA}:${bB}`;
+                vBox.className = "p-6 rounded-3xl text-center font-800 text-lg transition-all duration-500 bg-emerald-50 text-emerald-700 border-emerald-200 border-2";
+                sCard.style.borderColor = "#10b981"; // Emerald-500
+            } else {
+                vBox.innerText = `Changed Ratio: ${finalA}:${finalB} is NOT the same as ${bA}:${bB}`;
+                vBox.className = "p-6 rounded-3xl text-center font-800 text-lg transition-all duration-500 bg-rose-50 text-rose-700 border-rose-200 border-2";
+                sCard.style.borderColor = "#f43f5e"; // Rose-500
+            }
+
+            // Illustrations
+            renderUnits('illustrationA', finalA, 'bg-red-500');
+            renderUnits('illustrationB', finalB, 'bg-blue-500');
+        }
+
+        function renderUnits(id, count, colorClass) {
+            const container = document.getElementById(id);
+            container.innerHTML = '';
+            for(let i=0; i < count; i++) {
+                const dot = document.createElement('div');
+                dot.className = `unit-circle ${colorClass} shadow-sm border border-white/20`;
+                container.appendChild(dot);
+            }
+        }
+
+        function resetTool() {
+            baseA.value = 1; baseB.value = 2;
+            factorA.value = 1; factorB.value = 1;
+            setMode('multiply');
+        }
+
+        [baseA, baseB, factorA, factorB, labelA, labelB].forEach(el => {
+            el.addEventListener('input', update);
+        });
+
+        window.onload = update;
+    </script>
 </body>
 </html>
