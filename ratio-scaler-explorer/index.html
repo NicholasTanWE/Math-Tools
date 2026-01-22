@@ -103,7 +103,7 @@
                 <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-6">
                     <div class="flex justify-between items-center">
                         <h2 class="text-[11px] font-800 text-slate-400 uppercase tracking-widest">2. Scale Amounts</h2>
-                        <span id="scaleDisplay" class="text-lg font-800 text-indigo-600">× 1</span>
+                        <span id="scaleDisplay" class="text-lg font-800 text-indigo-600"></span>
                     </div>
                     
                     <div class="space-y-6">
@@ -122,7 +122,7 @@
                             <input type="range" id="factorB" min="1" max="10" value="1" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-500">
                         </div>
                     </div>
-                    <button onclick="syncFactors()" class="w-full py-2 bg-slate-900 text-white text-[10px] font-800 rounded-xl tracking-widest uppercase hover:bg-slate-800 transition-all">Link Factors</button>
+                    <button id="syncBtn" onclick="syncFactors()" class="w-full py-2 bg-slate-100 text-slate-600 text-[10px] font-800 rounded-xl tracking-widest uppercase hover:bg-slate-200 border border-slate-200 transition-all">Link Factors</button>
                 </div>
             </aside>
 
@@ -192,6 +192,8 @@
         const factorB = document.getElementById('factorB');
         const labelA = document.getElementById('labelA');
         const labelB = document.getElementById('labelB');
+        const syncBtn = document.getElementById('syncBtn');
+        const scaleDisplay = document.getElementById('scaleDisplay');
 
         function setMode(newMode) {
             mode = newMode;
@@ -199,14 +201,23 @@
             document.getElementById('modeAdd').className = mode === 'add' ? 'px-6 py-2 rounded-xl text-xs font-800 transition-all bg-white shadow-sm text-rose-600 border border-rose-100' : 'px-6 py-2 rounded-xl text-xs font-800 transition-all text-slate-400 hover:text-slate-600';
             
             // Reset factors on mode change
-            factorA.value = mode === 'multiply' ? 1 : 1;
-            factorB.value = mode === 'multiply' ? 1 : 1;
+            factorA.value = 1;
+            factorB.value = 1;
             update();
         }
 
         function syncFactors() {
             factorsSynced = !factorsSynced;
-            if (factorsSynced) factorB.value = factorA.value;
+            if (factorsSynced) {
+                factorB.value = factorA.value;
+                syncBtn.classList.remove('bg-slate-100', 'text-slate-600');
+                syncBtn.classList.add('bg-indigo-600', 'text-white', 'border-indigo-700', 'shadow-md');
+                syncBtn.innerText = "Factors Linked";
+            } else {
+                syncBtn.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-700', 'shadow-md');
+                syncBtn.classList.add('bg-slate-100', 'text-slate-600');
+                syncBtn.innerText = "Link Factors";
+            }
             update();
         }
 
@@ -224,8 +235,18 @@
             // Update Labels
             document.querySelectorAll('.displayNameA').forEach(el => el.innerText = labelA.value);
             document.querySelectorAll('.displayNameB').forEach(el => el.innerText = labelB.value);
-            document.getElementById('valA').innerText = mode === 'multiply' ? '×' + fA : '+' + (fA-1);
-            document.getElementById('valB').innerText = mode === 'multiply' ? '×' + fB : '+' + (fB-1);
+            
+            const opA = mode === 'multiply' ? '×' + fA : '+' + (fA-1);
+            const opB = mode === 'multiply' ? '×' + fB : '+' + (fB-1);
+            document.getElementById('valA').innerText = opA;
+            document.getElementById('valB').innerText = opB;
+
+            // Update Scale Indicator Header
+            if (factorsSynced) {
+                scaleDisplay.innerText = mode === 'multiply' ? '× ' + fA : '+ ' + (fA-1);
+            } else {
+                scaleDisplay.innerText = "";
+            }
 
             // Calculate Totals
             let finalA, finalB;
@@ -288,6 +309,7 @@
         function resetTool() {
             baseA.value = 1; baseB.value = 2;
             factorA.value = 1; factorB.value = 1;
+            if (factorsSynced) syncFactors(); // Turn off sync if on
             setMode('multiply');
         }
 
