@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ratio & Fraction Converter</title>
+    <link rel="stylesheet" href="../style-guide/colors.css">
+    <link rel="stylesheet" href="../style-guide/typography.css">
+    <link rel="stylesheet" href="../style-guide/layout.css">
+    <link rel="stylesheet" href="../style-guide/components.css">
+    <link rel="stylesheet" href="style.css">
+    <!-- Tailwind used by the original mini-project for layout; kept to preserve original look -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* minimal inline fallbacks kept; main styles in style.css */
+        .bar-unit { transition: all 0.3s ease; }
+    </style>
+</head>
+<body class="bg-slate-50 p-6">
+    <nav style="margin: 0;">
+        <a href="../index.html" style="color:#fff;">← Back to Landing Page</a>
+    </nav>
+    <header class="main-header" style="margin-top:0; text-align:center;">
+        <h1>Ratio &amp; Fraction Converter</h1>
+    </header>
+
+    <div class="max-w-4xl mx-auto space-y-6">
+        <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center">
+            <h1 class="text-3xl font-800 text-slate-900">Ratio <span class="text-indigo-600">&</span> Fraction</h1>
+            <p class="text-slate-500 font-600 uppercase tracking-widest text-xs mt-2">Connecting Parts to the Whole</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Inputs -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+                <div>
+                    <label class="text-[10px] font-800 text-slate-400 uppercase tracking-widest">Configure Groups & Ratio</label>
+                    <div class="flex items-center space-x-4 mt-2">
+                        <div class="flex-1 space-y-1">
+                            <input type="text" id="labelA" value="GIRLS" class="w-full bg-transparent text-center text-[10px] font-bold text-rose-500 border-b border-rose-200 uppercase outline-none focus:border-rose-500 mb-1">
+                            <input type="number" id="valA" value="2" min="1" max="15" class="w-full p-3 bg-rose-50 border border-rose-100 rounded-2xl text-center text-xl font-800 text-rose-600 outline-none">
+                        </div>
+                        <span class="text-2xl font-800 text-slate-300 mt-6">:</span>
+                        <div class="flex-1 space-y-1">
+                            <input type="text" id="labelB" value="BOYS" class="w-full bg-transparent text-center text-[10px] font-bold text-blue-500 border-b border-blue-200 uppercase outline-none focus:border-blue-500 mb-1">
+                            <input type="number" id="valB" value="3" min="1" max="15" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-2xl text-center text-xl font-800 text-blue-600 outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-900 rounded-2xl text-center">
+                    <span class="text-[10px] font-800 text-slate-400 uppercase tracking-widest block mb-1">Total</span>
+                    <span id="totalDisplay" class="text-3xl font-800 text-white">5</span>
+                </div>
+            </div>
+
+            <!-- Visualization -->
+            <div class="md:col-span-2 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center space-y-8">
+                <div>
+                    <h3 class="text-xs font-800 text-slate-400 uppercase tracking-widest mb-4">Visual Bar Model</h3>
+                    <div id="barContainer" class="flex w-full h-16 rounded-2xl overflow-hidden border-4 border-white shadow-lg">
+                        <!-- Units injected here -->
+                    </div>
+                </div>
+
+                <!-- Fractions Grid -->
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Section A (Girls) -->
+                    <div class="space-y-4">
+                        <div class="text-center p-3 bg-rose-50 rounded-2xl border border-rose-100">
+                            <span class="text-[10px] font-800 text-rose-400 uppercase tracking-widest"><span class="dispA">GIRLS</span> of Total</span>
+                            <div class="mt-1 text-xl font-800 text-rose-600">
+                                <span id="fracNumATotal">2</span>
+                                <div class="h-0.5 bg-rose-300 w-6 mx-auto my-1"></div>
+                                <span id="fracDenATotal">5</span>
+                            </div>
+                        </div>
+                        <div class="text-center p-3 bg-rose-50 rounded-2xl border-2 border-dashed border-rose-200">
+                            <span class="text-[10px] font-800 text-rose-400 uppercase tracking-widest"><span class="dispA">GIRLS</span> of <span class="dispB">BOYS</span></span>
+                            <div class="mt-1 text-xl font-800 text-rose-600">
+                                <span id="fracNumABoys">2</span>
+                                <div class="h-0.5 bg-rose-300 w-6 mx-auto my-1"></div>
+                                <span id="fracDenABoys">3</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section B (Boys) -->
+                    <div class="space-y-4">
+                        <div class="text-center p-3 bg-blue-50 rounded-2xl border border-blue-100">
+                            <span class="text-[10px] font-800 text-blue-400 uppercase tracking-widest"><span class="dispB">BOYS</span> of Total</span>
+                            <div class="mt-1 text-xl font-800 text-blue-600">
+                                <span id="fracNumBTotal">3</span>
+                                <div class="h-0.5 bg-blue-300 w-6 mx-auto my-1"></div>
+                                <span id="fracDenBTotal">5</span>
+                            </div>
+                        </div>
+                        <div class="text-center p-3 bg-blue-50 rounded-2xl border-2 border-dashed border-blue-200">
+                            <span class="text-[10px] font-800 text-blue-400 uppercase tracking-widest"><span class="dispB">BOYS</span> of <span class="dispA">GIRLS</span></span>
+                            <div class="mt-1 text-xl font-800 text-blue-600">
+                                <span id="fracNumBGirls">3</span>
+                                <div class="h-0.5 bg-blue-300 w-6 mx-auto my-1"></div>
+                                <span id="fracDenBGirls">2</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="ruleBox" class="bg-indigo-600 p-6 rounded-3xl text-white text-center font-600 italic shadow-lg">
+            "Pay attention to the denominator! Is it the 'Total' or the 'Other Part'?"
+        </div>
+    </div>
+
+    <script>
+        const inputA = document.getElementById('valA');
+        const inputB = document.getElementById('valB');
+        const labelA = document.getElementById('labelA');
+        const labelB = document.getElementById('labelB');
+        const bar = document.getElementById('barContainer');
+        const totalDisp = document.getElementById('totalDisplay');
+
+        function update() {
+            const a = Math.max(0, parseInt(inputA.value) || 0);
+            const b = Math.max(0, parseInt(inputB.value) || 0);
+            const total = a + b;
+
+            const nameA = labelA.value.toUpperCase() || "GROUP A";
+            const nameB = labelB.value.toUpperCase() || "GROUP B";
+
+            totalDisp.innerText = total;
+            
+            // Update Text Labels
+            document.querySelectorAll('.dispA').forEach(el => el.innerText = nameA);
+            document.querySelectorAll('.dispB').forEach(el => el.innerText = nameB);
+
+            // Section A Fractions
+            document.getElementById('fracNumATotal').innerText = a;
+            document.getElementById('fracDenATotal').innerText = total;
+            document.getElementById('fracNumABoys').innerText = a;
+            document.getElementById('fracDenABoys').innerText = b || "-";
+
+            // Section B Fractions
+            document.getElementById('fracNumBTotal').innerText = b;
+            document.getElementById('fracDenBTotal').innerText = total;
+            document.getElementById('fracNumBGirls').innerText = b;
+            document.getElementById('fracDenBGirls').innerText = a || "-";
+
+            bar.innerHTML = '';
+            for(let i=0; i<a; i++) {
+                const u = document.createElement('div');
+                u.className = 'bar-unit flex-1 bg-rose-500 border-r border-white/20';
+                bar.appendChild(u);
+            }
+            for(let i=0; i<b; i++) {
+                const u = document.createElement('div');
+                u.className = 'bar-unit flex-1 bg-blue-500 border-r border-white/20';
+                bar.appendChild(u);
+            }
+        }
+
+        [inputA, inputB, labelA, labelB].forEach(el => {
+            el.addEventListener('input', update);
+        });
+        
+        window.onload = update;
+    </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+/* fraction-vs-ratio/style.css - small overrides to align with repo style-guide */
+body { font-family: Inter, 'Segoe UI', Arial, sans-serif; }
+.main-header h1 { color: var(--text-dark, #222); }
+
+/* Ensure the demo keeps reasonable max width */
+.max-w-4xl { max-width: 48rem; margin-left: auto; margin-right: auto; }
+
+/* Make bar units visible when Tailwind not loaded or to complement style-guide */
+.bar-unit { min-width: 0; }
