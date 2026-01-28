@@ -70,17 +70,17 @@
                         <div class="text-center p-3 bg-rose-50 rounded-2xl border border-rose-100">
                             <span class="text-[10px] font-800 text-rose-400 tracking-widest"><span class="dispA uppercase">GIRLS</span> as a fraction of the total</span>
                             <div class="mt-1 text-xl font-800 text-rose-600">
-                                <span id="fracNumATotal">2</span>
+                                <span id="fracNumATotal" class="fraction-value">2</span>
                                 <div class="h-0.5 bg-rose-300 w-6 mx-auto my-1"></div>
-                                <span id="fracDenATotal">5</span>
+                                <span id="fracDenATotal" class="fraction-value">5</span>
                             </div>
                         </div>
                         <div class="text-center p-3 bg-rose-50 rounded-2xl border-2 border-dashed border-rose-200">
                             <span class="text-[10px] font-800 text-rose-400 tracking-widest"><span class="dispA uppercase">GIRLS</span> as a fraction of the <span class="dispB uppercase">BOYS</span></span>
                             <div class="mt-1 text-xl font-800 text-rose-600">
-                                <span id="fracNumABoys">2</span>
+                                <span id="fracNumABoys" class="fraction-value">2</span>
                                 <div class="h-0.5 bg-rose-300 w-6 mx-auto my-1"></div>
-                                <span id="fracDenABoys">3</span>
+                                <span id="fracDenABoys" class="fraction-value">3</span>
                             </div>
                         </div>
                     </div>
@@ -90,20 +90,23 @@
                         <div class="text-center p-3 bg-blue-50 rounded-2xl border border-blue-100">
                             <span class="text-[10px] font-800 text-blue-400 tracking-widest"><span class="dispB uppercase">BOYS</span> as a fraction of the total</span>
                             <div class="mt-1 text-xl font-800 text-blue-600">
-                                <span id="fracNumBTotal">3</span>
+                                <span id="fracNumBTotal" class="fraction-value">3</span>
                                 <div class="h-0.5 bg-blue-300 w-6 mx-auto my-1"></div>
-                                <span id="fracDenBTotal">5</span>
+                                <span id="fracDenBTotal" class="fraction-value">5</span>
                             </div>
                         </div>
                         <div class="text-center p-3 bg-blue-50 rounded-2xl border-2 border-dashed border-blue-200">
                             <span class="text-[10px] font-800 text-blue-400 tracking-widest"><span class="dispB uppercase">BOYS</span> as a fraction of the <span class="dispA uppercase">GIRLS</span></span>
                             <div class="mt-1 text-xl font-800 text-blue-600">
-                                <span id="fracNumBGirls">3</span>
+                                <span id="fracNumBGirls" class="fraction-value">3</span>
                                 <div class="h-0.5 bg-blue-300 w-6 mx-auto my-1"></div>
-                                <span id="fracDenBGirls">2</span>
+                                <span id="fracDenBGirls" class="fraction-value">2</span>
                             </div>
                         </div>
                     </div>
+                </div>
+                <div style="text-align:center; margin-top:8px;">
+                    <button id="reveal-fractions-btn" class="secondary hidden">Reveal Fractions</button>
                 </div>
             </div>
         </div>
@@ -120,6 +123,30 @@
         const labelB = document.getElementById('labelB');
         const bar = document.getElementById('barContainer');
         const totalDisp = document.getElementById('totalDisplay');
+        const revealBtn = document.getElementById('reveal-fractions-btn');
+
+        function showFractions(show) {
+            document.querySelectorAll('.fraction-value').forEach(el => {
+                if (show) el.classList.add('show'); else el.classList.remove('show');
+            });
+        }
+
+        if (revealBtn) {
+            revealBtn.addEventListener('click', function() {
+                const isActive = revealBtn.classList.contains('active');
+                if (isActive) {
+                    // Hide fractions and update button
+                    showFractions(false);
+                    revealBtn.classList.remove('active');
+                    revealBtn.textContent = 'Reveal Fractions';
+                } else {
+                    // Show fractions and update button
+                    showFractions(true);
+                    revealBtn.classList.add('active');
+                    revealBtn.textContent = 'Hide Fractions';
+                }
+            });
+        }
 
         function update() {
             const a = Math.max(0, parseInt(inputA.value) || 0);
@@ -150,13 +177,23 @@
             bar.innerHTML = '';
             for(let i=0; i<a; i++) {
                 const u = document.createElement('div');
-                u.className = 'bar-unit flex-1 bg-rose-500 border-r border-white/20';
+                u.className = 'bar-unit flex-1 bg-rose-500';
+                if(i < a-1 || b > 0) u.style.borderRight = '2px solid black';
                 bar.appendChild(u);
             }
             for(let i=0; i<b; i++) {
                 const u = document.createElement('div');
-                u.className = 'bar-unit flex-1 bg-blue-500 border-r border-white/20';
+                u.className = 'bar-unit flex-1 bg-blue-500';
+                if(i < b-1) u.style.borderRight = '2px solid black';
                 bar.appendChild(u);
+            }
+            // reveal the Reveal button only when there is something to reveal
+            if (revealBtn) {
+                if ((a + b) > 0) {
+                    revealBtn.classList.remove('hidden');
+                } else {
+                    revealBtn.classList.add('hidden');
+                }
             }
         }
 

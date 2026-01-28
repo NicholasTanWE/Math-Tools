@@ -1,5 +1,9 @@
 /* fraction-vs-ratio/style.css - small overrides to align with repo style-guide */
-body { font-family: Inter, 'Segoe UI', Arial, sans-serif; }
+html {
+	/* increase base font size so Tailwind utility sizes scale up */
+	font-size: 18px;
+}
+body { font-family: Inter, 'Segoe UI', Arial, sans-serif; font-size: 1rem; }
 .main-header h1 { color: var(--text-dark, #222); }
 
 /* Ensure the demo keeps reasonable max width */
@@ -7,3 +11,56 @@ body { font-family: Inter, 'Segoe UI', Arial, sans-serif; }
 
 /* Make bar units visible when Tailwind not loaded or to complement style-guide */
 .bar-unit { min-width: 0; }
+
+/* Make each bar segment outlined in black so segments stand out */
+.bar-unit {
+    /* draw a thick black separator on the right edge of every unit so segments appear distinct */
+    border-right: 4px solid #000;
+    box-sizing: border-box;
+    border-radius: 0;
+}
+.bar-unit:last-child {
+    /* last unit doesn't need right border since container provides the outline */
+    border-right: none;
+}/* Make the bar container have a clear black outline and sharp corners */
+#barContainer {
+	border: 2px solid #000 !important;
+	border-radius: 0 !important;
+}
+
+/* Fraction values hidden by default until revealed */
+.fraction-value { display: none; }
+.fraction-value.show { display: inline; }
+
+/* Reveal Fractions button styling */
+#reveal-fractions-btn {
+    border: 2px solid #6366f1; /* indigo border to match theme */
+    background: transparent;
+    color: #6366f1;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#reveal-fractions-btn:hover {
+    background: #6366f1;
+    color: white;
+}
+
+/* Active/toggled state when fractions are revealed */
+#reveal-fractions-btn.active {
+    background: #6366f1;
+    color: white;
+    border-color: #4f46e5;
+}
+
+/* Slightly increase inputs and small labels for readability */
+input[type="number"], input[type="text"] {
+	font-size: 1rem; /* ensure inputs scale with new base */
+}
+
+/* Increase the prominent title sizes where Tailwind utilities are used */
+.text-3xl { font-size: 2.25rem; }
+.text-xl { font-size: 1.125rem; }
