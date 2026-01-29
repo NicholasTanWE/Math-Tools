@@ -4,43 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ratio Scaler Explorer</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Import style guide -->
+    <link rel="stylesheet" href="../style-guide/colors.css">
+    <link rel="stylesheet" href="../style-guide/typography.css">
+    <link rel="stylesheet" href="../style-guide/layout.css">
+    <link rel="stylesheet" href="../style-guide/components.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        
-        body { font-family: 'Inter', sans-serif; }
-
         .ratio-bar-container {
             height: 60px;
             width: 100%;
-            border-radius: 12px;
+            border-radius: 8px;
             overflow: hidden;
             display: flex;
             position: relative;
-            background: #f1f5f9;
+            background: #fff;
+            border: 2px solid #ccc;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
         }
 
         .segment {
             height: 100%;
-            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: width 0.6s ease;
         }
 
-        .red-segment { background-color: #ef4444; }
-        .blue-segment { background-color: #3b82f6; }
+        .red-segment { background-color: var(--primary-red); }
+        .blue-segment { background-color: var(--primary-blue); }
 
         .overlay-marker {
             position: absolute;
             top: 0;
             bottom: 0;
             width: 3px;
-            background-color: rgba(255, 255, 255, 0.7);
+            background-color: #000;
             z-index: 10;
             pointer-events: none;
         }
 
         .scaling-card {
-            transition: border-color 0.4s ease, box-shadow 0.4s ease;
-            border-width: 6px;
+            transition: border-color 0.4s ease;
+            border-width: 3px;
         }
 
         .unit-circle {
@@ -49,9 +51,23 @@
             border-radius: 50%;
             display: inline-block;
             transition: all 0.3s ease;
+            border: 2px solid #000;
         }
 
-        /* Custom Input Styling */
+        .red-units { background-color: var(--primary-red); }
+        .blue-units { background-color: var(--primary-blue); }
+
+        /* Input Styling */
+        input[type=number], input[type=text] {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            border: 1px solid #ccc;
+            font-size: 1.1rem;
+            padding: 0.5em;
+            font-family: var(--font-main);
+        }
+
         input[type=number] {
             -moz-appearance: textfield;
         }
@@ -60,127 +76,248 @@
             -webkit-appearance: none;
             margin: 0;
         }
+
+        input[type=range] {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .control-panel {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            border: 2px solid #ccc;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .visualization-area {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            border: 2px solid #ccc;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin: 1rem 0;
+        }
+
+        .mode-btn {
+            padding: 0.5em 1em;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .mode-btn.active {
+            background: var(--primary-blue);
+            color: var(--text-light);
+        }
+
+        .mode-btn.inactive {
+            background: #ccc;
+            color: var(--text-main);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+
+        .verification-box {
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 1rem;
+            border: 2px solid #ccc;
+        }
+
+        .equivalent {
+            background: #d4edda;
+            color: #155724;
+            border-color: var(--primary-green);
+        }
+
+        .different {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: var(--primary-red);
+        }
+
+        .ratio-input-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .ratio-input {
+            width: 80px;
+            text-align: center;
+        }
+
+        .scale-controls {
+            margin: 1rem 0;
+        }
+
+        .scale-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.5rem 0;
+        }
+
+        .units-container {
+            min-height: 40px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            align-items: flex-start;
+            margin: 0.5rem 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .layout-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
-<body class="bg-[#f8fafc] min-h-screen p-4 md:p-10">
-
-    <div class="max-w-6xl mx-auto space-y-6">
-        
-        <!-- Premium Header -->
-        <header class="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div>
-                <h1 class="text-3xl font-800 text-slate-900 tracking-tight">Ratio Scaler <span class="text-indigo-600">Explorer</span></h1>
-                <p class="text-slate-500 font-500 text-sm uppercase tracking-widest mt-1">Multiplicative vs Additive Reasoning</p>
-            </div>
-            <div class="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
-                <button id="modeMult" onclick="setMode('multiply')" class="px-6 py-2 rounded-xl text-xs font-800 transition-all bg-white shadow-sm text-slate-900">MULTIPLICATION</button>
-                <button id="modeAdd" onclick="setMode('add')" class="px-6 py-2 rounded-xl text-xs font-800 transition-all text-slate-400 hover:text-slate-600">ADDITION</button>
-            </div>
-        </header>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<body>
+    <nav style="margin: 0;">
+        <a href="../index.html" style="font-size:1.1rem; text-decoration:underline; color:#fff;">← Back to Landing Page</a>
+    </nav>
+    <header class="main-header" style="margin-top:0;">
+        <h1>Ratio Scaler Explorer</h1>
+        <nav>Multiplicative vs Additive Reasoning</nav>
+    </header>
+    
+    <div class="container">
+        <div class="layout-grid">
             
-            <!-- Left Panel: Inputs -->
-            <aside class="lg:col-span-4 space-y-6">
-                <!-- Base Settings -->
-                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-6">
-                    <h2 class="text-[11px] font-800 text-slate-400 uppercase tracking-widest">1. Base Ratio Setup</h2>
+            <!-- Left Panel: Controls -->
+            <aside>
+                <!-- Mode Selection -->
+                <div class="control-panel">
+                    <div class="section-title">Mode Selection</div>
+                    <div class="mode-selector">
+                        <button id="modeMult" onclick="setMode('multiply')" class="mode-btn active">MULTIPLICATION</button>
+                        <button id="modeAdd" onclick="setMode('add')" class="mode-btn inactive">ADDITION</button>
+                    </div>
+                </div>
+                
+                <!-- Base Ratio Setup -->
+                <div class="control-panel">
+                    <div class="section-title">1. Base Ratio Setup</div>
                     
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-2 gap-3">
-                            <input type="text" id="labelA" value="Red Paint" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-600 outline-none focus:ring-2 focus:ring-red-500">
-                            <input type="text" id="labelB" value="Blue Paint" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-600 outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div class="flex items-center justify-between bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                            <input type="number" id="baseA" value="1" min="1" class="w-16 bg-transparent text-2xl font-800 text-center text-red-600">
-                            <span class="text-2xl font-800 text-slate-300">:</span>
-                            <input type="number" id="baseB" value="2" min="1" class="w-16 bg-transparent text-2xl font-800 text-center text-blue-600">
-                        </div>
+                    <div style="margin-bottom: 1rem;">
+                        <input type="text" id="labelA" value="Red Paint" placeholder="Item A Name">
+                        <input type="text" id="labelB" value="Blue Paint" placeholder="Item B Name" style="margin-top: 0.5rem;">
+                    </div>
+                    
+                    <div class="ratio-input-section">
+                        <input type="number" id="baseA" value="1" min="1" class="ratio-input">
+                        <span style="font-size: 1.5rem; font-weight: bold;">:</span>
+                        <input type="number" id="baseB" value="2" min="1" class="ratio-input">
                     </div>
                 </div>
 
                 <!-- Scaling Factor -->
-                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-6">
-                    <div class="flex justify-between items-center">
-                        <h2 class="text-[11px] font-800 text-slate-400 uppercase tracking-widest">2. Scale Amounts</h2>
-                        <span id="scaleDisplay" class="text-lg font-800 text-indigo-600"></span>
+                <div class="control-panel">
+                    <div class="section-title">2. Scale Amounts <span id="scaleDisplay"></span></div>
+                    
+                    <div class="scale-controls">
+                        <div class="scale-item">
+                            <span class="displayNameA">Item A</span>
+                            <span id="valA">×1</span>
+                        </div>
+                        <input type="range" id="factorA" min="1" max="10" value="1">
+                        
+                        <div class="scale-item">
+                            <span class="displayNameB">Item B</span>
+                            <span id="valB">×1</span>
+                        </div>
+                        <input type="range" id="factorB" min="1" max="10" value="1">
                     </div>
                     
-                    <div class="space-y-6">
-                        <div class="space-y-2">
-                            <div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase">
-                                <span class="displayNameA">Item A</span>
-                                <span id="valA">1</span>
-                            </div>
-                            <input type="range" id="factorA" min="1" max="10" value="1" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-red-500">
-                        </div>
-                        <div class="space-y-2">
-                            <div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase">
-                                <span class="displayNameB">Item B</span>
-                                <span id="valB">1</span>
-                            </div>
-                            <input type="range" id="factorB" min="1" max="10" value="1" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-500">
-                        </div>
-                    </div>
-                    <button id="syncBtn" onclick="syncFactors()" class="w-full py-2 bg-slate-100 text-slate-600 text-[10px] font-800 rounded-xl tracking-widest uppercase hover:bg-slate-200 border border-slate-200 transition-all">Link Factors</button>
+                    <button id="syncBtn" onclick="syncFactors()" class="btn">Link Factors</button>
                 </div>
             </aside>
 
             <!-- Right Panel: Visualization -->
-            <main class="lg:col-span-8 space-y-6">
+            <main>
                 
                 <!-- Bars View -->
-                <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 space-y-10">
+                <div class="visualization-area">
+                    <div class="section-title">Ratio Visualization</div>
                     
                     <!-- Original Bar -->
-                    <div class="space-y-3">
-                        <h3 class="text-xs font-800 text-slate-400 uppercase tracking-widest">Original Result Mix</h3>
-                        <div class="ratio-bar-container border-4 border-white shadow-sm">
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Original Result Mix</h3>
+                        <div class="ratio-bar-container">
                             <div id="baseBarA" class="segment red-segment"></div>
                             <div id="baseBarB" class="segment blue-segment"></div>
                         </div>
                     </div>
 
                     <!-- Scaling Result Bar -->
-                    <div class="space-y-3">
-                        <h3 class="text-xs font-800 text-slate-400 uppercase tracking-widest">Scaling Result</h3>
-                        <div id="scalingCard" class="ratio-bar-container border-white shadow-xl bg-white">
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Scaling Result</h3>
+                        <div id="scalingCard" class="ratio-bar-container scaling-card">
                             <div id="overlayMarker" class="overlay-marker"></div>
                             <div id="scaleBarA" class="segment red-segment"></div>
                             <div id="scaleBarB" class="segment blue-segment"></div>
                         </div>
                     </div>
-
                 </div>
 
                 <!-- Unit Illustration -->
-                <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 space-y-8">
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-                            <span class="text-xs font-800 text-slate-500 uppercase tracking-widest"><span class="displayNameA">Item A</span> Units: <span id="finalCountA" class="text-red-600 font-900">1</span></span>
-                        </div>
-                        <div id="illustrationA" class="flex flex-wrap gap-2 min-h-[30px]"></div>
+                <div class="visualization-area">
+                    <div class="section-title">Unit Count</div>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <strong><span class="displayNameA">Item A</span> Units: <span id="finalCountA" style="color: var(--primary-red);">1</span></strong>
+                        <div id="illustrationA" class="units-container"></div>
                     </div>
 
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-                            <span class="text-xs font-800 text-slate-500 uppercase tracking-widest"><span class="displayNameB">Item B</span> Units: <span id="finalCountB" class="text-blue-600 font-900">2</span></span>
-                        </div>
-                        <div id="illustrationB" class="flex flex-wrap gap-2 min-h-[30px]"></div>
+                    <div style="margin-bottom: 1rem;">
+                        <strong><span class="displayNameB">Item B</span> Units: <span id="finalCountB" style="color: var(--primary-blue);">2</span></strong>
+                        <div id="illustrationB" class="units-container"></div>
                     </div>
                 </div>
 
                 <!-- Final Verification -->
-                <div id="verificationBox" class="p-6 rounded-3xl text-center font-800 text-lg transition-all duration-500 shadow-sm border-2">
+                <div id="verificationBox" class="verification-box">
                     Start adjusting values to verify the ratio.
                 </div>
             </main>
         </div>
-
-        <footer class="text-center py-6 text-slate-400 text-[10px] font-700 uppercase tracking-[0.2em]">
-            Primary Math Lab • Ratio Visualization Heuristics
-        </footer>
     </div>
+
+    <footer>
+        <p>&copy; Nicholas Tan</p>
+    </footer>
 
     <script>
         let mode = 'multiply';
@@ -197,8 +334,16 @@
 
         function setMode(newMode) {
             mode = newMode;
-            document.getElementById('modeMult').className = mode === 'multiply' ? 'px-6 py-2 rounded-xl text-xs font-800 transition-all bg-white shadow-sm text-slate-900' : 'px-6 py-2 rounded-xl text-xs font-800 transition-all text-slate-400 hover:text-slate-600';
-            document.getElementById('modeAdd').className = mode === 'add' ? 'px-6 py-2 rounded-xl text-xs font-800 transition-all bg-white shadow-sm text-rose-600 border border-rose-100' : 'px-6 py-2 rounded-xl text-xs font-800 transition-all text-slate-400 hover:text-slate-600';
+            const multBtn = document.getElementById('modeMult');
+            const addBtn = document.getElementById('modeAdd');
+            
+            if (mode === 'multiply') {
+                multBtn.className = 'mode-btn active';
+                addBtn.className = 'mode-btn inactive';
+            } else {
+                multBtn.className = 'mode-btn inactive';
+                addBtn.className = 'mode-btn active';
+            }
             
             // Reset factors on mode change
             factorA.value = 1;
@@ -210,13 +355,13 @@
             factorsSynced = !factorsSynced;
             if (factorsSynced) {
                 factorB.value = factorA.value;
-                syncBtn.classList.remove('bg-slate-100', 'text-slate-600');
-                syncBtn.classList.add('bg-indigo-600', 'text-white', 'border-indigo-700', 'shadow-md');
-                syncBtn.innerText = "Factors Linked";
+                syncBtn.textContent = "Factors Linked";
+                syncBtn.style.background = "var(--primary-blue)";
+                syncBtn.style.color = "var(--text-light)";
             } else {
-                syncBtn.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-700', 'shadow-md');
-                syncBtn.classList.add('bg-slate-100', 'text-slate-600');
-                syncBtn.innerText = "Link Factors";
+                syncBtn.textContent = "Link Factors";
+                syncBtn.style.background = "var(--primary-green)";
+                syncBtn.style.color = "var(--text-light)";
             }
             update();
         }
@@ -233,19 +378,19 @@
             const fB = parseInt(factorB.value);
 
             // Update Labels
-            document.querySelectorAll('.displayNameA').forEach(el => el.innerText = labelA.value);
-            document.querySelectorAll('.displayNameB').forEach(el => el.innerText = labelB.value);
+            document.querySelectorAll('.displayNameA').forEach(el => el.textContent = labelA.value);
+            document.querySelectorAll('.displayNameB').forEach(el => el.textContent = labelB.value);
             
             const opA = mode === 'multiply' ? '×' + fA : '+' + (fA-1);
             const opB = mode === 'multiply' ? '×' + fB : '+' + (fB-1);
-            document.getElementById('valA').innerText = opA;
-            document.getElementById('valB').innerText = opB;
+            document.getElementById('valA').textContent = opA;
+            document.getElementById('valB').textContent = opB;
 
             // Update Scale Indicator Header
             if (factorsSynced) {
-                scaleDisplay.innerText = mode === 'multiply' ? '× ' + fA : '+ ' + (fA-1);
+                scaleDisplay.textContent = '(' + (mode === 'multiply' ? '× ' + fA : '+ ' + (fA-1)) + ')';
             } else {
-                scaleDisplay.innerText = "";
+                scaleDisplay.textContent = "";
             }
 
             // Calculate Totals
@@ -258,8 +403,8 @@
                 finalB = bB + (fB - 1);
             }
 
-            document.getElementById('finalCountA').innerText = finalA;
-            document.getElementById('finalCountB').innerText = finalB;
+            document.getElementById('finalCountA').textContent = finalA;
+            document.getElementById('finalCountB').textContent = finalB;
 
             // Bar Percentages
             const baseTotal = bA + bB;
@@ -282,18 +427,18 @@
             const sCard = document.getElementById('scalingCard');
 
             if (isEquivalent) {
-                vBox.innerText = `Equivalent Ratios: ${finalA}:${finalB} is same as ${bA}:${bB}`;
-                vBox.className = "p-6 rounded-3xl text-center font-800 text-lg transition-all duration-500 bg-emerald-50 text-emerald-700 border-emerald-200 border-2";
-                sCard.style.borderColor = "#10b981"; // Emerald-500
+                vBox.textContent = `Equivalent Ratios: ${finalA}:${finalB} is same as ${bA}:${bB}`;
+                vBox.className = "verification-box equivalent";
+                sCard.style.borderColor = "var(--primary-green)";
             } else {
-                vBox.innerText = `Changed Ratio: ${finalA}:${finalB} is NOT the same as ${bA}:${bB}`;
-                vBox.className = "p-6 rounded-3xl text-center font-800 text-lg transition-all duration-500 bg-rose-50 text-rose-700 border-rose-200 border-2";
-                sCard.style.borderColor = "#f43f5e"; // Rose-500
+                vBox.textContent = `Changed Ratio: ${finalA}:${finalB} is NOT the same as ${bA}:${bB}`;
+                vBox.className = "verification-box different";
+                sCard.style.borderColor = "var(--primary-red)";
             }
 
             // Illustrations
-            renderUnits('illustrationA', finalA, 'bg-red-500');
-            renderUnits('illustrationB', finalB, 'bg-blue-500');
+            renderUnits('illustrationA', finalA, 'red-units');
+            renderUnits('illustrationB', finalB, 'blue-units');
         }
 
         function renderUnits(id, count, colorClass) {
@@ -301,7 +446,7 @@
             container.innerHTML = '';
             for(let i=0; i < count; i++) {
                 const dot = document.createElement('div');
-                dot.className = `unit-circle ${colorClass} shadow-sm border border-white/20`;
+                dot.className = `unit-circle ${colorClass}`;
                 container.appendChild(dot);
             }
         }
