@@ -32,28 +32,16 @@ body { font-family: Inter, 'Segoe UI', Arial, sans-serif; font-size: 1rem; }
 .fraction-value { display: none; }
 .fraction-value.show { display: inline; }
 
-/* Reveal Fractions button styling */
-#reveal-fractions-btn {
-    border: 2px solid #6366f1; /* indigo border to match theme */
-    background: transparent;
-    color: #6366f1;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-weight: 600;
+/* Fraction box interactive styles */
+.fraction-box {
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+    user-select: none; /* prevent text selection when clicking */
 }
 
-#reveal-fractions-btn:hover {
-    background: #6366f1;
-    color: white;
-}
-
-/* Active/toggled state when fractions are revealed */
-#reveal-fractions-btn.active {
-    background: #6366f1;
-    color: white;
-    border-color: #4f46e5;
+.fraction-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* Slightly increase inputs and small labels for readability */

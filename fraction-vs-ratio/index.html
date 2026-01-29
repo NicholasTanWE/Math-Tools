@@ -67,7 +67,7 @@
                 <div class="grid grid-cols-2 gap-4">
                     <!-- Section A (Girls) -->
                     <div class="space-y-4">
-                        <div class="text-center p-3 bg-rose-50 rounded-2xl border border-rose-100">
+                        <div id="fraction-a-total" class="fraction-box text-center p-3 bg-rose-50 rounded-2xl border border-rose-100 cursor-pointer hover:bg-rose-100 transition-colors">
                             <span class="text-[10px] font-800 text-rose-400 tracking-widest"><span class="dispA uppercase">GIRLS</span> as a fraction of the total</span>
                             <div class="mt-1 text-xl font-800 text-rose-600">
                                 <span id="fracNumATotal" class="fraction-value">2</span>
@@ -75,7 +75,7 @@
                                 <span id="fracDenATotal" class="fraction-value">5</span>
                             </div>
                         </div>
-                        <div class="text-center p-3 bg-rose-50 rounded-2xl border-2 border-dashed border-rose-200">
+                        <div id="fraction-a-boys" class="fraction-box text-center p-3 bg-rose-50 rounded-2xl border-2 border-dashed border-rose-200 cursor-pointer hover:bg-rose-100 transition-colors">
                             <span class="text-[10px] font-800 text-rose-400 tracking-widest"><span class="dispA uppercase">GIRLS</span> as a fraction of the <span class="dispB uppercase">BOYS</span></span>
                             <div class="mt-1 text-xl font-800 text-rose-600">
                                 <span id="fracNumABoys" class="fraction-value">2</span>
@@ -87,7 +87,7 @@
 
                     <!-- Section B (Boys) -->
                     <div class="space-y-4">
-                        <div class="text-center p-3 bg-blue-50 rounded-2xl border border-blue-100">
+                        <div id="fraction-b-total" class="fraction-box text-center p-3 bg-blue-50 rounded-2xl border border-blue-100 cursor-pointer hover:bg-blue-100 transition-colors">
                             <span class="text-[10px] font-800 text-blue-400 tracking-widest"><span class="dispB uppercase">BOYS</span> as a fraction of the total</span>
                             <div class="mt-1 text-xl font-800 text-blue-600">
                                 <span id="fracNumBTotal" class="fraction-value">3</span>
@@ -95,7 +95,7 @@
                                 <span id="fracDenBTotal" class="fraction-value">5</span>
                             </div>
                         </div>
-                        <div class="text-center p-3 bg-blue-50 rounded-2xl border-2 border-dashed border-blue-200">
+                        <div id="fraction-b-girls" class="fraction-box text-center p-3 bg-blue-50 rounded-2xl border-2 border-dashed border-blue-200 cursor-pointer hover:bg-blue-100 transition-colors">
                             <span class="text-[10px] font-800 text-blue-400 tracking-widest"><span class="dispB uppercase">BOYS</span> as a fraction of the <span class="dispA uppercase">GIRLS</span></span>
                             <div class="mt-1 text-xl font-800 text-blue-600">
                                 <span id="fracNumBGirls" class="fraction-value">3</span>
@@ -105,9 +105,8 @@
                         </div>
                     </div>
                 </div>
-                <div style="text-align:center; margin-top:8px;">
-                    <button id="reveal-fractions-btn" class="secondary hidden">Reveal Fractions</button>
-                </div>
+
+                <p class="text-xs text-slate-500 mt-2 text-center">Click each colored box below to reveal or hide its fraction.</p>
             </div>
         </div>
 
@@ -123,30 +122,24 @@
         const labelB = document.getElementById('labelB');
         const bar = document.getElementById('barContainer');
         const totalDisp = document.getElementById('totalDisplay');
-        const revealBtn = document.getElementById('reveal-fractions-btn');
 
-        function showFractions(show) {
-            document.querySelectorAll('.fraction-value').forEach(el => {
-                if (show) el.classList.add('show'); else el.classList.remove('show');
+        // Add click handlers to each fraction box for individual reveal/hide
+        document.querySelectorAll('.fraction-box').forEach(box => {
+            box.addEventListener('click', function() {
+                // Find fraction values within this specific box
+                const fractionValues = box.querySelectorAll('.fraction-value');
+                const isRevealed = fractionValues[0] && fractionValues[0].classList.contains('show');
+                
+                // Toggle the fraction values within this box only
+                fractionValues.forEach(el => {
+                    if (isRevealed) {
+                        el.classList.remove('show');
+                    } else {
+                        el.classList.add('show');
+                    }
+                });
             });
-        }
-
-        if (revealBtn) {
-            revealBtn.addEventListener('click', function() {
-                const isActive = revealBtn.classList.contains('active');
-                if (isActive) {
-                    // Hide fractions and update button
-                    showFractions(false);
-                    revealBtn.classList.remove('active');
-                    revealBtn.textContent = 'Reveal Fractions';
-                } else {
-                    // Show fractions and update button
-                    showFractions(true);
-                    revealBtn.classList.add('active');
-                    revealBtn.textContent = 'Hide Fractions';
-                }
-            });
-        }
+        });
 
         function update() {
             const a = Math.max(0, parseInt(inputA.value) || 0);
@@ -186,14 +179,6 @@
                 u.className = 'bar-unit flex-1 bg-blue-500';
                 if(i < b-1) u.style.borderRight = '2px solid black';
                 bar.appendChild(u);
-            }
-            // reveal the Reveal button only when there is something to reveal
-            if (revealBtn) {
-                if ((a + b) > 0) {
-                    revealBtn.classList.remove('hidden');
-                } else {
-                    revealBtn.classList.add('hidden');
-                }
             }
         }
 
