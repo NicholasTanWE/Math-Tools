@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dice Roller</title>
+    <!-- Import style guide -->
+    <link rel="stylesheet" href="../style-guide/colors.css">
+    <link rel="stylesheet" href="../style-guide/typography.css">
+    <link rel="stylesheet" href="../style-guide/layout.css">
+    <link rel="stylesheet" href="../style-guide/components.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav style="margin: 0;">
+      <a href="../index.html" style="font-size:1.1rem; text-decoration:underline; color:#fff;">← Back to Landing Page</a>
+    </nav>
+    <header class="main-header" style="margin-top:0;">
+      <h1>Dice Roller</h1>
+    </header>
+    <div class="container">
+        <div class="controls">
+            <label for="numDice">Number of Dice:</label>
+            <input type="number" id="numDice" min="1" max="10" value="1">
+            <label for="numSides">Number of Sides:</label>
+            <input type="number" id="numSides" min="3" max="20" value="6">
+            <button id="rollButton">Roll Dice</button>
+        </div>
+        <div id="diceContainer" class="dice-container">
+            <!-- Dice will be added here -->
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

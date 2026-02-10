@@ -1,0 +1,98 @@
+/* Dice Roller Styles */
+
+body, h1, .controls, .controls label, .controls input, .controls select, button {
+    font-family: 'Segoe UI', 'Arial', sans-serif !important;
+}
+
+.dice-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.die {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+    font-weight: bold;
+    color: white;
+    transition: transform 0.5s ease-out;
+}
+
+.die.rolling {
+    animation: swivel 0.8s ease-in-out;
+}
+
+@keyframes swivel {
+    0% { transform: rotateY(0deg); }
+    50% { transform: rotateY(180deg); }
+    100% { transform: rotateY(360deg); }
+}
+
+/* Polygon shapes based on number of sides */
+.die-3 {
+    background-color: var(--primary-red);
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+.die-4 {
+    background-color: var(--primary-blue);
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+}
+
+.die-5 {
+    background-color: var(--primary-green);
+    clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+}
+
+.die-6 {
+    background-color: var(--primary-yellow);
+    clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+}
+
+.die-7 {
+    background-color: var(--primary-red);
+    clip-path: polygon(50% 0%, 90% 20%, 100% 60%, 75% 100%, 25% 100%, 0% 60%, 10% 20%);
+}
+
+.die-8 {
+    background-color: var(--primary-blue);
+    clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+}
+
+.die-9 {
+    background-color: var(--primary-green);
+    clip-path: polygon(50% 0%, 83% 12%, 100% 38%, 95% 69%, 70% 95%, 30% 95%, 5% 69%, 0% 38%, 17% 12%);
+}
+
+.die-10 {
+    background-color: var(--primary-yellow);
+    clip-path: polygon(50% 0%, 80% 10%, 100% 35%, 100% 65%, 80% 90%, 50% 100%, 20% 90%, 0% 65%, 0% 35%, 20% 10%);
+}
+
+.die-11 {
+    background-color: var(--primary-red);
+    clip-path: polygon(50% 0%, 77% 8%, 95% 25%, 100% 50%, 95% 75%, 77% 92%, 50% 100%, 23% 92%, 5% 75%, 0% 50%, 5% 25%, 23% 8%);
+}
+
+.die-12 {
+    background-color: var(--primary-blue);
+    clip-path: polygon(50% 0%, 75% 7%, 93% 25%, 100% 50%, 93% 75%, 75% 93%, 50% 100%, 25% 93%, 7% 75%, 0% 50%, 7% 25%, 25% 7%);
+}
+
+.die-13, .die-14, .die-15, .die-16, .die-17, .die-18, .die-19, .die-20 {
+    background-color: var(--primary-green);
+    border-radius: 50%;
+}
+
+.number {
+    position: absolute;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
