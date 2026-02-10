@@ -1,3 +1,43 @@
+/* Dice Panel Styles */
+.dice-panel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    margin-top: 30px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.toggle-btn {
+    background-color: var(--primary-blue, #0074D9);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 18px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    outline: none;
+}
+
+.toggle-btn.toggled {
+    background-color: var(--primary-green, #2ECC40);
+    color: #fff;
+}
+
+.panel-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 10px;
+    color: var(--primary-blue, #0074D9);
+    background: #f7f7f7;
+    border-radius: 4px;
+    padding: 4px 10px;
+    min-width: 80px;
+    display: inline-block;
+    text-align: center;
+}
 /* Dice Roller Styles */
 
 body, h1, .controls, .controls label, .controls input, .controls select, button {
