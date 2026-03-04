@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Drawing Tool</title>
+    <link rel="stylesheet" href="../style-guide/colors.css">
+    <link rel="stylesheet" href="../style-guide/typography.css">
+    <link rel="stylesheet" href="../style-guide/layout.css">
+    <link rel="stylesheet" href="../style-guide/components.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-content">
+            <a href="../index.html" class="back-link">← Back to Math Tools</a>
+            <h1>Model Drawing Tool</h1>
+        </div>
+    </header>
+    <main>
+        <div class="toolbar">
+            <button id="addBarBtn">Add Bar</button>
+            <button id="addUnitBarBtn">Add Unit Bar</button>
+            <button id="addBraceBtn">Add Brace Label</button>
+            <button id="addTextBoxBtn">Add Text Box</button>
+            <span class="toolbar-separator">|</span>
+            <label for="barColorInput">Bar Color:</label>
+            <input type="color" id="barColorInput" value="#e0e0e0" title="Choose bar color">
+            <span class="toolbar-separator">|</span>
+            <button id="undoBtn">Undo</button>
+            <button id="redoBtn">Redo</button>
+            <button id="clearAllBtn">Clear All</button>
+        </div>
+        <div class="canvas-container">
+            <svg id="modelCanvas" width="900" height="500"></svg>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
