@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Circle Area Wedge Explorer</title>
+  <link rel="stylesheet" href="../style-guide/colors.css">
+  <link rel="stylesheet" href="../style-guide/typography.css">
+  <link rel="stylesheet" href="../style-guide/layout.css">
+  <link rel="stylesheet" href="../style-guide/components.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav style="margin: 0;">
+    <a href="../index.html" style="font-size:1.1rem; text-decoration:underline; color:#fff;">← Back to Landing Page</a>
+  </nav>
+  <header class="main-header" style="margin-top:0;">
+    <h1>Circle Area Wedge Explorer</h1>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="instructions card">
+        <h2>What to Observe</h2>
+        <ul>
+          <li>Slice the circle into blue and red wedges.</li>
+          <li>Phase 4: blue wedges move above while red wedges move below.</li>
+          <li>Phase 5: wedges combine into a near-rectangle to show area of a circle.</li>
+        </ul>
+      </section>
+
+      <section class="controls card" aria-label="Controls">
+        <div class="control-grid">
+          <div class="control-item">
+            <label for="radiusInput">Radius (r)</label>
+            <input id="radiusInput" type="number" min="1" max="200" step="0.01" value="10">
+          </div>
+          <div class="control-item">
+            <label for="sliceCount">Number of Slices</label>
+            <input id="sliceCount" type="range" min="6" max="60" step="2" value="24">
+            <div class="small-text"><span id="sliceValue">24</span> slices</div>
+          </div>
+          <div class="control-item">
+            <label for="speedType">Animation Speed</label>
+            <select id="speedType">
+              <option value="instant">Instant</option>
+              <option value="fast">Fast</option>
+              <option value="regular" selected>Regular</option>
+              <option value="slow">Slow</option>
+              <option value="very-slow">Very Slow</option>
+            </select>
+          </div>
+          <div class="control-item button-group" role="group" aria-label="Phase controls">
+            <button id="rewindBtn" type="button">Rewind</button>
+            <button id="forwardBtn" type="button">Forward</button>
+            <button id="resetBtn" type="button">Reset</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="viz card" aria-label="Visualization">
+        <canvas id="wedgeCanvas" width="980" height="420" aria-label="Circle area wedge visualization"></canvas>
+        <div class="phase-readout" id="phaseReadout"></div>
+        <div class="math-readout" id="mathReadout"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; Nicholas Tan</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+body,
+header.main-header h1,
+.instructions,
+.controls,
+.controls label,
+.controls input[type="number"],
+.controls select,
+button,
+.btn,
+.math-readout,
+.viz {
+  font-family: 'Segoe UI', 'Arial', sans-serif !important;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border: 2px solid #ccc;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.instructions {
+  font-size: 1.05rem;
+}
+
+.instructions h2 {
+  margin-top: 0;
+}
+
+.control-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: end;
+}
+
+.control-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 180px;
+}
+
+.control-item label {
+  font-weight: bold;
+}
+
+.control-item input,
+.control-item select {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  font-size: 1.1rem;
+  padding: 0.5em;
+}
+
+.button-group {
+  flex-direction: row;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.viz {
+  padding: 1rem;
+}
+
+#rollCanvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border: 2px solid #ccc;
+}
+
+.math-readout {
+  margin-top: 0.9rem;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 700px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .control-item {
+    min-width: 100%;
+  }
+
+  .button-group {
+    justify-content: flex-start;
+  }
+}

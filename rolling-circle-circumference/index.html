@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rolling Circle & Circumference Explorer</title>
+  <link rel="stylesheet" href="../style-guide/colors.css">
+  <link rel="stylesheet" href="../style-guide/typography.css">
+  <link rel="stylesheet" href="../style-guide/layout.css">
+  <link rel="stylesheet" href="../style-guide/components.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav style="margin: 0;">
+    <a href="../index.html" style="font-size:1.1rem; text-decoration:underline; color:#fff;">← Back to Landing Page</a>
+  </nav>
+  <header class="main-header" style="margin-top:0;">
+    <h1>Rolling Circle & Circumference Explorer</h1>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="instructions card">
+        <h2>What to Observe</h2>
+        <ul>
+          <li>Each full rotation of the circle moves it forward by exactly one circumference, C.</li>
+          <li>Use <strong>Forward</strong> and <strong>Rewind</strong> to move one full rotation at a time.</li>
+          <li>Each completed circumference segment is marked in a different color on the ground line.</li>
+        </ul>
+      </section>
+
+      <section class="controls card" aria-label="Controls">
+        <div class="control-grid">
+          <div class="control-item">
+            <label for="radiusInput">Radius (r)</label>
+            <input id="radiusInput" type="number" min="5" max="100" step="1" value="20">
+          </div>
+          <div class="control-item">
+            <label for="rotationCount">Total Rotations</label>
+            <select id="rotationCount">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3" selected>3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+          </div>
+          <div class="control-item">
+            <label for="objectType">Rolling Object</label>
+            <select id="objectType">
+              <option value="car-wheel">Car Wheel</option>
+              <option value="wagon-wheel">Wagon Wheel</option>
+              <option value="circle">Circle</option>
+            </select>
+          </div>
+          <div class="control-item">
+            <label for="speedType">Rotation Speed</label>
+            <select id="speedType">
+              <option value="instant">Instant</option>
+              <option value="fast">Fast</option>
+              <option value="regular" selected>Regular</option>
+              <option value="slow">Slow</option>
+              <option value="very-slow">Very Slow</option>
+            </select>
+          </div>
+          <div class="control-item button-group" role="group" aria-label="Phase controls">
+            <button id="rewindBtn" type="button">Rewind</button>
+            <button id="forwardBtn" type="button">Forward</button>
+            <button id="resetBtn" type="button">Reset</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="viz card" aria-label="Visualization">
+        <canvas id="rollCanvas" width="980" height="360" aria-label="Rolling circle visualization"></canvas>
+        <div class="math-readout" id="mathReadout"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; Nicholas Tan</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
