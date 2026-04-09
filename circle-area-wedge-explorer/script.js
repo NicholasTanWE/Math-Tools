@@ -36,14 +36,20 @@ function getAnimationDuration() {
 }
 
 function getScene() {
-  const radius = clampValue(Number(radiusInput.value) || 10, 1, 200);
+  const radius = clampValue(Number(radiusInput.value) || 10, 1, 18);
   const slices = clampValue(Number(sliceCountInput.value) || 24, 6, 60);
-  const visualRadius = clampValue(radius * 7, 45, 110);
+  const minInputRadius = 1;
+  const maxInputRadius = 18;
+  const minVisualRadius = 28;
+  const maxVisualRadius = 90;
+  const radiusRatio = (radius - minInputRadius) / (maxInputRadius - minInputRadius);
+  const visualRadius = minVisualRadius + radiusRatio * (maxVisualRadius - minVisualRadius);
 
-  const circleCenter = { x: 250, y: 210 };
+  const layoutCenterY = canvas.height / 2;
+  const circleCenter = { x: 250, y: layoutCenterY };
 
   const rectangleHeight = visualRadius;
-  const rectCenterY = 220;
+  const rectCenterY = layoutCenterY;
   const topY = rectCenterY - rectangleHeight / 2;
   const bottomY = rectCenterY + rectangleHeight / 2;
 
@@ -332,7 +338,7 @@ function animateToPhase(targetPhase) {
 }
 
 function normalizeInputs() {
-  const safeRadius = clampValue(Number(radiusInput.value) || 10, 1, 200);
+  const safeRadius = clampValue(Number(radiusInput.value) || 10, 1, 18);
   radiusInput.value = safeRadius.toFixed(2);
 
   const safeSlices = clampValue(Number(sliceCountInput.value) || 24, 6, 60);
