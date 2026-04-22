@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Behaviour Tracker</title>
+    <link rel="stylesheet" href="../style-guide/colors.css">
+    <link rel="stylesheet" href="../style-guide/typography.css">
+    <link rel="stylesheet" href="../style-guide/layout.css">
+    <link rel="stylesheet" href="../style-guide/components.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav style="margin: 0;">
+        <a href="../index.html" style="color:#fff;">← Back to Landing Page</a>
+    </nav>
+    <header class="main-header" style="margin-top:0;">
+        <h1>Student Behaviour Tracker</h1>
+    </header>
+
+    <main>
+        <!-- Upload Section -->
+        <section id="upload-section" class="card">
+            <h2>Load Student Names</h2>
+            <p class="hint">Upload a CSV file with one student name per row (no header row needed).</p>
+            <div class="upload-row">
+                <input type="file" id="csv-file" accept=".csv">
+                <button id="upload-btn">Upload &amp; Start</button>
+            </div>
+            <div id="cached-notice" class="hidden">
+                <p class="hint">Previous session data found.</p>
+                <button id="load-cached-btn" class="secondary-btn">Resume Cached Session</button>
+            </div>
+        </section>
+
+        <!-- Tracker Section -->
+        <section id="tracker-section" class="hidden">
+            <div class="toolbar">
+                <span id="student-count" class="student-count-badge"></span>
+                <div class="toolbar-actions">
+                    <button id="export-btn">&#8595; Export CSV</button>
+                    <button id="reset-btn" class="danger-btn">&#10005; Reset All Data</button>
+                </div>
+            </div>
+
+            <div class="legend-row">
+                <span class="badge badge-positive">&#43; Positive</span>
+                <span class="badge badge-negative">&#8722; Negative</span>
+                <span class="hint legend-hint">Timestamps accumulate to the right of each student.</span>
+            </div>
+
+            <div id="student-list"></div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

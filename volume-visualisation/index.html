@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Volume Visualiser</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+</main>
+
+  <main class="app">
+    <h1>Volume Visualiser</h1>
+
+    <section class="controls">
+      <div class="inputs">
+        <label>Length: <input id="length" aria-label="Length" type="number" min="1" value="2"></label>
+        <label>Breadth: <input id="breadth" aria-label="Breadth" type="number" min="1" value="3"></label>
+        <label>Height: <input id="height" aria-label="Height" type="number" min="1" value="4"></label>
+        <button id="generate">Generate</button>
+        <button id="resetBtn" type="button">Reset</button>
+        <button id="exportBtn" type="button">Export PNG</button>
+      </div>
+
+      <div class="options">
+        <div class="split-type">
+          <label><input type="radio" name="split" value="horizontal" checked> Horizontal (stacked layers)</label>
+          <label><input type="radio" name="split" value="vertical-length"> Vertical (along Length)</label>
+          <label><input type="radio" name="split" value="vertical-breadth"> Vertical (along Breadth)</label>
+        </div>
+
+        <label class="split-toggle"><input id="showSplit" type="checkbox"> Split into visible layers</label>
+
+        <label>Layer: <input id="layerRange" aria-label="Layer selector" type="range" min="1" value="1"></label>
+        <div id="layerInfo" class="layer-info">Layer 1</div>
+      </div>
+    </section>
+
+    <section class="visual">
+      <div id="scene" class="scene" role="img" aria-label="Volume visualisation"></div>
+      <div class="summary">Volume: <span id="volume" aria-live="polite">0</span> cubes</div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

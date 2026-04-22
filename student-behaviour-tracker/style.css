@@ -1,0 +1,284 @@
+/* ── Upload Section ─────────────────────────────────────────────────────── */
+.upload-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+}
+
+.upload-row input[type="file"] {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 0.4em 0.6em;
+    background: #fff;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.hint {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0.25rem 0;
+}
+
+/* ── Cached Notice ───────────────────────────────────────────────────────── */
+#cached-notice {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background: #fffbe6;
+    border: 1px solid #ffe066;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+#cached-notice p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.secondary-btn {
+    background: var(--primary-blue) !important;
+    color: #fff !important;
+    padding: 0.4em 1em;
+    border-radius: 4px;
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.secondary-btn:hover {
+    background: #1a56b0 !important;
+}
+
+/* ── Toolbar ─────────────────────────────────────────────────────────────── */
+.toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.student-count-badge {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #444;
+    background: #e8eef7;
+    border-radius: 20px;
+    padding: 0.25em 0.9em;
+}
+
+.danger-btn {
+    background: var(--primary-red) !important;
+    color: #fff !important;
+}
+
+.danger-btn:hover {
+    background: #c0392b !important;
+}
+
+/* ── Legend Row ──────────────────────────────────────────────────────────── */
+.legend-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.legend-hint {
+    margin-left: 0.5rem;
+}
+
+/* ── Student Rows ────────────────────────────────────────────────────────── */
+#student-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.student-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 0.6rem 0.9rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    flex-wrap: nowrap;
+}
+
+.student-name {
+    min-width: 160px;
+    max-width: 220px;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-main);
+    padding-top: 0.35rem;
+    word-break: break-word;
+    flex-shrink: 0;
+}
+
+/* ── Behaviour Buttons ───────────────────────────────────────────────────── */
+.btn-group {
+    display: flex;
+    gap: 0.35rem;
+    flex-shrink: 0;
+    padding-top: 0.1rem;
+}
+
+.behaviour-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s, box-shadow 0.1s;
+    flex-shrink: 0;
+}
+
+.behaviour-btn:hover {
+    transform: scale(1.12);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+
+.behaviour-btn:active {
+    transform: scale(0.95);
+}
+
+.btn-positive {
+    background: var(--primary-green) !important;
+    color: #fff !important;
+}
+
+.btn-positive:hover {
+    background: #2a9a5e !important;
+}
+
+.btn-negative {
+    background: var(--primary-red) !important;
+    color: #fff !important;
+}
+
+.btn-negative:hover {
+    background: #c0392b !important;
+}
+
+.btn-top {
+    background: var(--accent) !important;
+    color: var(--text-main) !important;
+    font-size: 1rem !important;
+}
+
+.btn-top:hover {
+    background: #e0a000 !important;
+}
+
+/* ── Timestamp Badges ────────────────────────────────────────────────────── */
+.ts-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+    padding-top: 0.35rem;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.22em 0.6em;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+}
+
+.badge-positive {
+    background: #d4f5e4;
+    color: #1a6b44;
+    border: 1px solid #a3dfc0;
+}
+
+.badge-negative {
+    background: #fde8e6;
+    color: #a02020;
+    border: 1px solid #f5b0a8;
+}
+
+.badge-removable {
+    cursor: pointer;
+    transition: opacity 0.15s, text-decoration 0.15s;
+}
+
+.badge-removable:hover {
+    opacity: 0.6;
+    text-decoration: line-through;
+}
+
+/* ── Drag Handle ─────────────────────────────────────────────────────────── */
+.drag-handle {
+    flex-shrink: 0;
+    cursor: grab;
+    color: #bbb;
+    font-size: 1rem;
+    letter-spacing: -3px;
+    padding: 0.35rem 0.2rem 0 0.1rem;
+    user-select: none;
+    line-height: 1;
+}
+
+.drag-handle:hover {
+    color: #888;
+}
+
+.student-row[draggable="true"] {
+    cursor: default;
+}
+
+.student-row.dragging {
+    opacity: 0.4;
+    background: #e8eef7;
+}
+
+/* ── Hidden Utility ──────────────────────────────────────────────────────── */
+.hidden {
+    display: none !important;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+    .student-row {
+        flex-wrap: wrap;
+    }
+
+    .student-name {
+        min-width: 100%;
+        max-width: 100%;
+    }
+
+    .ts-container {
+        width: 100%;
+        padding-top: 0;
+    }
+}
