@@ -77,7 +77,18 @@
     l: '    /\\/\\    \n<*(( ★º )))*><\n    \\/\\/    ',
     spd: [0.18, 0.38],
   };
+  // ─ The Shark ─  (4-row, fast pass-through, eats fish)
+  const SHARK = {
+    //  right-facing:  forked-tail  ──  sleek body  ──  eye+jaw+snout
+    //  left-facing:   snout+jaw+eye  ──  sleek body  ──  forked-tail
+    r: '      /\\        \n><======{  °)>   \n      \\/        ',
+    l: '        /\\      \n   <(°  }======><\n        \\/      ',
+    spd: 3.2,
+    eatRange: 180,
+    eatRangeY: 90,
+  };
 
+  let sharkActive = false;   // only one shark at a time
   // Rare pass-through giants
   const SPECIAL = [
     { r: '><(((((((((º>',    l: '<º)))))))))><',    spd: [0.12, 0.35] },
@@ -187,6 +198,31 @@
       scaleX: 1,
       passThrough,
       behavior,
+    });
+  }
+
+  // ── Shark ──
+  function addShark () {
+    if (sharkActive) return;
+    sharkActive = true;
+    document.getElementById('btn-shark').disabled = true;
+
+    const dir   = Math.random() < 0.5 ? 1 : -1;
+    const ascii = dir === 1 ? SHARK.r : SHARK.l;
+    const el    = document.createElement('div');
+    el.className   = 'creature shark';
+    el.textContent = ascii;
+    tank.appendChild(el);
+
+    const x = dir === 1 ? -320 : W + 320;
+    const y = rnd(60, H - 200);
+
+    pool.push({
+      el, x, y,
+      vx: dir * SHARK.spd, vy: 0,
+      type: 'shark',
+      wobble: 0,
+      dir,
     });
   }
 
@@ -536,6 +572,37 @@
 
         // Use stored baseY – no random call per frame, no vibration
         c.el.style.transform = `translate(${Math.round(c.x)}px, ${Math.round(c.baseY)}px)`;
+
+      } else if (c.type === 'shark') {
+        c.wobble += 0.015;
+        c.x      += c.vx;
+        c.y      += Math.sin(c.wobble) * 0.3;
+        c.el.style.transform = `translate(${Math.round(c.x)}px, ${Math.round(c.y)}px)`;
+
+        // Eat nearby fish
+        for (let j = pool.length - 1; j >= 0; j--) {
+          if (j === i) continue;
+          const f = pool[j];
+          if (f.type !== 'fish' || f.passThrough) continue;   // don't eat rainbow / giants
+          const dx = Math.abs(f.x - c.x);
+          const dy = Math.abs(f.y - c.y);
+          if (dx < SHARK.eatRange && dy < SHARK.eatRangeY) {
+            // Play chomp flash then remove
+            f.el.classList.add('chomped');
+            const doomed = f.el;
+            pool.splice(j, 1);
+            if (j < i) i--;   // adjust index after splice
+            setTimeout(() => doomed.remove(), 300);
+          }
+        }
+
+        // Exit and clean up when fully off-screen
+        if ((c.vx > 0 && c.x > W + 340) || (c.vx < 0 && c.x < -340)) {
+          c.el.remove();
+          pool.splice(i, 1);
+          sharkActive = false;
+          syncButtons();
+        }
       }
     }
 
@@ -553,6 +620,7 @@
   function syncButtons () {
     document.getElementById('btn-remove').disabled = fishCount() <= 1;
     document.getElementById('btn-add').disabled    = fishCount() >= FISH_MAX;
+    document.getElementById('btn-shark').disabled  = sharkActive;
   }
 
   function onAddFish () {
@@ -579,6 +647,7 @@
     // Remove all creature elements and clear the pool
     pool.forEach(c => c.el.remove());
     pool.length = 0;
+    sharkActive = false;
     // Re-spawn default population
     for (let i = 0; i < 22; i++) addFish(true);
     for (let i = 0; i < 3;  i++) addBigFish(true);
@@ -600,6 +669,7 @@
 
   document.getElementById('btn-add').addEventListener('click', onAddFish);
   document.getElementById('btn-remove').addEventListener('click', onRemoveFish);
+  document.getElementById('btn-shark').addEventListener('click', addShark);
   document.getElementById('btn-reset').addEventListener('click', onReset);
 
   window.addEventListener('resize', () => {
