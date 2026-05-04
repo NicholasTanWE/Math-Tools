@@ -106,22 +106,36 @@ body {
   50%       { transform: rotate(5deg);  }
 }
 
-/* ── Rainbow fish ── */
-@keyframes rainbowCycle {
-   0% { color: hsl(  0, 100%, 65%); }
-  14% { color: hsl( 45, 100%, 60%); }
-  28% { color: hsl( 90, 100%, 55%); }
-  42% { color: hsl(180, 100%, 55%); }
-  57% { color: hsl(240, 100%, 70%); }
-  71% { color: hsl(285, 100%, 68%); }
-  85% { color: hsl(320, 100%, 65%); }
- 100% { color: hsl(360, 100%, 65%); }
+/* ── Rare fish (per-character rainbow colouring + flowing hue rotation) ── */
+@keyframes rainbowFlow {
+  from { filter: hue-rotate(0deg); }
+  to   { filter: hue-rotate(360deg); }
 }
 
-.creature.rainbow-fish {
-  animation: rainbowCycle 2.4s linear infinite;
-  text-shadow: none !important;
-  color: unset !important;
+.creature.rare-fish {
+  animation: rainbowFlow 5s linear infinite;
+}
+
+.creature.rare-fish span {
+  text-shadow:
+    0 0 5px currentColor,
+    0 0 14px currentColor,
+    0 0 28px currentColor;
+}
+
+/* ── Sparkle particles emitted by rare fish ── */
+.sparkle {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.85rem;
+  animation: sparkleFade 0.9s ease-out forwards;
+}
+
+@keyframes sparkleFade {
+  0%   { opacity: 1;   transform: translateY(0)      scale(1.1); }
+  100% { opacity: 0;   transform: translateY(-20px)  scale(0.4); }
 }
 
 /* ── Shark ── */

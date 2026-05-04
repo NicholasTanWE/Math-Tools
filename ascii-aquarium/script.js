@@ -140,6 +140,40 @@
     return pick(options)();
   }
 
+  // Render each visible ASCII character in its own <span> with an evenly-spaced
+  // rainbow hue.  Newlines are preserved as raw \n (white-space:pre handles them).
+  // < > & are HTML-escaped so innerHTML is safe.
+  function setRainbowText (el, ascii) {
+    const chars        = Array.from(ascii);
+    const visibleCount = chars.filter(ch => ch !== '\n').length || 1;
+    const hueStep      = 330 / visibleCount;   // ~330° spread reads clearly as rainbow
+    let   hue          = rndInt(0, 359);        // random start so each fish looks unique
+    let   html         = '';
+    for (const ch of chars) {
+      if (ch === '\n') {
+        html += '\n';
+      } else {
+        const esc = ch === '&' ? '&amp;' : ch === '<' ? '&lt;' : ch === '>' ? '&gt;' : ch;
+        html += `<span style="color:hsl(${Math.round(hue)},100%,68%)">${esc}</span>`;
+        hue = (hue + hueStep) % 360;
+      }
+    }
+    el.innerHTML = html;
+  }
+
+  function emitSparkle (x, y, dir) {
+    const chars = ['✦', '✧', '★', '✷', '✸', '·'];
+    const el    = document.createElement('div');
+    el.className   = 'sparkle';
+    el.textContent = pick(chars);
+    el.style.color = randomColor();
+    // Trail slightly behind the fish, scattered vertically
+    el.style.left  = `${Math.round(x - dir * rnd(5, 40))}px`;
+    el.style.top   = `${Math.round(y + rnd(-28, 28))}px`;
+    tank.appendChild(el);
+    setTimeout(() => el.remove(), 900);
+  }
+
   // ═══════════════════════════════════════════════
   // CREATURE POOL
   // ═══════════════════════════════════════════════
@@ -171,6 +205,11 @@
     const color    = randomColor();
     const el       = makeEl('fish', ascii, color);
     if (big) el.style.fontSize = '1.5rem';
+    if (passThrough && def !== null) {
+      el.classList.add('rare-fish');
+      el.style.color = '';
+      setRainbowText(el, ascii);
+    }
 
     // Initial fish spawn inside the safe zone; entering fish spawn off-screen
     const x = initial
@@ -197,6 +236,7 @@
       turnFlipped:  false, // ASCII already swapped at midpoint?
       scaleX: 1,
       passThrough,
+      rare: passThrough && def !== null,
       behavior,
     });
   }
@@ -233,8 +273,8 @@
     const ascii    = dir === 1 ? RAINBOW_FISH.r : RAINBOW_FISH.l;
 
     const el = document.createElement('div');
-    el.className   = 'creature fish rainbow-fish';
-    el.textContent = ascii;
+    el.className   = 'creature fish rare-fish';
+    setRainbowText(el, ascii);
     el.style.fontSize   = '1.4rem';
     el.style.lineHeight = '1.35';
     tank.appendChild(el);
@@ -255,6 +295,7 @@
       turnFlipped:  false,
       scaleX:       1,
       passThrough:  true,   // swims fully across then disappears
+      rare:         true,
     });
   }
 
@@ -532,6 +573,11 @@
               c.turnFlipped  = false;
               c.scaleX       = 1;
             }
+          }
+
+          // Sparkle trail for rare fish
+          if (c.rare && Math.random() < 0.05) {
+            emitSparkle(c.x, c.y, c.dir);
           }
         }
 
