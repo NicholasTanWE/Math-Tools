@@ -1,0 +1,474 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Casio fx-97SG X Simulator — Stylesheet
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Base ─────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #e8e0d0;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 12px 40px;
+}
+
+/* ── Page wrapper ─────────────────────────────────────────────────────────── */
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+/* ── Calculator shell ─────────────────────────────────────────────────────── */
+.calculator {
+  background: #2b2b2e;
+  border-radius: 14px 14px 18px 18px;
+  padding: 10px 10px 14px;
+  width: 320px;
+  box-shadow:
+    0 2px 0 #111 inset,
+    0 8px 32px rgba(0,0,0,0.55),
+    0 2px 6px rgba(0,0,0,0.4);
+  border: 2px solid #1a1a1c;
+  /* subtle texture */
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 2px,
+    rgba(255,255,255,0.012) 2px,
+    rgba(255,255,255,0.012) 4px
+  );
+}
+
+/* ── Brand header ─────────────────────────────────────────────────────────── */
+.brand-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 4px 6px 8px;
+}
+.brand-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 2px;
+}
+.brand-model {
+  font-size: 0.7rem;
+  color: #ccc;
+  letter-spacing: 1px;
+}
+
+/* ── Display section ──────────────────────────────────────────────────────── */
+.display-section {
+  padding: 0 4px 8px;
+}
+.display-screen {
+  background: #b8c990;
+  border-radius: 4px;
+  padding: 6px 8px 8px;
+  min-height: 72px;
+  box-shadow:
+    inset 0 3px 8px rgba(0,0,0,0.35),
+    inset 0 1px 2px rgba(0,0,0,0.2);
+  border: 2px solid #555;
+  position: relative;
+  overflow: hidden;
+}
+/* LCD scanline effect */
+.display-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.04) 2px,
+    rgba(0,0,0,0.04) 4px
+  );
+  pointer-events: none;
+}
+
+/* Status bar */
+.status-bar {
+  display: flex;
+  gap: 5px;
+  font-size: 0.55rem;
+  font-family: 'Courier New', monospace;
+  color: #3a4a20;
+  margin-bottom: 4px;
+  min-height: 10px;
+}
+.status-item {
+  opacity: 0.25;
+  transition: opacity 0.15s;
+  font-weight: 700;
+}
+.status-item.active { opacity: 1; }
+#status-mode { margin-left: auto; opacity: 0.6; }
+
+/* Expression line */
+.expr-line {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #2a3810;
+  min-height: 18px;
+  word-break: break-all;
+  white-space: pre-wrap;
+  text-align: right;
+  padding-right: 2px;
+}
+
+/* Result line */
+.result-line {
+  font-family: 'Courier New', monospace;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #1a2808;
+  text-align: right;
+  margin-top: 2px;
+  padding-right: 2px;
+  letter-spacing: 0.5px;
+}
+
+/* ── Keypad container ─────────────────────────────────────────────────────── */
+.keypad {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 2px;
+}
+
+/* ── Button base ──────────────────────────────────────────────────────────── */
+.btn {
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-weight: 600;
+  outline: none;
+  position: relative;
+  transition: filter 0.07s, transform 0.07s;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.btn:active {
+  filter: brightness(1.35);
+  transform: translateY(1px);
+}
+
+/* Button label structure */
+.btn.has-lbl {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 3px;
+  gap: 1px;
+}
+.slbl {  /* SHIFT secondary (yellow) */
+  font-size: 0.42rem;
+  color: #f5c200;
+  line-height: 1;
+  font-weight: 700;
+  min-height: 8px;
+}
+.albl {  /* ALPHA secondary (red/pink) */
+  font-size: 0.42rem;
+  color: #ff8aaa;
+  line-height: 1;
+  font-weight: 700;
+  min-height: 8px;
+}
+.mlbl {  /* Primary label */
+  font-size: 0.75rem;
+  color: #fff;
+  line-height: 1;
+}
+
+/* ── System buttons (SHIFT, ALPHA, MENU, SETUP, ON) ──────────────────────── */
+.btn-sys {
+  background: #4a4a50;
+  color: #ddd;
+  font-size: 0.55rem;
+  height: 26px;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #26262a;
+}
+.btn-shift {
+  color: #f5c200;
+  border: 1px solid #f5c20060;
+}
+.btn-alpha {
+  color: #ff8aaa;
+  border: 1px solid #ff8aaa60;
+}
+.btn-on {
+  color: #eee;
+}
+.btn-sys.mode-active {
+  filter: brightness(1.5);
+  box-shadow: 0 0 6px 2px currentColor;
+}
+
+/* ── Top section layout ───────────────────────────────────────────────────── */
+.top-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+
+/* Left 2×2 grid */
+.top-left-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 26px 32px;
+  gap: 3px;
+  flex-shrink: 0;
+}
+/* Right group: 3 top + 2 bottom (with spacer) */
+.top-right-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 26px 32px;
+  gap: 3px;
+  flex-shrink: 0;
+}
+.top-right-spacer {
+  /* occupies first cell of row 2 — leaves first col empty */
+}
+
+/* ── D-pad ────────────────────────────────────────────────────────────────── */
+.dpad-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+.dpad {
+  position: relative;
+  width: 72px;
+  height: 72px;
+}
+.dpad-btn {
+  position: absolute;
+  background: #3a3a40;
+  border: 1px solid #555;
+  color: #aaa;
+  font-size: 0.5rem;
+  cursor: pointer;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 0.07s;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.dpad-btn:active { filter: brightness(1.5); }
+
+/* Outer ring (up/down/left/right) */
+.dpad-up    { top: 0;    left: 50%; transform: translateX(-50%); width: 28px; height: 22px; border-radius: 4px 4px 0 0; }
+.dpad-down  { bottom: 0; left: 50%; transform: translateX(-50%); width: 28px; height: 22px; border-radius: 0 0 4px 4px; }
+.dpad-left  { left: 0;   top: 50%;  transform: translateY(-50%); width: 22px; height: 28px; border-radius: 4px 0 0 4px; }
+.dpad-right { right: 0;  top: 50%;  transform: translateY(-50%); width: 22px; height: 28px; border-radius: 0 4px 4px 0; }
+
+/* Center ring + button */
+.dpad-center-ring {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px; height: 30px;
+  background: #252528;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #555;
+}
+.dpad-center {
+  width: 22px; height: 22px;
+  background: #3a3a42;
+  border-radius: 50%;
+  border: 1px solid #666;
+  position: static;
+  transform: none;
+}
+
+/* ── Scientific rows ──────────────────────────────────────────────────────── */
+.sci-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 3px;
+}
+.btn-sci {
+  background: #3d3d42;
+  height: 32px;
+  border-bottom: 2px solid #1e1e22;
+}
+
+/* ── Numeric rows ─────────────────────────────────────────────────────────── */
+.num-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 3px;
+}
+
+/* Number buttons */
+.btn-num {
+  background: #484850;
+  height: 38px;
+  font-size: 1rem;
+  color: #fff;
+  border-bottom: 2px solid #252528;
+  border-radius: 5px;
+}
+
+/* Operator buttons */
+.btn-op {
+  background: #3d3d42;
+  height: 38px;
+  border-bottom: 2px solid #1e1e22;
+}
+
+/* DEL — yellow */
+.btn-del {
+  background: #d4a800;
+  height: 38px;
+  border-bottom: 2px solid #8a6c00;
+}
+.btn-del .mlbl { color: #1a1000; font-size: 0.82rem; }
+.btn-del .slbl { color: #1a1000; }
+
+/* AC — yellow */
+.btn-ac {
+  background: #e0b000;
+  height: 38px;
+  border-bottom: 2px solid #8a6c00;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+.btn-ac .mlbl { color: #1a1000; font-size: 1rem; font-weight: 800; }
+.btn-ac .slbl { color: #1a1000; }
+
+/* Equals */
+.btn-eq {
+  background: #3d3d42;
+  height: 38px;
+  font-size: 1.1rem;
+  color: #fff;
+  border-bottom: 2px solid #1e1e22;
+}
+
+/* ── Angle selector (below calculator) ───────────────────────────────────── */
+.angle-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: #2b2b2e;
+  border-radius: 0 0 14px 14px;
+  width: 100%;
+  justify-content: center;
+}
+.angle-label {
+  font-size: 0.65rem;
+  color: #aaa;
+}
+.amode-btn {
+  background: #3a3a40;
+  color: #aaa;
+  border: 1px solid #555;
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: background 0.12s, color 0.12s;
+}
+.amode-btn.active {
+  background: #2a6edb;
+  color: #fff;
+  border-color: #2a6edb;
+}
+
+/* ── Memory panel ─────────────────────────────────────────────────────────── */
+.memory-panel {
+  background: #2b2b2e;
+  border-radius: 8px;
+  padding: 8px 12px;
+  width: 320px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.mem-title {
+  font-size: 0.65rem;
+  color: #ff8aaa;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+.mem-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+.mem-cell {
+  background: #3d3d42;
+  border-radius: 4px;
+  padding: 3px 4px;
+  text-align: center;
+}
+.mem-cell-name {
+  font-size: 0.5rem;
+  color: #ff8aaa;
+  font-weight: 700;
+}
+.mem-cell-val {
+  font-size: 0.58rem;
+  color: #ccc;
+  word-break: break-all;
+  font-family: 'Courier New', monospace;
+}
+
+/* ── Active mode glow on SHIFT/ALPHA buttons ──────────────────────────────── */
+#btn-shift.mode-active { background: #5a500a; box-shadow: 0 0 6px #f5c200; color: #f5c200; }
+#btn-alpha.mode-active { background: #5a1a28; box-shadow: 0 0 6px #ff8aaa; color: #ff8aaa; }
+
+/* ── Notification flash ───────────────────────────────────────────────────── */
+.result-line.error { color: #c0392b; }
+
+/* ── STO/RCL indicator on display ────────────────────────────────────────── */
+.waiting-indicator {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: #f5c200;
+  color: #1a1000;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+  z-index: 1;
+  display: none;
+}
+.waiting-indicator.visible { display: block; }
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 360px) {
+  .calculator, .memory-panel { width: 96vw; }
+  .btn-num  { height: 34px; }
+  .btn-op   { height: 34px; }
+  .btn-del  { height: 34px; }
+  .btn-ac   { height: 34px; }
+  .btn-eq   { height: 34px; }
+}

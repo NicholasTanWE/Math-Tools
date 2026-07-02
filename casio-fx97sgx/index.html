@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Casio fx-97SG X Simulator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="calculator" id="calculator">
+
+      <!-- Brand header -->
+      <div class="brand-header">
+        <span class="brand-name">CASIO</span>
+        <span class="brand-model">fx-97SG X</span>
+      </div>
+
+      <!-- Display -->
+      <div class="display-section">
+        <div class="display-screen">
+          <div class="status-bar">
+            <span class="status-item" id="status-shift">S</span>
+            <span class="status-item" id="status-alpha">A</span>
+            <span class="status-item" id="status-m">M</span>
+            <span class="status-item" id="status-angle">D</span>
+            <span class="status-item" id="status-mode">COMP</span>
+          </div>
+          <div class="expr-line" id="expr-line"></div>
+          <div class="result-line" id="result-line">0</div>
+        </div>
+      </div>
+
+      <!-- Keypad -->
+      <div class="keypad">
+
+        <!-- ── TOP SECTION: SHIFT/ALPHA · D-PAD · MENU/SETUP/ON ── -->
+        <div class="top-section">
+
+          <!-- Left group: 2×2 (SHIFT,ALPHA / OPTN,x³) -->
+          <div class="top-left-group">
+            <button class="btn btn-sys btn-shift" id="btn-shift">SHIFT</button>
+            <button class="btn btn-sys btn-alpha" id="btn-alpha">ALPHA</button>
+            <button class="btn btn-sci has-lbl" id="btn-optn">
+              <span class="slbl">QR</span>
+              <span class="mlbl">OPTN</span>
+            </button>
+            <button class="btn btn-sci has-lbl" id="btn-cube">
+              <span class="slbl">:</span>
+              <span class="mlbl">x³</span>
+            </button>
+          </div>
+
+          <!-- Centre: D-pad -->
+          <div class="dpad-wrapper">
+            <div class="dpad">
+              <button class="dpad-btn dpad-up"     id="dpad-up">▲</button>
+              <button class="dpad-btn dpad-left"   id="dpad-left">◀</button>
+              <div    class="dpad-center-ring">
+                <button class="dpad-btn dpad-center" id="dpad-center"></button>
+              </div>
+              <button class="dpad-btn dpad-right"  id="dpad-right">▶</button>
+              <button class="dpad-btn dpad-down"   id="dpad-down">▼</button>
+            </div>
+          </div>
+
+          <!-- Right group: 3+2 (MENU,SETUP,ON / –,Abs,x!) -->
+          <div class="top-right-group">
+            <button class="btn btn-sys" id="btn-menu">MENU</button>
+            <button class="btn btn-sys" id="btn-setup">SETUP</button>
+            <button class="btn btn-sys btn-on" id="btn-on">ON</button>
+            <div class="top-right-spacer"></div>
+            <button class="btn btn-sci has-lbl" id="btn-abs">
+              <span class="slbl">=</span>
+              <span class="mlbl">Abs</span>
+            </button>
+            <button class="btn btn-sci has-lbl" id="btn-fact">
+              <span class="mlbl">x!</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ── SCIENTIFIC ROW 1: frac · √ · x² · x^y · log · ln ── -->
+        <div class="key-row sci-row">
+          <button class="btn btn-sci has-lbl" id="btn-frac">
+            <span class="slbl">≡</span>
+            <span class="mlbl">a b/c</span>
+          </button>
+          <button class="btn btn-sci has-lbl" id="btn-sqrt">
+            <span class="slbl">∛</span>
+            <span class="mlbl">√■</span>
+          </button>
+          <button class="btn btn-sci has-lbl" id="btn-sq">
+            <span class="mlbl">x²</span>
+          </button>
+          <button class="btn btn-sci has-lbl" id="btn-pow">
+            <span class="slbl">DEC</span>
+            <span class="mlbl">x■</span>
+          </button>
+          <button class="btn btn-sci has-lbl" id="btn-log">
+            <span class="slbl">10ˣ</span>
+            <span class="mlbl">log</span>
+          </button>
+          <button class="btn btn-sci has-lbl" id="btn-ln">
+            <span class="slbl">eˣ</span>
+            <span class="mlbl">ln</span>
+          </button>
+        </div>
+
+        <!-- ── SCIENTIFIC ROW 2: (-) · °'" · x⁻¹ · sin · cos · tan ── -->
+        <div class="key-row sci-row">
+          <button class="btn btn-sci has-lbl" id="btn-neg">
+            <span class="albl">A</span>
+            <span class="mlbl">(–)</span>
+          </button>
+          <button class="btn btn-sci has-lbl" id="btn-dms">
+            <span class="albl">B</span>
+            <span class="mlbl">°'"</span>
+          </button>
+          <button class="btn btn-sci has-lbl" id="btn-recip">
+            <span class="slbl">sin⁻¹</span>
+            <span class="albl">C</span>
+            <span class="mlbl">x⁻¹</span>
+          </button>
+          <button class="btn btn-sci has-lbl" id="btn-sin">
+            <span class="slbl">sin⁻¹</span>
+            <span class="albl">D</span>
+            <span class="mlbl">sin</span>
+          </button>
+          <button class="btn btn-sci has-lbl" id="btn-cos">
+            <span class="slbl">cos⁻¹</span>
+            <span class="albl">E</span>
+            <span class="mlbl">cos</span>
+          </button>
+          <button class="btn btn-sci has-lbl" id="btn-tan">
+            <span class="slbl">tan⁻¹</span>
+            <span class="albl">F</span>
+            <span class="mlbl">tan</span>
+          </button>
+        </div>
+
+        <!-- ── SCIENTIFIC ROW 3: STO · ENG · ( · ) · S⇔D · M+ ── -->
+        <div class="key-row sci-row">
+          <button class="btn btn-sci has-lbl" id="btn-sto">
+            <span class="slbl">RCL</span>
+            <span class="mlbl">STO</span>
+          </button>
+          <button class="btn btn-sci has-lbl" id="btn-eng">
+            <span class="slbl">←</span>
+            <span class="mlbl">ENG</span>
+          </button>
+          <button class="btn btn-sci has-lbl" id="btn-open">
+            <span class="slbl">,</span>
+            <span class="mlbl">(</span>
+          </button>
+          <button class="btn btn-sci has-lbl" id="btn-close">
+            <span class="albl">X</span>
+            <span class="mlbl">)</span>
+          </button>
+          <button class="btn btn-sci has-lbl" id="btn-sd">
+            <span class="slbl">a↔b/c</span>
+            <span class="albl">Y</span>
+            <span class="mlbl">S⇔D</span>
+          </button>
+          <button class="btn btn-sci has-lbl" id="btn-mplus">
+            <span class="slbl">M−</span>
+            <span class="albl">M</span>
+            <span class="mlbl">M+</span>
+          </button>
+        </div>
+
+        <!-- ── NUMERIC ROW 1: 7 · 8 · 9 · DEL · AC ── -->
+        <div class="key-row num-row">
+          <button class="btn btn-num" id="btn-7">7</button>
+          <button class="btn btn-num" id="btn-8">8</button>
+          <button class="btn btn-num has-lbl" id="btn-9">
+            <span class="slbl">RESET</span>
+            <span class="mlbl">9</span>
+          </button>
+          <button class="btn btn-del has-lbl" id="btn-del">
+            <span class="slbl">INS</span>
+            <span class="mlbl">DEL</span>
+          </button>
+          <button class="btn btn-ac has-lbl" id="btn-ac">
+            <span class="slbl">OFF</span>
+            <span class="mlbl">AC</span>
+          </button>
+        </div>
+
+        <!-- ── NUMERIC ROW 2: 4 · 5 · 6 · × · ÷ ── -->
+        <div class="key-row num-row">
+          <button class="btn btn-num" id="btn-4">4</button>
+          <button class="btn btn-num" id="btn-5">5</button>
+          <button class="btn btn-num" id="btn-6">6</button>
+          <button class="btn btn-op has-lbl" id="btn-mul">
+            <span class="slbl">nPr</span>
+            <span class="mlbl">×</span>
+          </button>
+          <button class="btn btn-op has-lbl" id="btn-div">
+            <span class="slbl">nCr</span>
+            <span class="mlbl">÷</span>
+          </button>
+        </div>
+
+        <!-- ── NUMERIC ROW 3: 1 · 2 · 3 · + · − ── -->
+        <div class="key-row num-row">
+          <button class="btn btn-num" id="btn-1">1</button>
+          <button class="btn btn-num" id="btn-2">2</button>
+          <button class="btn btn-num" id="btn-3">3</button>
+          <button class="btn btn-op has-lbl" id="btn-add">
+            <span class="slbl">Pol</span>
+            <span class="mlbl">+</span>
+          </button>
+          <button class="btn btn-op has-lbl" id="btn-sub">
+            <span class="slbl">Rec</span>
+            <span class="mlbl">−</span>
+          </button>
+        </div>
+
+        <!-- ── NUMERIC ROW 4: 0 · . · ×10ˣ · Ans · = ── -->
+        <div class="key-row num-row">
+          <button class="btn btn-num has-lbl" id="btn-0">
+            <span class="slbl">Rnd</span>
+            <span class="mlbl">0</span>
+          </button>
+          <button class="btn btn-num has-lbl" id="btn-dot">
+            <span class="slbl">Ran#</span>
+            <span class="mlbl">.</span>
+          </button>
+          <button class="btn btn-op has-lbl" id="btn-exp">
+            <span class="slbl">π</span>
+            <span class="albl">e</span>
+            <span class="mlbl">×10ˣ</span>
+          </button>
+          <button class="btn btn-op has-lbl" id="btn-ans">
+            <span class="slbl">%</span>
+            <span class="mlbl">Ans</span>
+          </button>
+          <button class="btn btn-eq" id="btn-eq">=</button>
+        </div>
+
+      </div><!-- /keypad -->
+
+      <!-- Angle mode selector (below the calculator body) -->
+      <div class="angle-selector">
+        <span class="angle-label">Angle Mode:</span>
+        <button class="amode-btn active" id="amode-D" onclick="setAngleMode('D')">DEG</button>
+        <button class="amode-btn" id="amode-R" onclick="setAngleMode('R')">RAD</button>
+        <button class="amode-btn" id="amode-G" onclick="setAngleMode('G')">GRA</button>
+      </div>
+
+    </div><!-- /calculator -->
+
+    <!-- Memory display panel -->
+    <div class="memory-panel" id="memory-panel">
+      <div class="mem-title">Memory</div>
+      <div class="mem-grid" id="mem-grid"></div>
+    </div>
+
+  </div><!-- /page-wrapper -->
+
+  <script src="script.js"></script>
+</body>
+</html>

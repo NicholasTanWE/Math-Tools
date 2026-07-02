@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cortisol Meter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="card">
+        <h1>CORTISOL LEVEL</h1>
+        <div class="level-badge" id="levelBadge">LOW</div>
+        <canvas id="gauge" width="440" height="280"></canvas>
+        <div class="controls">
+            <label for="valueInput">Value (0 – 100):</label>
+            <input type="number" id="valueInput" min="0" max="100" value="20">
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
