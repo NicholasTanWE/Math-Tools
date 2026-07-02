@@ -142,6 +142,11 @@ function buildEvalStr(expr) {
   // Ans
   e = e.replace(/Ans/g, '(' + state.ans + ')');
 
+  // Implicit multiplication — must run before variable substitution
+  // e.g. 3X → 3*X,  2(3+1) → 2*(3+1),  )(3) → )*(3),  )X → )*X
+  e = e.replace(/(\d)([A-FXYM(])/g, '$1*$2');
+  e = e.replace(/\)([\dA-FXYM(])/g, ')*$1');
+
   // Memory variables
   for (const [k, v] of Object.entries(state.memory)) {
     e = e.replace(new RegExp('(?<![A-Za-z])' + k + '(?![A-Za-z])', 'g'), '(' + v + ')');
@@ -569,6 +574,10 @@ document.querySelectorAll('.btn, .dpad-btn').forEach(function(btn) {
 
 // ── Keyboard support ──────────────────────────────────────────────────────
 document.addEventListener('keydown', function(e) {
+  // Direct insert keys (bypass button routing)
+  if (e.key === '^') { e.preventDefault(); insert('^('); return; }
+  if (e.key === '%') { e.preventDefault(); insert('%'); return; }
+
   const map = {
     '0':'btn-0','1':'btn-1','2':'btn-2','3':'btn-3','4':'btn-4',
     '5':'btn-5','6':'btn-6','7':'btn-7','8':'btn-8','9':'btn-9',
