@@ -108,6 +108,10 @@ function buildEvalStr(expr) {
   e = e.replace(/10\^\(/g, '10**(');
   e = e.replace(/eˣ\(/g,   '(Math.E)**(');
 
+  // nPr / nCr infix: "5nPr2" → "nPr(5,2)", "5nCr2" → "nCr(5,2)"
+  e = e.replace(/(\d+(?:\.\d+)?)nPr(\d+(?:\.\d+)?)/g, 'nPr($1,$2)');
+  e = e.replace(/(\d+(?:\.\d+)?)nCr(\d+(?:\.\d+)?)/g, 'nCr($1,$2)');
+
   // Roots / abs
   e = e.replace(/√\(/g,   'Math.sqrt(');
   e = e.replace(/∛\(/g,   'Math.cbrt(');
@@ -294,7 +298,7 @@ const TOKEN_ENDS = [
   'sin(', 'cos(', 'tan(',
   'log(', 'ln(', '10^(', 'e\u02e3(',
   '\u221a(', '\u221b(', 'Abs(',
-  'nPr(', 'nCr(', 'Pol(', 'Rec(', 'Rnd(',
+  'nPr', 'nCr', 'Pol(', 'Rec(', 'Rnd(',
   '\xd710^', 'Ans', '\u207b\xb9',
 ];
 
@@ -470,8 +474,8 @@ function handleButton(id) {
 
     case 'btn-add': S ? insert('Pol(') : insert('+'); break;
     case 'btn-sub': S ? insert('Rec(') : insert('\u2212'); break;
-    case 'btn-mul': S ? insert('nPr(') : insert('\xd7'); break;
-    case 'btn-div': S ? insert('nCr(') : insert('\xf7'); break;
+    case 'btn-mul': S ? insert('nPr') : insert('\xd7'); break;
+    case 'btn-div': S ? insert('nCr') : insert('\xf7'); break;
 
     case 'btn-exp':
       if (S)      insert('\u03c0');
