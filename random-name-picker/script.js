@@ -134,6 +134,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Selection page logic
     const randomizeRepeat = document.getElementById('randomize-repeat');
     const randomizeNoRepeat = document.getElementById('randomize-no-repeat');
+    const randomizeMultiBtn = document.getElementById('randomize-multi');
+    const pickCountInput = document.getElementById('pick-count');
     const uploadNew = document.getElementById('upload-new');
     const toggleAnimationsNamesBtn = document.getElementById('toggle-animations-names');
     const displayArea = document.getElementById('display-area');
@@ -191,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // helper to enable/disable controls during flicker
     function setNameControlsEnabled(enabled) {
-        [randomizeRepeat, randomizeNoRepeat, uploadNew, clearNamesBtn].forEach(btn => {
+        [randomizeRepeat, randomizeNoRepeat, randomizeMultiBtn, uploadNew, clearNamesBtn].forEach(btn => {
             if (btn) btn.disabled = !enabled;
         });
     }
@@ -326,6 +328,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (randomizeRepeat) {
         randomizeRepeat.addEventListener('click', function() {
             if (names.length === 0) return;
+            displayArea.classList.remove('multi-mode');
             const finalIdx = Math.floor(Math.random() * names.length);
             const finalName = names[finalIdx];
             if (!animationsEnabledNames) {
@@ -356,6 +359,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (randomizeNoRepeat) {
         randomizeNoRepeat.addEventListener('click', function() {
             if (names.length === 0) return;
+            displayArea.classList.remove('multi-mode');
             if (usedNames.length >= names.length) {
                 showToast('All names have been used. Resetting.', 'info');
                 usedNames = [];
@@ -391,6 +395,96 @@ document.addEventListener('DOMContentLoaded', function() {
                     setTimeout(() => displayArea.classList.remove('flourish'), 500);
                     setNameControlsEnabled(true);
                 });
+            }
+        });
+    }
+
+    if (randomizeMultiBtn) {
+        randomizeMultiBtn.addEventListener('click', function() {
+            if (names.length === 0) return;
+            const count = Math.max(1, parseInt(pickCountInput ? pickCountInput.value : '1') || 1);
+
+            if (usedNames.length >= names.length) {
+                showToast('All names have been used. Resetting.', 'info');
+                usedNames = [];
+                try { localStorage.removeItem('usedNames'); } catch(e){}
+            }
+
+            const availableNames = names.filter(name => !usedNames.includes(name));
+            if (availableNames.length === 0) return;
+
+            const actualCount = Math.min(count, availableNames.length);
+            if (actualCount < count) {
+                showToast(`Only ${actualCount} name(s) remaining.`, 'warn');
+            }
+
+            // Shuffle and pick
+            const shuffled = [...availableNames].sort(() => Math.random() - 0.5);
+            const picked = shuffled.slice(0, actualCount);
+
+            if (actualCount === 1) {
+                // Single name — use slot roll like the no-repeat button
+                displayArea.classList.remove('multi-mode');
+                const finalName = picked[0];
+                if (!animationsEnabledNames) {
+                    setDisplayedName(finalName);
+                    usedNames.push(finalName);
+                    selectedNames.push(finalName);
+                    try { localStorage.setItem('usedNames', JSON.stringify(usedNames)); } catch(e){}
+                    try { localStorage.setItem('selectedNames', JSON.stringify(selectedNames)); } catch(e){}
+                    updateNameHistory();
+                    displayArea.classList.add('flourish');
+                    setTimeout(() => displayArea.classList.remove('flourish'), 500);
+                } else {
+                    setNameControlsEnabled(false);
+                    const itemH = computeItemHeightForNames(availableNames, 2);
+                    slotRoll(availableNames, finalName, undefined, itemH).then(name => {
+                        usedNames.push(name);
+                        selectedNames.push(name);
+                        try { localStorage.setItem('usedNames', JSON.stringify(usedNames)); } catch(e){}
+                        try { localStorage.setItem('selectedNames', JSON.stringify(selectedNames)); } catch(e){}
+                        updateNameHistory();
+                        selectedName = document.getElementById('selected-name');
+                        displayArea.classList.add('flourish');
+                        setTimeout(() => displayArea.classList.remove('flourish'), 500);
+                        setNameControlsEnabled(true);
+                    });
+                }
+            } else {
+                // Multiple names — show as chip grid
+                picked.forEach(name => {
+                    usedNames.push(name);
+                    selectedNames.push(name);
+                });
+                try { localStorage.setItem('usedNames', JSON.stringify(usedNames)); } catch(e){}
+                try { localStorage.setItem('selectedNames', JSON.stringify(selectedNames)); } catch(e){}
+                updateNameHistory();
+
+                displayArea.classList.add('multi-mode');
+                displayArea.innerHTML = '';
+                const grid = document.createElement('div');
+                grid.className = 'multi-name-grid';
+                picked.forEach((name, i) => {
+                    const chip = document.createElement('div');
+                    chip.className = 'multi-name-chip';
+                    chip.textContent = name;
+                    if (animationsEnabledNames) {
+                        chip.style.animationDelay = `${i * 0.12}s`;
+                    } else {
+                        chip.style.opacity = '1';
+                        chip.style.transform = 'scale(1)';
+                        chip.style.animation = 'none';
+                    }
+                    grid.appendChild(chip);
+                });
+                displayArea.appendChild(grid);
+
+                if (animationsEnabledNames) {
+                    setTimeout(() => {
+                        displayArea.classList.add('flourish');
+                        setTimeout(() => displayArea.classList.remove('flourish'), 500);
+                    }, picked.length * 120 + 200);
+                }
             }
         });
     }
