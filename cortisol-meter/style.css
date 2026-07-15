@@ -6,11 +6,14 @@
 
 body {
     min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     background: #e4eaf0;
     font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    padding: 2rem 1rem;
 }
 
 .card {
@@ -23,7 +26,7 @@ body {
     width: 100%;
 }
 
-h1 {
+.card h1 {
     font-size: 1.35rem;
     letter-spacing: 3px;
     color: #1a1a1a;

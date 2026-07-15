@@ -4,9 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cortisol Meter</title>
+    <link rel="stylesheet" href="../style-guide/colors.css">
+    <link rel="stylesheet" href="../style-guide/typography.css">
+    <link rel="stylesheet" href="../style-guide/layout.css">
+    <link rel="stylesheet" href="../style-guide/components.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <nav style="margin: 0;">
+    <a href="../index.html" style="font-size:1.1rem; text-decoration:underline; color:#fff;">← Back to Landing Page</a>
+  </nav>
+  <header class="main-header" style="margin-top:0;">
+    <h1>Cortisol Meter</h1>
+    <nav>Visualise cortisol levels on a gauge</nav>
+  </header>
+  <main>
     <div class="card">
         <h1>CORTISOL LEVEL</h1>
         <div class="level-badge" id="levelBadge">LOW</div>
@@ -16,6 +28,7 @@
             <input type="number" id="valueInput" min="0" max="100" value="20">
         </div>
     </div>
+  </main>
     <script src="script.js"></script>
 </body>
 </html>
