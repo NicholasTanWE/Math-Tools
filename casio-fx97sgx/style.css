@@ -484,6 +484,66 @@ body {
 }
 .waiting-indicator.visible { display: block; }
 
+/* ── Stacked fraction rendering ───────────────────────────────────────────── */
+.frac {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  line-height: 1;
+}
+.frac > .frac-n {
+  border-bottom: 2px solid currentColor;
+  padding: 0 3px 1px;
+  font-size: 0.7em;
+}
+.frac > .frac-d {
+  padding: 1px 3px 0;
+  font-size: 0.7em;
+}
+
+/* ── Fraction input template (dotted boxes in expression line) ────────────── */
+.frac-input-template {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  vertical-align: middle;
+  line-height: 1;
+  gap: 2px;
+}
+.frac-input-num,
+.frac-input-den {
+  border: 1.5px dotted currentColor;
+  padding: 1px 3px;
+  font-size: 0.7em;
+  min-width: 1.4em;
+  text-align: center;
+  line-height: 1.4;
+}
+.frac-input-bar {
+  height: 0;
+  border-top: 2px solid currentColor;
+}
+.frac-input-cursor {
+  background: rgba(26, 40, 8, 0.15);
+}
+
+/* Stacked fraction inside a button key label */
+.frac-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.frac-key > .frac > .frac-n,
+.frac-key > .frac > .frac-d {
+  font-size: 0.9em;
+  padding: 0 1px;
+}
+.frac-key > .frac > .frac-n {
+  border-bottom-width: 1px;
+  padding-bottom: 0;
+}
+
 /* ── Responsive ───────────────────────────────────────────────────────────── */
 @media (max-width: 360px) {
   .calculator, .memory-panel { width: 96vw; }

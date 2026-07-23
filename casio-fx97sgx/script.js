@@ -16,6 +16,8 @@ const state = {
   waitSto:   false,
   waitRcl:   false,
   justCalc:  false,    // True immediately after '='; next non-op starts fresh
+  fracInput: null,     // Active fraction input: { num, den, inDen } or null
+  cursor:    0,        // Caret position within state.expr
   history:   [],
   histIdx:   -1,
 };
@@ -196,7 +198,8 @@ function evaluate() {
   // Auto-close brackets and update the display expression
   const closed = autoClose(raw);
   if (closed !== raw) {
-    state.expr = closed;
+    state.expr   = closed;
+    state.cursor = closed.length;
     raw = closed;
   }
 
@@ -243,9 +246,67 @@ function showError() {
 }
 
 // ── Display update ─────────────────────────────────────────────────────────
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Render num/den fraction patterns in the expression as stacked dotted-box style
+function exprToHTML(expr) {
+  let result = '';
+  const re = /(\d[\d.]*)\/(\d[\d.]*)/g;
+  let lastIndex = 0;
+  let match;
+  while ((match = re.exec(expr)) !== null) {
+    result += escapeHtml(expr.slice(lastIndex, match.index));
+    result += '<span class="frac-input-template">'
+      + '<span class="frac-input-num">' + escapeHtml(match[1]) + '</span>'
+      + '<span class="frac-input-bar"></span>'
+      + '<span class="frac-input-den">' + escapeHtml(match[2]) + '</span>'
+      + '</span>';
+    lastIndex = match.index + match[0].length;
+  }
+  result += escapeHtml(expr.slice(lastIndex));
+  return result;
+}
+
+function fracToHTML(str) {
+  // Mixed fraction: "-3 2/5" or "3 2/5"
+  const mixed = str.match(/^(-?\d+)\s+(\d+)\/(\d+)$/);
+  if (mixed) {
+    const [, w, n, d] = mixed;
+    return w + '\u2009<span class="frac"><span class="frac-n">' + n + '</span><span class="frac-d">' + d + '</span></span>';
+  }
+  // Simple fraction: "-1/4" or "1/4"
+  const simple = str.match(/^(-?)(\d+)\/(\d+)$/);
+  if (simple) {
+    const [, s, n, d] = simple;
+    return s + '<span class="frac"><span class="frac-n">' + n + '</span><span class="frac-d">' + d + '</span></span>';
+  }
+  return null;
+}
+
 function updateDisplay() {
-  exprEl.textContent   = state.expr;
-  resultEl.textContent = state.result;
+  // Expression line: show live fracInput template, or render committed fractions as stacked boxes
+  if (state.fracInput) {
+    const fi = state.fracInput;
+    const numBox = '<span class="frac-input-num' + (!fi.inDen ? ' frac-input-cursor' : '') + '">'  + (escapeHtml(fi.num) || '\u00a0') + '</span>';
+    const denBox = '<span class="frac-input-den' + (fi.inDen  ? ' frac-input-cursor' : '') + '">'  + (escapeHtml(fi.den) || '\u00a0') + '</span>';
+    const tmpl = '<span class="frac-input-template">' + numBox + '<span class="frac-input-bar"></span>' + denBox + '</span>';
+    exprEl.innerHTML = exprToHTML(state.expr) + tmpl;
+  } else {
+    const cur = Math.min(state.cursor, state.expr.length);
+    exprEl.innerHTML =
+      exprToHTML(state.expr.slice(0, cur)) +
+      '<span class="expr-cursor"></span>' +
+      exprToHTML(state.expr.slice(cur));
+  }
+
+  const fracHTML = fracToHTML(state.result);
+  if (fracHTML !== null) {
+    resultEl.innerHTML = fracHTML;
+  } else {
+    resultEl.textContent = state.result;
+  }
 
   document.getElementById('status-shift').classList.toggle('active', state.shift);
   document.getElementById('status-alpha').classList.toggle('active', state.alpha);
@@ -285,10 +346,12 @@ function insert(display) {
   if (state.justCalc) {
     const startsWithOp = /^[+\-x\xd7\xf7]/.test(display);
     state.expr     = startsWithOp ? 'Ans' : '';
+    state.cursor   = state.expr.length;
     state.justCalc = false;
     resultEl.classList.remove('error');
   }
-  state.expr += display;
+  state.expr   = state.expr.slice(0, state.cursor) + display + state.expr.slice(state.cursor);
+  state.cursor += display.length;
   updateDisplay();
 }
 
@@ -303,23 +366,29 @@ const TOKEN_ENDS = [
 ];
 
 function del() {
-  if (!state.expr) return;
+  if (!state.expr || state.cursor === 0) return;
   state.justCalc = false;
+  const before = state.expr.slice(0, state.cursor);
+  const after  = state.expr.slice(state.cursor);
   for (const tok of TOKEN_ENDS) {
-    if (state.expr.endsWith(tok)) {
-      state.expr = state.expr.slice(0, -tok.length);
+    if (before.endsWith(tok)) {
+      state.expr   = before.slice(0, -tok.length) + after;
+      state.cursor -= tok.length;
       updateDisplay();
       return;
     }
   }
-  state.expr = state.expr.slice(0, -1);
+  state.expr   = before.slice(0, -1) + after;
+  state.cursor -= 1;
   updateDisplay();
 }
 
 function clearAll() {
-  state.expr     = '';
-  state.result   = '0';
-  state.justCalc = false;
+  state.expr      = '';
+  state.result    = '0';
+  state.justCalc  = false;
+  state.fracInput = null;
+  state.cursor    = 0;
   resultEl.classList.remove('error');
   updateDisplay();
 }
@@ -351,7 +420,8 @@ function historyUp() {
   if (!state.history.length) return;
   if (state.histIdx < state.history.length - 1) {
     state.histIdx++;
-    state.expr = state.history[state.histIdx];
+    state.expr   = state.history[state.histIdx];
+    state.cursor = state.expr.length;
     state.justCalc = false;
     updateDisplay();
   }
@@ -364,6 +434,7 @@ function historyDown() {
     state.histIdx = -1;
     state.expr = '';
   }
+  state.cursor   = state.expr.length;
   state.justCalc = false;
   updateDisplay();
 }
@@ -447,6 +518,80 @@ function handleButton(id) {
     state.waitSto = state.waitRcl = false;
     clearMode();
     return;
+  }
+
+  // ── Fraction input mode ───────────────────────────────────────────────────
+  if (state.fracInput) {
+    const fi = state.fracInput;
+
+    // Digit keys → route to active part
+    const FRAC_DIGITS = {
+      'btn-0':'0','btn-1':'1','btn-2':'2','btn-3':'3','btn-4':'4',
+      'btn-5':'5','btn-6':'6','btn-7':'7','btn-8':'8','btn-9':'9',
+    };
+    if (id in FRAC_DIGITS) {
+      if (fi.inDen) fi.den += FRAC_DIGITS[id];
+      else          fi.num += FRAC_DIGITS[id];
+      clearMode(); updateDisplay(); return;
+    }
+
+    // Decimal point
+    if (id === 'btn-dot') {
+      if (fi.inDen  && !fi.den.includes('.')) fi.den += '.';
+      else if (!fi.inDen && !fi.num.includes('.')) fi.num += '.';
+      clearMode(); updateDisplay(); return;
+    }
+
+    // DEL — backspace within current part
+    if (id === 'btn-del') {
+      if (fi.inDen) {
+        if (fi.den.length > 0) fi.den = fi.den.slice(0, -1);
+        else                   fi.inDen = false;
+      } else {
+        if (fi.num.length > 0) fi.num = fi.num.slice(0, -1);
+        else                   state.fracInput = null;
+      }
+      clearMode(); updateDisplay(); return;
+    }
+
+    // Fraction button (no SHIFT) → move to denominator
+    if (id === 'btn-frac' && !S) {
+      fi.inDen = true;
+      clearMode(); updateDisplay(); return;
+    }
+
+    // Down arrow → move to denominator; Up arrow → move back to numerator
+    if (id === 'dpad-down') {
+      fi.inDen = true;
+      updateDisplay(); return;
+    }
+    if (id === 'dpad-up') {
+      fi.inDen = false;
+      updateDisplay(); return;
+    }
+
+    // AC / ON → cancel and clear
+    if (id === 'btn-ac' || id === 'btn-on') {
+      state.fracInput = null;
+      clearAll(); clearMode(); return;
+    }
+
+    // SHIFT / ALPHA → just toggle mode, don't commit
+    if (id !== 'btn-shift' && id !== 'btn-alpha') {
+      // Commit the fraction into the expression before handling any other key
+      const num = fi.num || '0';
+      const den = fi.den || '1';
+      state.fracInput = null;
+      if (state.justCalc) {
+        state.expr     = '';
+        state.cursor   = 0;
+        state.justCalc = false;
+        resultEl.classList.remove('error');
+      }
+      state.expr   = state.expr.slice(0, state.cursor) + num + '/' + den + state.expr.slice(state.cursor);
+      state.cursor += (num + '/' + den).length;
+      // Fall through to switch to handle the triggering key normally
+    }
   }
 
   switch (id) {
@@ -556,13 +701,23 @@ function handleButton(id) {
       handleSetup(); clearMode(); return;
 
     case 'btn-frac':
-      S ? handleSD() : insert('/');
-      break;
+      if (S) { handleSD(); break; }
+      if (state.justCalc) {
+        state.expr     = '';
+        state.justCalc = false;
+        resultEl.classList.remove('error');
+      }
+      state.fracInput = { num: '', den: '', inDen: false };
+      clearMode(); updateDisplay(); return;
 
     case 'dpad-up':     historyUp(); return;
     case 'dpad-down':   historyDown(); return;
     case 'dpad-left':
-    case 'dpad-right':  return;
+      if (state.cursor > 0) { state.cursor--; updateDisplay(); }
+      return;
+    case 'dpad-right':
+      if (state.cursor < state.expr.length) { state.cursor++; updateDisplay(); }
+      return;
     case 'dpad-center': evaluate(); clearMode(); return;
 
     default: return;
