@@ -52,23 +52,9 @@
 
     <!-- ==================== TIMER ==================== -->
     <section id="timerSection" class="tool-section" style="display:none;">
-      <div class="timer-setup card">
-        <h3>Set Duration</h3>
-        <div class="duration-inputs">
-          <div class="input-group">
-            <label for="hoursInput">Hours</label>
-            <input type="number" id="hoursInput" min="0" max="23" value="0">
-          </div>
-          <div class="input-group">
-            <label for="minutesInput">Minutes</label>
-            <input type="number" id="minutesInput" min="0" max="59" value="5">
-          </div>
-          <div class="input-group">
-            <label for="secondsInput">Seconds</label>
-            <input type="number" id="secondsInput" min="0" max="59" value="0">
-          </div>
-        </div>
 
+      <!-- Shared options -->
+      <div class="timer-options card">
         <div class="display-mode">
           <span class="label">Display mode:</span>
           <label class="radio-label">
@@ -79,41 +65,148 @@
             <input type="radio" name="displayMode" value="clock">
             Clock Face
           </label>
+          <label class="radio-label">
+            <input type="radio" name="displayMode" value="progress">
+            Progress Bar
+          </label>
+        </div>
+        <div class="start-mode">
+          <span class="label">Start mode:</span>
+          <label class="radio-label">
+            <input type="radio" name="startMode" value="simultaneous" checked>
+            Simultaneous
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="startMode" value="async">
+            Asynchronous
+          </label>
         </div>
       </div>
 
-      <!-- Digital countdown display -->
-      <div id="timerDigitalWrap" class="display-card">
-        <div id="timerDisplay" class="digital-display">05:00</div>
-        <div id="timerStatus" class="timer-status"></div>
+      <!-- Simultaneous shared controls -->
+      <div id="simultaneousControls" class="controls shared-controls">
+        <button id="tmStartBothBtn" class="btn">Start Both</button>
+        <button id="tmPauseBothBtn" class="btn" disabled>Pause Both</button>
+        <button id="tmResetBothBtn" class="btn">Reset Both</button>
       </div>
 
-      <!-- Analog clock face display -->
-      <div id="timerClockWrap" class="display-card clock-card" style="display:none;">
-        <svg id="clockSvg" viewBox="0 0 300 300" width="280" height="280">
-          <!-- Outer ring -->
-          <circle cx="150" cy="150" r="140" fill="#fff" stroke="#222" stroke-width="6"/>
-          <!-- Minute markers -->
-          <g id="minuteMarkers"></g>
-          <!-- Hour markers (every 5 min) -->
-          <g id="hourMarkers"></g>
-          <!-- Center -->
-          <circle cx="150" cy="150" r="8" fill="#222"/>
-          <!-- Minute hand -->
-          <line id="minuteHand" x1="150" y1="150" x2="150" y2="40" stroke="#2a6edb" stroke-width="6" stroke-linecap="round"/>
-          <!-- Second hand (sweeps) -->
-          <line id="secondHand" x1="150" y1="150" x2="150" y2="25" stroke="#e94f37" stroke-width="3" stroke-linecap="round"/>
-          <!-- Center pin -->
-          <circle cx="150" cy="150" r="5" fill="#e94f37"/>
-        </svg>
-        <div id="clockDigitalHint" class="clock-hint">05:00</div>
-        <div id="timerClockStatus" class="timer-status"></div>
-      </div>
+      <!-- Two timer panels -->
+      <div class="dual-timers">
 
-      <div class="controls">
-        <button id="tmStartBtn" class="btn">Start</button>
-        <button id="tmPauseBtn" class="btn" disabled>Pause</button>
-        <button id="tmResetBtn" class="btn">Reset</button>
+        <!-- ========== TIMER 1 ========== -->
+        <div class="timer-panel timer-1">
+          <h3 class="timer-title">Timer 1</h3>
+
+          <div class="duration-inputs">
+            <div class="input-group">
+              <label for="t1Hours">Hours</label>
+              <input type="number" id="t1Hours" min="0" max="23" value="0">
+            </div>
+            <div class="input-group">
+              <label for="t1Minutes">Minutes</label>
+              <input type="number" id="t1Minutes" min="0" max="59" value="5">
+            </div>
+            <div class="input-group">
+              <label for="t1Seconds">Seconds</label>
+              <input type="number" id="t1Seconds" min="0" max="59" value="0">
+            </div>
+          </div>
+
+          <!-- Digital -->
+          <div class="display-wrap digital-wrap" data-timer="1">
+            <div class="digital-display" id="t1Digital">05:00</div>
+            <div class="timer-status" id="t1Status"></div>
+          </div>
+
+          <!-- Clock face -->
+          <div class="display-wrap clock-wrap" data-timer="1" style="display:none;">
+            <svg class="clock-svg" id="t1ClockSvg" viewBox="0 0 300 300" width="200" height="200">
+              <circle cx="150" cy="150" r="140" fill="#fff" stroke="#222" stroke-width="6"/>
+              <g class="minute-markers"></g>
+              <g class="hour-markers"></g>
+              <circle cx="150" cy="150" r="8" fill="#222"/>
+              <line class="minute-hand" x1="150" y1="150" x2="150" y2="40" stroke="#2a6edb" stroke-width="6" stroke-linecap="round"/>
+              <line class="second-hand" x1="150" y1="150" x2="150" y2="25" stroke="#e94f37" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="150" cy="150" r="5" fill="#e94f37"/>
+            </svg>
+            <div class="clock-hint" id="t1ClockHint">05:00</div>
+            <div class="timer-status" id="t1ClockStatus"></div>
+          </div>
+
+          <!-- Progress bar -->
+          <div class="display-wrap progress-wrap" data-timer="1" style="display:none;">
+            <div class="progress-label" id="t1ProgressLabel">05:00</div>
+            <div class="progress-track">
+              <div class="progress-fill" id="t1ProgressFill" style="width:0%"></div>
+            </div>
+            <div class="timer-status" id="t1ProgressStatus"></div>
+          </div>
+
+          <!-- Per-timer controls (visible in async mode) -->
+          <div class="controls async-controls" data-timer="1">
+            <button class="btn tm-start" data-timer="1">Start</button>
+            <button class="btn tm-pause" data-timer="1" disabled>Pause</button>
+            <button class="btn tm-reset" data-timer="1">Reset</button>
+          </div>
+        </div>
+
+        <!-- ========== TIMER 2 ========== -->
+        <div class="timer-panel timer-2">
+          <h3 class="timer-title">Timer 2</h3>
+
+          <div class="duration-inputs">
+            <div class="input-group">
+              <label for="t2Hours">Hours</label>
+              <input type="number" id="t2Hours" min="0" max="23" value="0">
+            </div>
+            <div class="input-group">
+              <label for="t2Minutes">Minutes</label>
+              <input type="number" id="t2Minutes" min="0" max="59" value="3">
+            </div>
+            <div class="input-group">
+              <label for="t2Seconds">Seconds</label>
+              <input type="number" id="t2Seconds" min="0" max="59" value="0">
+            </div>
+          </div>
+
+          <!-- Digital -->
+          <div class="display-wrap digital-wrap" data-timer="2">
+            <div class="digital-display" id="t2Digital">03:00</div>
+            <div class="timer-status" id="t2Status"></div>
+          </div>
+
+          <!-- Clock face -->
+          <div class="display-wrap clock-wrap" data-timer="2" style="display:none;">
+            <svg class="clock-svg" id="t2ClockSvg" viewBox="0 0 300 300" width="200" height="200">
+              <circle cx="150" cy="150" r="140" fill="#fff" stroke="#222" stroke-width="6"/>
+              <g class="minute-markers"></g>
+              <g class="hour-markers"></g>
+              <circle cx="150" cy="150" r="8" fill="#222"/>
+              <line class="minute-hand" x1="150" y1="150" x2="150" y2="40" stroke="#3bb273" stroke-width="6" stroke-linecap="round"/>
+              <line class="second-hand" x1="150" y1="150" x2="150" y2="25" stroke="#e94f37" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="150" cy="150" r="5" fill="#e94f37"/>
+            </svg>
+            <div class="clock-hint" id="t2ClockHint">03:00</div>
+            <div class="timer-status" id="t2ClockStatus"></div>
+          </div>
+
+          <!-- Progress bar -->
+          <div class="display-wrap progress-wrap" data-timer="2" style="display:none;">
+            <div class="progress-label" id="t2ProgressLabel">03:00</div>
+            <div class="progress-track">
+              <div class="progress-fill progress-fill-2" id="t2ProgressFill" style="width:0%"></div>
+            </div>
+            <div class="timer-status" id="t2ProgressStatus"></div>
+          </div>
+
+          <!-- Per-timer controls (visible in async mode) -->
+          <div class="controls async-controls" data-timer="2">
+            <button class="btn tm-start" data-timer="2">Start</button>
+            <button class="btn tm-pause" data-timer="2" disabled>Pause</button>
+            <button class="btn tm-reset" data-timer="2">Reset</button>
+          </div>
+        </div>
+
       </div>
     </section>
   </main>

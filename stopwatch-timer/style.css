@@ -14,7 +14,9 @@ button,
 .radio-label,
 .timer-status,
 .clock-hint,
-.laps-header h3 {
+.laps-header h3,
+.timer-title,
+.progress-label {
   font-family: 'Segoe UI', 'Arial', sans-serif !important;
 }
 
@@ -60,7 +62,7 @@ button,
 }
 
 .digital-display {
-  font-size: 3.4rem;
+  font-size: 2.8rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   color: var(--text-main);
@@ -69,11 +71,11 @@ button,
 }
 
 .timer-status {
-  margin-top: 0.6rem;
-  font-size: 1.15rem;
+  margin-top: 0.5rem;
+  font-size: 1.05rem;
   font-weight: 600;
   color: var(--primary-red);
-  min-height: 1.4em;
+  min-height: 1.3em;
 }
 
 /* Controls */
@@ -82,67 +84,37 @@ button,
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.7rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .controls .btn {
   min-width: 90px;
 }
 
+.shared-controls {
+  margin-bottom: 1.5rem;
+}
+
 /* Inputs */
-.timer-setup {
-  max-width: 420px;
+.timer-options {
+  max-width: 640px;
   margin: 0 auto 1.25rem;
   text-align: center;
+  padding: 1rem;
 }
 
-.timer-setup h3 {
-  margin-top: 0;
-  margin-bottom: 0.9rem;
-  font-size: 1.25rem;
-}
-
-.duration-inputs {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.input-group label {
-  font-size: 0.9rem;
-  margin-bottom: 0.25rem;
-  color: #444;
-}
-
-.input-group input[type="number"] {
-  width: 70px;
-  text-align: center;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-  border: 1px solid #ccc;
-  font-size: 1.1rem;
-  padding: 0.5em;
-}
-
-.display-mode {
+.display-mode,
+.start-mode {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
-  margin-top: 0.5rem;
+  margin: 0.4rem 0;
 }
 
-.display-mode .label {
+.display-mode .label,
+.start-mode .label {
   font-weight: 600;
 }
 
@@ -154,7 +126,123 @@ button,
   font-size: 1rem;
 }
 
-/* Laps */
+.duration-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.input-group label {
+  font-size: 0.85rem;
+  margin-bottom: 0.2rem;
+  color: #444;
+}
+
+.input-group input[type="number"] {
+  width: 64px;
+  text-align: center;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border: 1px solid #ccc;
+  font-size: 1.1rem;
+  padding: 0.45em;
+}
+
+/* Dual timer layout */
+.dual-timers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.timer-panel {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border: 2px solid #ccc;
+  padding: 1.1rem 1rem;
+  width: 100%;
+  max-width: 320px;
+  text-align: center;
+}
+
+.timer-1 {
+  border-top: 4px solid var(--primary-blue);
+}
+
+.timer-2 {
+  border-top: 4px solid var(--primary-green);
+}
+
+.timer-title {
+  margin: 0 0 0.8rem;
+  font-size: 1.2rem;
+}
+
+.timer-1 .timer-title { color: var(--primary-blue); }
+.timer-2 .timer-title { color: var(--primary-green); }
+
+.display-wrap {
+  margin-bottom: 0.8rem;
+  min-height: 80px;
+}
+
+/* Clock face */
+.clock-svg {
+  display: block;
+  margin: 0 auto;
+}
+
+.clock-hint {
+  margin-top: 0.4rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-main);
+}
+
+/* Progress bar */
+.progress-label {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 0.6rem;
+}
+
+.progress-track {
+  width: 100%;
+  height: 28px;
+  background: #e8e8e8;
+  border-radius: 14px;
+  border: 2px solid #ccc;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--primary-blue);
+  border-radius: 12px;
+  transition: width 0.05s linear;
+}
+
+.progress-fill-2 {
+  background: var(--primary-green);
+}
+
+/* Laps (stopwatch) */
 .laps-card {
   background: #fff;
   border-radius: 8px;
@@ -230,30 +318,16 @@ button,
   font-size: 0.95rem;
 }
 
-/* Clock face */
-.clock-card {
-  max-width: 320px;
-  padding: 1rem;
-}
-
-#clockSvg {
-  display: block;
-  margin: 0 auto;
-}
-
-.clock-hint {
-  margin-top: 0.6rem;
-  font-size: 1.4rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-main);
-}
-
 /* Finished state flash */
 .finished .digital-display,
-.finished .clock-hint {
+.finished .clock-hint,
+.finished .progress-label {
   color: var(--primary-red);
   animation: pulse 0.8s ease-in-out infinite alternate;
+}
+
+.finished .progress-fill {
+  background: var(--primary-red) !important;
 }
 
 @keyframes pulse {
@@ -261,15 +335,31 @@ button,
   to   { opacity: 0.55; }
 }
 
+/* Hide async controls by default (simultaneous mode) */
+.async-controls {
+  display: none;
+}
+
+body.async-mode .async-controls {
+  display: flex;
+}
+
+body.async-mode #simultaneousControls {
+  display: none;
+}
+
 /* Responsive */
-@media (max-width: 500px) {
+@media (max-width: 700px) {
   .digital-display {
-    font-size: 2.6rem;
+    font-size: 2.2rem;
   }
-  .duration-inputs {
-    gap: 0.6rem;
+  .dual-timers {
+    gap: 1rem;
+  }
+  .timer-panel {
+    max-width: 100%;
   }
   .input-group input[type="number"] {
-    width: 60px;
+    width: 56px;
   }
 }
