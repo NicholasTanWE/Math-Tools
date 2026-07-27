@@ -1,41 +1,14 @@
 // Stopwatch & Timer – Math Tools mini-project
 // Lap times persist in localStorage
+// Dual timers with Simultaneous / Asynchronous start + Digital / Clock / Progress displays
 
 document.addEventListener('DOMContentLoaded', () => {
-  // ---------- DOM refs ----------
+  // ---------- Mode switcher (Stopwatch / Timer) ----------
   const btnStopwatch = document.getElementById('btnStopwatch');
   const btnTimer     = document.getElementById('btnTimer');
   const stopwatchSection = document.getElementById('stopwatchSection');
   const timerSection     = document.getElementById('timerSection');
 
-  // Stopwatch
-  const swDisplay   = document.getElementById('stopwatchDisplay');
-  const swStartBtn  = document.getElementById('swStartBtn');
-  const swStopBtn   = document.getElementById('swStopBtn');
-  const swLapBtn    = document.getElementById('swLapBtn');
-  const swResetBtn  = document.getElementById('swResetBtn');
-  const lapsList    = document.getElementById('lapsList');
-  const noLapsMsg   = document.getElementById('noLapsMsg');
-  const clearLapsBtn = document.getElementById('clearLapsBtn');
-
-  // Timer
-  const hoursInput   = document.getElementById('hoursInput');
-  const minutesInput = document.getElementById('minutesInput');
-  const secondsInput = document.getElementById('secondsInput');
-  const timerDisplay = document.getElementById('timerDisplay');
-  const timerStatus  = document.getElementById('timerStatus');
-  const timerClockStatus = document.getElementById('timerClockStatus');
-  const tmStartBtn   = document.getElementById('tmStartBtn');
-  const tmPauseBtn   = document.getElementById('tmPauseBtn');
-  const tmResetBtn   = document.getElementById('tmResetBtn');
-  const timerDigitalWrap = document.getElementById('timerDigitalWrap');
-  const timerClockWrap   = document.getElementById('timerClockWrap');
-  const clockHint        = document.getElementById('clockDigitalHint');
-  const minuteHand       = document.getElementById('minuteHand');
-  const secondHand       = document.getElementById('secondHand');
-  const displayModeRadios = document.querySelectorAll('input[name="displayMode"]');
-
-  // ---------- Mode switcher ----------
   btnStopwatch.addEventListener('click', () => {
     btnStopwatch.classList.add('active');
     btnTimer.classList.remove('active');
@@ -51,13 +24,22 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // =====================================================
-  // STOPWATCH
+  // STOPWATCH (unchanged)
   // =====================================================
+  const swDisplay   = document.getElementById('stopwatchDisplay');
+  const swStartBtn  = document.getElementById('swStartBtn');
+  const swStopBtn   = document.getElementById('swStopBtn');
+  const swLapBtn    = document.getElementById('swLapBtn');
+  const swResetBtn  = document.getElementById('swResetBtn');
+  const lapsList    = document.getElementById('lapsList');
+  const noLapsMsg   = document.getElementById('noLapsMsg');
+  const clearLapsBtn = document.getElementById('clearLapsBtn');
+
   let swRunning = false;
-  let swStartTime = 0;       // performance.now() when started / resumed
-  let swElapsed = 0;         // accumulated ms while stopped
+  let swStartTime = 0;
+  let swElapsed = 0;
   let swRafId = null;
-  let laps = [];             // array of { time: ms, label: string }
+  let laps = [];
 
   const LAPS_KEY = 'mathTools_stopwatchLaps';
 
@@ -76,21 +58,18 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveLaps() {
     try {
       localStorage.setItem(LAPS_KEY, JSON.stringify(laps));
-    } catch (e) { /* quota or private mode */ }
+    } catch (e) { /* ignore */ }
   }
 
   function formatMs(ms) {
-    const totalCs = Math.floor(ms / 10); // centiseconds
+    const totalCs = Math.floor(ms / 10);
     const cs = totalCs % 100;
     const totalSec = Math.floor(totalCs / 100);
     const s = totalSec % 60;
     const m = Math.floor(totalSec / 60) % 60;
     const h = Math.floor(totalSec / 3600);
-
     const pad = (n, w = 2) => String(n).padStart(w, '0');
-    if (h > 0) {
-      return `${pad(h)}:${pad(m)}:${pad(s)}.${pad(cs)}`;
-    }
+    if (h > 0) return `${pad(h)}:${pad(m)}:${pad(s)}.${pad(cs)}`;
     return `${pad(m)}:${pad(s)}.${pad(cs)}`;
   }
 
@@ -102,9 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function swTick() {
     updateSwDisplay();
-    if (swRunning) {
-      swRafId = requestAnimationFrame(swTick);
-    }
+    if (swRunning) swRafId = requestAnimationFrame(swTick);
   }
 
   function startStopwatch() {
@@ -138,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const now = performance.now();
     const current = swRunning ? swElapsed + (now - swStartTime) : swElapsed;
     const label = formatMs(current);
-    laps.unshift({ time: current, label }); // newest first
+    laps.unshift({ time: current, label });
     saveLaps();
     renderLaps();
   }
@@ -152,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
     noLapsMsg.style.display = 'none';
     laps.forEach((lap, idx) => {
       const li = document.createElement('li');
-      const num = laps.length - idx; // Lap 1 is oldest
+      const num = laps.length - idx;
       li.innerHTML = `<span class="lap-num">Lap ${num}</span><span class="lap-time">${lap.label}</span>`;
       lapsList.appendChild(li);
     });
@@ -169,26 +146,11 @@ document.addEventListener('DOMContentLoaded', () => {
   swLapBtn.addEventListener('click', addLap);
   swResetBtn.addEventListener('click', resetStopwatch);
   clearLapsBtn.addEventListener('click', clearLaps);
-
-  // Load persisted laps on start
   loadLaps();
 
   // =====================================================
-  // TIMER
+  // TIMER – dual independent engines
   // =====================================================
-  let tmRunning = false;
-  let tmEndTime = 0;         // performance.now() when timer should finish
-  let tmRemaining = 0;       // ms left when paused
-  let tmTotalDuration = 0;   // original duration in ms (for clock face)
-  let tmRafId = null;
-  let tmFinished = false;
-
-  function getDurationMs() {
-    const h = Math.max(0, parseInt(hoursInput.value, 10) || 0);
-    const m = Math.max(0, parseInt(minutesInput.value, 10) || 0);
-    const s = Math.max(0, parseInt(secondsInput.value, 10) || 0);
-    return ((h * 3600) + (m * 60) + s) * 1000;
-  }
 
   function formatTimer(ms) {
     if (ms < 0) ms = 0;
@@ -202,42 +164,12 @@ document.addEventListener('DOMContentLoaded', () => {
     return `${pad(m)}:${pad(s)}`;
   }
 
-  function getDisplayMode() {
-    const checked = document.querySelector('input[name="displayMode"]:checked');
-    return checked ? checked.value : 'digital';
-  }
-
-  function updateDisplayModeUI() {
-    const mode = getDisplayMode();
-    if (mode === 'clock') {
-      timerDigitalWrap.style.display = 'none';
-      timerClockWrap.style.display = '';
-    } else {
-      timerDigitalWrap.style.display = '';
-      timerClockWrap.style.display = 'none';
-    }
-  }
-
-  displayModeRadios.forEach(r => {
-    r.addEventListener('change', () => {
-      updateDisplayModeUI();
-      // refresh current remaining value on the new display
-      if (!tmRunning && !tmFinished) {
-        const ms = getDurationMs();
-        timerDisplay.textContent = formatTimer(ms);
-        clockHint.textContent = formatTimer(ms);
-        updateClockHands(ms, ms || 1);
-      }
-    });
-  });
-
-  // Build static clock markers once
-  function buildClockMarkers() {
-    const minuteMarkers = document.getElementById('minuteMarkers');
-    const hourMarkers = document.getElementById('hourMarkers');
-    minuteMarkers.innerHTML = '';
-    hourMarkers.innerHTML = '';
-
+  function buildClockMarkers(svg) {
+    const minuteG = svg.querySelector('.minute-markers');
+    const hourG = svg.querySelector('.hour-markers');
+    if (!minuteG || !hourG) return;
+    minuteG.innerHTML = '';
+    hourG.innerHTML = '';
     for (let i = 0; i < 60; i++) {
       const angle = (i * 6) * Math.PI / 180;
       const isHour = i % 5 === 0;
@@ -247,7 +179,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const y1 = 150 - outer * Math.cos(angle);
       const x2 = 150 + inner * Math.sin(angle);
       const y2 = 150 - inner * Math.cos(angle);
-
       const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
       line.setAttribute('x1', x1);
       line.setAttribute('y1', y1);
@@ -255,163 +186,271 @@ document.addEventListener('DOMContentLoaded', () => {
       line.setAttribute('y2', y2);
       line.setAttribute('stroke', '#222');
       line.setAttribute('stroke-width', isHour ? 3 : 1.5);
-      if (isHour) {
-        hourMarkers.appendChild(line);
+      (isHour ? hourG : minuteG).appendChild(line);
+    }
+  }
+
+  function playBeep() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.8);
+    } catch (e) { /* ignore */ }
+  }
+
+  function createTimer(id) {
+    const hoursInput   = document.getElementById(`t${id}Hours`);
+    const minutesInput = document.getElementById(`t${id}Minutes`);
+    const secondsInput = document.getElementById(`t${id}Seconds`);
+    const digitalEl    = document.getElementById(`t${id}Digital`);
+    const statusEl     = document.getElementById(`t${id}Status`);
+    const clockSvg     = document.getElementById(`t${id}ClockSvg`);
+    const clockHint    = document.getElementById(`t${id}ClockHint`);
+    const clockStatus  = document.getElementById(`t${id}ClockStatus`);
+    const progressLabel = document.getElementById(`t${id}ProgressLabel`);
+    const progressFill  = document.getElementById(`t${id}ProgressFill`);
+    const progressStatus = document.getElementById(`t${id}ProgressStatus`);
+    const panel        = document.querySelector(`.timer-${id}`);
+    const minuteHand   = clockSvg.querySelector('.minute-hand');
+    const secondHand   = clockSvg.querySelector('.second-hand');
+
+    const startBtn = document.querySelector(`.tm-start[data-timer="${id}"]`);
+    const pauseBtn = document.querySelector(`.tm-pause[data-timer="${id}"]`);
+    const resetBtn = document.querySelector(`.tm-reset[data-timer="${id}"]`);
+
+    buildClockMarkers(clockSvg);
+
+    let running = false;
+    let endTime = 0;
+    let remaining = 0;
+    let totalDuration = 0;
+    let rafId = null;
+    let finished = false;
+
+    function getDurationMs() {
+      const h = Math.max(0, parseInt(hoursInput.value, 10) || 0);
+      const m = Math.max(0, parseInt(minutesInput.value, 10) || 0);
+      const s = Math.max(0, parseInt(secondsInput.value, 10) || 0);
+      return ((h * 3600) + (m * 60) + s) * 1000;
+    }
+
+    function updateClockHands(ms) {
+      if (ms < 0) ms = 0;
+      const totalSeconds = ms / 1000;
+      const seconds = totalSeconds % 60;
+      const minutes = (ms / 60000) % 60;
+      const secAngle = (seconds / 60) * 360;
+      const minAngle = (minutes / 60) * 360;
+      secondHand.setAttribute('transform', `rotate(${secAngle} 150 150)`);
+      minuteHand.setAttribute('transform', `rotate(${minAngle} 150 150)`);
+    }
+
+    function setDisplays(ms) {
+      const text = formatTimer(ms);
+      digitalEl.textContent = text;
+      clockHint.textContent = text;
+      progressLabel.textContent = text;
+      updateClockHands(ms);
+
+      if (totalDuration > 0) {
+        const elapsed = totalDuration - Math.max(0, ms);
+        const pct = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
+        progressFill.style.width = pct + '%';
       } else {
-        minuteMarkers.appendChild(line);
+        progressFill.style.width = '0%';
       }
     }
-  }
-  buildClockMarkers();
 
-  /**
-   * Update analog hands based on remaining milliseconds.
-   * Second hand: full circle = 60 seconds (smooth sweep)
-   * Minute hand: full circle = 60 minutes
-   * When remaining > 60 min we still map minutes mod 60 for the minute hand.
-   */
-  function updateClockHands(remainingMs, totalMs) {
-    if (remainingMs < 0) remainingMs = 0;
-
-    // Seconds (including fraction) for smooth sweep
-    const totalSeconds = remainingMs / 1000;
-    const seconds = totalSeconds % 60;
-    const minutes = (remainingMs / 60000) % 60; // fractional minutes
-
-    // Angles: 0 at top, clockwise
-    const secAngle = (seconds / 60) * 360;
-    const minAngle = (minutes / 60) * 360;
-
-    // Rotate around center (150,150)
-    secondHand.setAttribute('transform', `rotate(${secAngle} 150 150)`);
-    minuteHand.setAttribute('transform', `rotate(${minAngle} 150 150)`);
-  }
-
-  function setTimerDisplays(ms) {
-    const text = formatTimer(ms);
-    timerDisplay.textContent = text;
-    clockHint.textContent = text;
-    updateClockHands(ms, tmTotalDuration || ms || 1);
-  }
-
-  function clearFinishedState() {
-    tmFinished = false;
-    timerDigitalWrap.classList.remove('finished');
-    timerClockWrap.classList.remove('finished');
-    timerStatus.textContent = '';
-    timerClockStatus.textContent = '';
-  }
-
-  function tmTick() {
-    const now = performance.now();
-    const left = tmEndTime - now;
-
-    if (left <= 0) {
-      // Finished
-      setTimerDisplays(0);
-      tmRunning = false;
-      tmFinished = true;
-      tmPauseBtn.disabled = true;
-      tmStartBtn.disabled = false;
-      timerDigitalWrap.classList.add('finished');
-      timerClockWrap.classList.add('finished');
-      timerStatus.textContent = "Time's up!";
-      timerClockStatus.textContent = "Time's up!";
-      // Simple beep using Web Audio if available
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = 880;
-        gain.gain.setValueAtTime(0.3, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
-        osc.start(ctx.currentTime);
-        osc.stop(ctx.currentTime + 0.8);
-      } catch (e) { /* ignore */ }
-      return;
+    function clearFinished() {
+      finished = false;
+      panel.classList.remove('finished');
+      statusEl.textContent = '';
+      clockStatus.textContent = '';
+      progressStatus.textContent = '';
     }
 
-    setTimerDisplays(left);
-    tmRafId = requestAnimationFrame(tmTick);
-  }
-
-  function startTimer() {
-    if (tmRunning) return;
-
-    clearFinishedState();
-
-    let duration;
-    if (tmRemaining > 0) {
-      // Resuming from pause
-      duration = tmRemaining;
-    } else {
-      duration = getDurationMs();
-      if (duration <= 0) {
-        alert('Please set a duration greater than zero.');
+    function tick() {
+      const left = endTime - performance.now();
+      if (left <= 0) {
+        setDisplays(0);
+        running = false;
+        finished = true;
+        pauseBtn.disabled = true;
+        startBtn.disabled = false;
+        panel.classList.add('finished');
+        statusEl.textContent = "Time's up!";
+        clockStatus.textContent = "Time's up!";
+        progressStatus.textContent = "Time's up!";
+        progressFill.style.width = '100%';
+        playBeep();
+        updateSharedButtons();
         return;
       }
-      tmTotalDuration = duration;
+      setDisplays(left);
+      rafId = requestAnimationFrame(tick);
     }
 
-    tmEndTime = performance.now() + duration;
-    tmRunning = true;
-    tmRemaining = 0;
-    tmStartBtn.disabled = true;
-    tmPauseBtn.disabled = false;
-    // Disable inputs while running
-    hoursInput.disabled = true;
-    minutesInput.disabled = true;
-    secondsInput.disabled = true;
-    displayModeRadios.forEach(r => r.disabled = true);
+    function start() {
+      if (running) return;
+      clearFinished();
+      let duration;
+      if (remaining > 0) {
+        duration = remaining;
+      } else {
+        duration = getDurationMs();
+        if (duration <= 0) {
+          alert(`Timer ${id}: please set a duration greater than zero.`);
+          return false;
+        }
+        totalDuration = duration;
+      }
+      endTime = performance.now() + duration;
+      running = true;
+      remaining = 0;
+      startBtn.disabled = true;
+      pauseBtn.disabled = false;
+      hoursInput.disabled = true;
+      minutesInput.disabled = true;
+      secondsInput.disabled = true;
+      rafId = requestAnimationFrame(tick);
+      updateSharedButtons();
+      return true;
+    }
 
-    tmRafId = requestAnimationFrame(tmTick);
+    function pause() {
+      if (!running) return;
+      running = false;
+      cancelAnimationFrame(rafId);
+      remaining = Math.max(0, endTime - performance.now());
+      setDisplays(remaining);
+      startBtn.disabled = false;
+      pauseBtn.disabled = true;
+      updateSharedButtons();
+    }
+
+    function reset() {
+      running = false;
+      cancelAnimationFrame(rafId);
+      remaining = 0;
+      totalDuration = 0;
+      clearFinished();
+      const ms = getDurationMs();
+      setDisplays(ms);
+      startBtn.disabled = false;
+      pauseBtn.disabled = true;
+      hoursInput.disabled = false;
+      minutesInput.disabled = false;
+      secondsInput.disabled = false;
+      updateSharedButtons();
+    }
+
+    function onDurationChange() {
+      if (running || finished) return;
+      const ms = getDurationMs();
+      totalDuration = 0;
+      setDisplays(ms);
+    }
+
+    hoursInput.addEventListener('input', onDurationChange);
+    minutesInput.addEventListener('input', onDurationChange);
+    secondsInput.addEventListener('input', onDurationChange);
+
+    startBtn.addEventListener('click', start);
+    pauseBtn.addEventListener('click', pause);
+    resetBtn.addEventListener('click', reset);
+
+    setDisplays(getDurationMs());
+
+    return {
+      start,
+      pause,
+      reset,
+      isRunning: () => running,
+      isFinished: () => finished,
+      hasRemaining: () => remaining > 0 || running
+    };
   }
 
-  function pauseTimer() {
-    if (!tmRunning) return;
-    tmRunning = false;
-    cancelAnimationFrame(tmRafId);
-    tmRemaining = Math.max(0, tmEndTime - performance.now());
-    setTimerDisplays(tmRemaining);
-    tmStartBtn.disabled = false;
-    tmPauseBtn.disabled = true;
-    // Re-enable inputs? Keep disabled until reset for clarity
+  const timer1 = createTimer('1');
+  const timer2 = createTimer('2');
+
+  // ---------- Display mode ----------
+  const displayModeRadios = document.querySelectorAll('input[name="displayMode"]');
+
+  function getDisplayMode() {
+    const checked = document.querySelector('input[name="displayMode"]:checked');
+    return checked ? checked.value : 'digital';
   }
 
-  function resetTimer() {
-    tmRunning = false;
-    cancelAnimationFrame(tmRafId);
-    tmRemaining = 0;
-    tmTotalDuration = 0;
-    clearFinishedState();
-    const ms = getDurationMs();
-    setTimerDisplays(ms);
-    tmStartBtn.disabled = false;
-    tmPauseBtn.disabled = true;
-    hoursInput.disabled = false;
-    minutesInput.disabled = false;
-    secondsInput.disabled = false;
-    displayModeRadios.forEach(r => r.disabled = false);
+  function updateDisplayModeUI() {
+    const mode = getDisplayMode();
+    document.querySelectorAll('.digital-wrap').forEach(el => {
+      el.style.display = mode === 'digital' ? '' : 'none';
+    });
+    document.querySelectorAll('.clock-wrap').forEach(el => {
+      el.style.display = mode === 'clock' ? '' : 'none';
+    });
+    document.querySelectorAll('.progress-wrap').forEach(el => {
+      el.style.display = mode === 'progress' ? '' : 'none';
+    });
   }
 
-  // Live preview when inputs change (only when not running)
-  function onDurationChange() {
-    if (tmRunning || tmFinished) return;
-    const ms = getDurationMs();
-    setTimerDisplays(ms);
-  }
-
-  hoursInput.addEventListener('input', onDurationChange);
-  minutesInput.addEventListener('input', onDurationChange);
-  secondsInput.addEventListener('input', onDurationChange);
-
-  tmStartBtn.addEventListener('click', startTimer);
-  tmPauseBtn.addEventListener('click', pauseTimer);
-  tmResetBtn.addEventListener('click', resetTimer);
-
-  // Initial state
+  displayModeRadios.forEach(r => r.addEventListener('change', updateDisplayModeUI));
   updateDisplayModeUI();
-  setTimerDisplays(getDurationMs());
+
+  // ---------- Start mode (Simultaneous / Asynchronous) ----------
+  const startModeRadios = document.querySelectorAll('input[name="startMode"]');
+  const simultaneousControls = document.getElementById('simultaneousControls');
+  const tmStartBothBtn = document.getElementById('tmStartBothBtn');
+  const tmPauseBothBtn = document.getElementById('tmPauseBothBtn');
+  const tmResetBothBtn = document.getElementById('tmResetBothBtn');
+
+  function getStartMode() {
+    const checked = document.querySelector('input[name="startMode"]:checked');
+    return checked ? checked.value : 'simultaneous';
+  }
+
+  function updateStartModeUI() {
+    const mode = getStartMode();
+    if (mode === 'async') {
+      document.body.classList.add('async-mode');
+    } else {
+      document.body.classList.remove('async-mode');
+    }
+    updateSharedButtons();
+  }
+
+  function updateSharedButtons() {
+    const anyRunning = timer1.isRunning() || timer2.isRunning();
+    tmPauseBothBtn.disabled = !anyRunning;
+    tmStartBothBtn.disabled = timer1.isRunning() && timer2.isRunning();
+  }
+
+  startModeRadios.forEach(r => r.addEventListener('change', updateStartModeUI));
+  updateStartModeUI();
+
+  tmStartBothBtn.addEventListener('click', () => {
+    if (!timer1.isRunning()) timer1.start();
+    if (!timer2.isRunning()) timer2.start();
+    updateSharedButtons();
+  });
+
+  tmPauseBothBtn.addEventListener('click', () => {
+    if (timer1.isRunning()) timer1.pause();
+    if (timer2.isRunning()) timer2.pause();
+    updateSharedButtons();
+  });
+
+  tmResetBothBtn.addEventListener('click', () => {
+    timer1.reset();
+    timer2.reset();
+    updateSharedButtons();
+  });
 });
