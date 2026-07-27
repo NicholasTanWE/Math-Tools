@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stopwatch &amp; Timer</title>
+  <link rel="stylesheet" href="../style-guide/colors.css">
+  <link rel="stylesheet" href="../style-guide/typography.css">
+  <link rel="stylesheet" href="../style-guide/layout.css">
+  <link rel="stylesheet" href="../style-guide/components.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav style="margin: 0;">
+    <a href="../index.html" style="font-size:1.1rem; text-decoration:underline; color:#fff;">← Back to Landing Page</a>
+  </nav>
+  <header class="main-header" style="margin-top:0;">
+    <h1>Stopwatch &amp; Timer</h1>
+  </header>
+
+  <main>
+    <!-- Mode Switcher -->
+    <div class="mode-switcher">
+      <button id="btnStopwatch" class="mode-btn active">Stopwatch</button>
+      <button id="btnTimer" class="mode-btn">Timer</button>
+    </div>
+
+    <!-- ==================== STOPWATCH ==================== -->
+    <section id="stopwatchSection" class="tool-section">
+      <div class="display-card">
+        <div id="stopwatchDisplay" class="digital-display">00:00.00</div>
+      </div>
+
+      <div class="controls">
+        <button id="swStartBtn" class="btn">Start</button>
+        <button id="swStopBtn" class="btn" disabled>Stop</button>
+        <button id="swLapBtn" class="btn" disabled>Lap</button>
+        <button id="swResetBtn" class="btn">Reset</button>
+      </div>
+
+      <div class="laps-card">
+        <div class="laps-header">
+          <h3>Lap Times</h3>
+          <button id="clearLapsBtn" class="btn-small">Clear Laps</button>
+        </div>
+        <ol id="lapsList" class="laps-list">
+          <!-- Laps will be inserted here -->
+        </ol>
+        <p id="noLapsMsg" class="no-laps">No laps recorded yet.</p>
+      </div>
+    </section>
+
+    <!-- ==================== TIMER ==================== -->
+    <section id="timerSection" class="tool-section" style="display:none;">
+      <div class="timer-setup card">
+        <h3>Set Duration</h3>
+        <div class="duration-inputs">
+          <div class="input-group">
+            <label for="hoursInput">Hours</label>
+            <input type="number" id="hoursInput" min="0" max="23" value="0">
+          </div>
+          <div class="input-group">
+            <label for="minutesInput">Minutes</label>
+            <input type="number" id="minutesInput" min="0" max="59" value="5">
+          </div>
+          <div class="input-group">
+            <label for="secondsInput">Seconds</label>
+            <input type="number" id="secondsInput" min="0" max="59" value="0">
+          </div>
+        </div>
+
+        <div class="display-mode">
+          <span class="label">Display mode:</span>
+          <label class="radio-label">
+            <input type="radio" name="displayMode" value="digital" checked>
+            Digital
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="displayMode" value="clock">
+            Clock Face
+          </label>
+        </div>
+      </div>
+
+      <!-- Digital countdown display -->
+      <div id="timerDigitalWrap" class="display-card">
+        <div id="timerDisplay" class="digital-display">05:00</div>
+        <div id="timerStatus" class="timer-status"></div>
+      </div>
+
+      <!-- Analog clock face display -->
+      <div id="timerClockWrap" class="display-card clock-card" style="display:none;">
+        <svg id="clockSvg" viewBox="0 0 300 300" width="280" height="280">
+          <!-- Outer ring -->
+          <circle cx="150" cy="150" r="140" fill="#fff" stroke="#222" stroke-width="6"/>
+          <!-- Minute markers -->
+          <g id="minuteMarkers"></g>
+          <!-- Hour markers (every 5 min) -->
+          <g id="hourMarkers"></g>
+          <!-- Center -->
+          <circle cx="150" cy="150" r="8" fill="#222"/>
+          <!-- Minute hand -->
+          <line id="minuteHand" x1="150" y1="150" x2="150" y2="40" stroke="#2a6edb" stroke-width="6" stroke-linecap="round"/>
+          <!-- Second hand (sweeps) -->
+          <line id="secondHand" x1="150" y1="150" x2="150" y2="25" stroke="#e94f37" stroke-width="3" stroke-linecap="round"/>
+          <!-- Center pin -->
+          <circle cx="150" cy="150" r="5" fill="#e94f37"/>
+        </svg>
+        <div id="clockDigitalHint" class="clock-hint">05:00</div>
+        <div id="timerClockStatus" class="timer-status"></div>
+      </div>
+
+      <div class="controls">
+        <button id="tmStartBtn" class="btn">Start</button>
+        <button id="tmPauseBtn" class="btn" disabled>Pause</button>
+        <button id="tmResetBtn" class="btn">Reset</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Math Tools Repository</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

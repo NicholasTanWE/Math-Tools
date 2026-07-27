@@ -1,0 +1,275 @@
+/* Stopwatch & Timer – project-specific styles */
+
+body,
+header.main-header h1,
+.controls,
+.controls label,
+.controls input[type="number"],
+button,
+.btn,
+.digital-display,
+.laps-list,
+.mode-btn,
+.input-group label,
+.radio-label,
+.timer-status,
+.clock-hint,
+.laps-header h3 {
+  font-family: 'Segoe UI', 'Arial', sans-serif !important;
+}
+
+/* Mode switcher */
+.mode-switcher {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 1.5rem 0 1rem;
+}
+
+.mode-btn {
+  padding: 0.55em 1.6em;
+  border: 2px solid var(--primary-blue);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--primary-blue);
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.mode-btn.active {
+  background: var(--primary-blue);
+  color: #fff;
+}
+
+.mode-btn:hover:not(.active) {
+  background: #e8f0fe;
+}
+
+/* Cards / display areas */
+.display-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border: 2px solid #ccc;
+  padding: 1.5rem 1rem;
+  margin: 0 auto 1.25rem;
+  max-width: 420px;
+  text-align: center;
+}
+
+.digital-display {
+  font-size: 3.4rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.timer-status {
+  margin-top: 0.6rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--primary-red);
+  min-height: 1.4em;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.7rem;
+  margin-bottom: 1.5rem;
+}
+
+.controls .btn {
+  min-width: 90px;
+}
+
+/* Inputs */
+.timer-setup {
+  max-width: 420px;
+  margin: 0 auto 1.25rem;
+  text-align: center;
+}
+
+.timer-setup h3 {
+  margin-top: 0;
+  margin-bottom: 0.9rem;
+  font-size: 1.25rem;
+}
+
+.duration-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.input-group label {
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+  color: #444;
+}
+
+.input-group input[type="number"] {
+  width: 70px;
+  text-align: center;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border: 1px solid #ccc;
+  font-size: 1.1rem;
+  padding: 0.5em;
+}
+
+.display-mode {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.display-mode .label {
+  font-weight: 600;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+/* Laps */
+.laps-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border: 1px solid #ddd;
+  padding: 1rem 1.25rem;
+  max-width: 420px;
+  margin: 0 auto 2rem;
+}
+
+.laps-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+
+.laps-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.btn-small {
+  padding: 0.3em 0.8em;
+  font-size: 0.85rem;
+  background: var(--primary-red);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-small:hover {
+  background: #c43c2a;
+}
+
+.laps-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.laps-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4em 0.3em;
+  border-bottom: 1px solid #eee;
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.laps-list li:last-child {
+  border-bottom: none;
+}
+
+.lap-num {
+  color: #666;
+  font-weight: 600;
+  min-width: 2.5em;
+}
+
+.lap-time {
+  font-weight: 600;
+  color: var(--primary-blue);
+}
+
+.no-laps {
+  text-align: center;
+  color: #888;
+  margin: 0.5rem 0 0;
+  font-size: 0.95rem;
+}
+
+/* Clock face */
+.clock-card {
+  max-width: 320px;
+  padding: 1rem;
+}
+
+#clockSvg {
+  display: block;
+  margin: 0 auto;
+}
+
+.clock-hint {
+  margin-top: 0.6rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-main);
+}
+
+/* Finished state flash */
+.finished .digital-display,
+.finished .clock-hint {
+  color: var(--primary-red);
+  animation: pulse 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  from { opacity: 1; }
+  to   { opacity: 0.55; }
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+  .digital-display {
+    font-size: 2.6rem;
+  }
+  .duration-inputs {
+    gap: 0.6rem;
+  }
+  .input-group input[type="number"] {
+    width: 60px;
+  }
+}
