@@ -386,7 +386,12 @@ body.async-mode #simultaneousControls {
 }
 
 .fs-entry-controls {
+  display: none;
   margin-bottom: 0.5rem;
+}
+
+body.async-mode .fs-entry-controls {
+  display: flex;
 }
 
 /* ========== FULLSCREEN MODE ========== */
@@ -403,9 +408,18 @@ body.fs-active .top-row,
 body.fs-active .mode-switcher,
 body.fs-active .laps-card,
 body.fs-active .timer-options,
-body.fs-active .fs-entry-controls,
 body.fs-active .duration-inputs,
 body.fs-active .timer-title {
+  display: none !important;
+}
+
+/* Keep Exit Fullscreen available for timer (esp. async mode) */
+body.fs-active .fs-entry-controls {
+  display: flex !important;
+}
+
+/* When simultaneous controls already include Fullscreen, hide the duplicate async bar */
+body.fs-active:not(.async-mode) .fs-entry-controls {
   display: none !important;
 }
 
