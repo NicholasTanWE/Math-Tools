@@ -20,21 +20,22 @@ button,
   font-family: 'Segoe UI', 'Arial', sans-serif !important;
 }
 
-/* Mode switcher */
+/* Mode switcher – left-aligned to free vertical space for displays */
 .mode-switcher {
   display: flex;
-  justify-content: center;
-  gap: 0.75rem;
-  margin: 1.5rem 0 1rem;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  margin: 0.6rem 0 0.75rem;
+  padding-left: 0.25rem;
 }
 
 .mode-btn {
-  padding: 0.55em 1.6em;
+  padding: 0.4em 1.1em;
   border: 2px solid var(--primary-blue);
   border-radius: 6px;
   background: #fff;
   color: var(--primary-blue);
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
@@ -92,15 +93,15 @@ button,
 }
 
 .shared-controls {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
 }
 
 /* Inputs */
 .timer-options {
   max-width: 640px;
-  margin: 0 auto 1.25rem;
+  margin: 0 auto 0.75rem;
   text-align: center;
-  padding: 1rem;
+  padding: 0.75rem 1rem;
 }
 
 .display-mode,
@@ -163,8 +164,8 @@ button,
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  gap: 1.25rem;
+  margin-bottom: 1rem;
 }
 
 .timer-panel {
@@ -370,7 +371,7 @@ body.async-mode #simultaneousControls {
 }
 
 .fs-entry-controls {
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 /* ========== FULLSCREEN MODE ========== */
