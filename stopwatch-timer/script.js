@@ -3,7 +3,6 @@
 // Dual timers with Simultaneous / Asynchronous start + Digital / Clock / Progress displays
 
 document.addEventListener('DOMContentLoaded', () => {
-  // ---------- Mode switcher (Stopwatch / Timer) ----------
   const btnStopwatch = document.getElementById('btnStopwatch');
   const btnTimer     = document.getElementById('btnTimer');
   const stopwatchSection = document.getElementById('stopwatchSection');
@@ -26,9 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (timerOptions) timerOptions.style.display = '';
   });
 
-  // =====================================================
-  // STOPWATCH (unchanged)
-  // =====================================================
   const swDisplay   = document.getElementById('stopwatchDisplay');
   const swStartBtn  = document.getElementById('swStartBtn');
   const swStopBtn   = document.getElementById('swStopBtn');
@@ -151,10 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
   clearLapsBtn.addEventListener('click', clearLaps);
   loadLaps();
 
-  // =====================================================
-  // TIMER – dual independent engines
-  // =====================================================
-
   function formatTimer(ms) {
     if (ms < 0) ms = 0;
     const totalSec = Math.ceil(ms / 1000);
@@ -193,7 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ---------- Chimes ----------
   const MUTE_KEY = 'mathTools_timerMute';
   let soundMuted = false;
   try {
@@ -436,7 +427,6 @@ document.addEventListener('DOMContentLoaded', () => {
   timers['1'] = timer1;
   timers['2'] = timer2;
 
-  // ---------- Display mode ----------
   const displayModeRadios = document.querySelectorAll('input[name="displayMode"]');
 
   function getDisplayMode() {
@@ -460,7 +450,6 @@ document.addEventListener('DOMContentLoaded', () => {
   displayModeRadios.forEach(r => r.addEventListener('change', updateDisplayModeUI));
   updateDisplayModeUI();
 
-  // ---------- Start mode ----------
   const startModeRadios = document.querySelectorAll('input[name="startMode"]');
   const simultaneousControls = document.getElementById('simultaneousControls');
   const tmStartBothBtn = document.getElementById('tmStartBothBtn');
@@ -509,11 +498,10 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSharedButtons();
   });
 
-  // =====================================================
   // FULLSCREEN MODE
-  // =====================================================
   const swFullscreenBtn = document.getElementById('swFullscreenBtn');
   const tmFullscreenBtn = document.getElementById('tmFullscreenBtn');
+  const tmFullscreenBtnAsync = document.getElementById('tmFullscreenBtnAsync');
   const fsTimerCountRadios = document.querySelectorAll('input[name="fsTimerCount"]');
 
   function getFsTimerCount() {
@@ -543,6 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const label = active ? 'Exit Fullscreen' : 'Fullscreen';
     if (swFullscreenBtn) swFullscreenBtn.textContent = label;
     if (tmFullscreenBtn) tmFullscreenBtn.textContent = label;
+    if (tmFullscreenBtnAsync) tmFullscreenBtnAsync.textContent = label;
   }
 
   function enterFullscreen(mode) {
@@ -586,6 +575,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (tmFullscreenBtn) {
     tmFullscreenBtn.addEventListener('click', () => toggleFullscreen('timer'));
+  }
+  if (tmFullscreenBtnAsync) {
+    tmFullscreenBtnAsync.addEventListener('click', () => toggleFullscreen('timer'));
   }
 
   document.addEventListener('fullscreenchange', () => {
