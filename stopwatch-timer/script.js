@@ -8,12 +8,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnTimer     = document.getElementById('btnTimer');
   const stopwatchSection = document.getElementById('stopwatchSection');
   const timerSection     = document.getElementById('timerSection');
+  const timerOptions = document.getElementById('timerOptions');
 
   btnStopwatch.addEventListener('click', () => {
     btnStopwatch.classList.add('active');
     btnTimer.classList.remove('active');
     stopwatchSection.style.display = '';
     timerSection.style.display = 'none';
+    if (timerOptions) timerOptions.style.display = 'none';
   });
 
   btnTimer.addEventListener('click', () => {
@@ -21,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnStopwatch.classList.remove('active');
     timerSection.style.display = '';
     stopwatchSection.style.display = 'none';
+    if (timerOptions) timerOptions.style.display = '';
   });
 
   // =====================================================
@@ -191,8 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ---------- Chimes ----------
-  // Timer 1 → single chime; Timer 2 → double chime.
-  // If both finish within ~200 ms, only one single chime is played.
   const MUTE_KEY = 'mathTools_timerMute';
   let soundMuted = false;
   try {
