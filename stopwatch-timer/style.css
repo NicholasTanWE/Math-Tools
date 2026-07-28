@@ -104,7 +104,8 @@ button,
 }
 
 .display-mode,
-.start-mode {
+.start-mode,
+.sound-options {
   display: flex;
   justify-content: center;
   align-items: center;
