@@ -1,1 +1,546 @@
-/* see local artifacts - placeholder */
+/* Stopwatch & Timer – project-specific styles */
+
+body,
+header.main-header h1,
+.controls,
+.controls label,
+.controls input[type="number"],
+button,
+.btn,
+.digital-display,
+.laps-list,
+.mode-btn,
+.input-group label,
+.radio-label,
+.timer-status,
+.clock-hint,
+.laps-header h3,
+.timer-title,
+.progress-label {
+  font-family: 'Segoe UI', 'Arial', sans-serif !important;
+}
+
+/* Mode switcher */
+.mode-switcher {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 1.5rem 0 1rem;
+}
+
+.mode-btn {
+  padding: 0.55em 1.6em;
+  border: 2px solid var(--primary-blue);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--primary-blue);
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.mode-btn.active {
+  background: var(--primary-blue);
+  color: #fff;
+}
+
+.mode-btn:hover:not(.active) {
+  background: #e8f0fe;
+}
+
+/* Cards / display areas */
+.display-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border: 2px solid #ccc;
+  padding: 1.5rem 1rem;
+  margin: 0 auto 1.25rem;
+  max-width: 420px;
+  text-align: center;
+}
+
+.digital-display {
+  font-size: 2.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.timer-status {
+  margin-top: 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--primary-red);
+  min-height: 1.3em;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.7rem;
+  margin-bottom: 1.25rem;
+}
+
+.controls .btn {
+  min-width: 90px;
+}
+
+.shared-controls {
+  margin-bottom: 1.5rem;
+}
+
+/* Inputs */
+.timer-options {
+  max-width: 640px;
+  margin: 0 auto 1.25rem;
+  text-align: center;
+  padding: 1rem;
+}
+
+.display-mode,
+.start-mode,
+.sound-options {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 0.4rem 0;
+}
+
+.display-mode .label,
+.start-mode .label {
+  font-weight: 600;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.duration-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.input-group label {
+  font-size: 0.85rem;
+  margin-bottom: 0.2rem;
+  color: #444;
+}
+
+.input-group input[type="number"] {
+  width: 64px;
+  text-align: center;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border: 1px solid #ccc;
+  font-size: 1.1rem;
+  padding: 0.45em;
+}
+
+/* Dual timer layout */
+.dual-timers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.timer-panel {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border: 2px solid #ccc;
+  padding: 1.1rem 1rem;
+  width: 100%;
+  max-width: 320px;
+  text-align: center;
+}
+
+.timer-1 {
+  border-top: 4px solid var(--primary-blue);
+}
+
+.timer-2 {
+  border-top: 4px solid var(--primary-green);
+}
+
+.timer-title {
+  margin: 0 0 0.8rem;
+  font-size: 1.2rem;
+}
+
+.timer-1 .timer-title { color: var(--primary-blue); }
+.timer-2 .timer-title { color: var(--primary-green); }
+
+.display-wrap {
+  margin-bottom: 0.8rem;
+  min-height: 80px;
+}
+
+/* Clock face */
+.clock-svg {
+  display: block;
+  margin: 0 auto;
+}
+
+.clock-hint {
+  margin-top: 0.4rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-main);
+}
+
+/* Progress bar */
+.progress-label {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 0.6rem;
+}
+
+.progress-track {
+  width: 100%;
+  height: 28px;
+  background: #e8e8e8;
+  border-radius: 14px;
+  border: 2px solid #ccc;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--primary-blue);
+  border-radius: 12px;
+  transition: width 0.05s linear;
+}
+
+.progress-fill-2 {
+  background: var(--primary-green);
+}
+
+/* Laps (stopwatch) */
+.laps-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border: 1px solid #ddd;
+  padding: 1rem 1.25rem;
+  max-width: 420px;
+  margin: 0 auto 2rem;
+}
+
+.laps-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+
+.laps-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.btn-small {
+  padding: 0.3em 0.8em;
+  font-size: 0.85rem;
+  background: var(--primary-red);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-small:hover {
+  background: #c43c2a;
+}
+
+.laps-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.laps-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4em 0.3em;
+  border-bottom: 1px solid #eee;
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.laps-list li:last-child {
+  border-bottom: none;
+}
+
+.lap-num {
+  color: #666;
+  font-weight: 600;
+  min-width: 2.5em;
+}
+
+.lap-time {
+  font-weight: 600;
+  color: var(--primary-blue);
+}
+
+.no-laps {
+  text-align: center;
+  color: #888;
+  margin: 0.5rem 0 0;
+  font-size: 0.95rem;
+}
+
+/* Finished state flash */
+.finished .digital-display,
+.finished .clock-hint,
+.finished .progress-label {
+  color: var(--primary-red);
+  animation: pulse 0.8s ease-in-out infinite alternate;
+}
+
+.finished .progress-fill {
+  background: var(--primary-red) !important;
+}
+
+@keyframes pulse {
+  from { opacity: 1; }
+  to   { opacity: 0.55; }
+}
+
+/* Hide async controls by default (simultaneous mode) */
+.async-controls {
+  display: none;
+}
+
+body.async-mode .async-controls {
+  display: flex;
+}
+
+body.async-mode #simultaneousControls {
+  display: none;
+}
+
+/* Fullscreen entry button */
+.btn-fs {
+  background: var(--primary-blue);
+}
+.btn-fs:hover {
+  background: #1e5bb8;
+}
+
+.fs-timer-count {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 0.4rem 0;
+}
+.fs-timer-count .label {
+  font-weight: 600;
+}
+
+.fs-entry-controls {
+  margin-bottom: 1rem;
+}
+
+/* ========== FULLSCREEN MODE ========== */
+body.fs-active {
+  background: #111;
+  color: #fff;
+  overflow: hidden;
+}
+
+body.fs-active > nav,
+body.fs-active > header.main-header,
+body.fs-active > footer,
+body.fs-active .mode-switcher,
+body.fs-active .laps-card,
+body.fs-active .timer-options,
+body.fs-active .fs-entry-controls,
+body.fs-active .duration-inputs,
+body.fs-active .timer-title {
+  display: none !important;
+}
+
+body.fs-active main {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+body.fs-active .tool-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  height: 100%;
+}
+
+body.fs-active .display-card,
+body.fs-active .timer-panel {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  padding: 1rem;
+}
+
+body.fs-active .digital-display {
+  font-size: clamp(4rem, 15vw, 10rem);
+  color: #fff;
+}
+
+body.fs-active .clock-hint,
+body.fs-active .progress-label {
+  font-size: clamp(2rem, 8vw, 4rem);
+  color: #fff;
+}
+
+body.fs-active .clock-svg {
+  width: min(70vw, 420px);
+  height: min(70vw, 420px);
+}
+
+body.fs-active .progress-track {
+  width: min(80vw, 600px);
+  height: 40px;
+  border-color: #555;
+  background: #333;
+}
+
+body.fs-active .timer-status {
+  font-size: 1.4rem;
+  color: var(--primary-red);
+}
+
+body.fs-active .dual-timers {
+  flex: 1;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  align-items: stretch;
+  margin: 0;
+  padding: 1rem;
+  height: 100%;
+}
+
+body.fs-active .timer-panel {
+  border-top: none;
+  max-width: none;
+  flex: 1;
+}
+
+body.fs-active.fs-one-timer .timer-2 {
+  display: none !important;
+}
+body.fs-active.fs-one-timer .timer-1 {
+  max-width: none;
+  width: 100%;
+}
+
+body.fs-active .controls,
+body.fs-active #swControls,
+body.fs-active #simultaneousControls,
+body.fs-active .async-controls {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 0, 0, 0.75);
+  gap: 0.4rem;
+  z-index: 100;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+body.fs-active .controls .btn,
+body.fs-active .async-controls .btn {
+  min-width: auto;
+  padding: 0.35em 0.75em;
+  font-size: 0.85rem;
+  border-radius: 4px;
+}
+
+body.fs-active .btn-fs {
+  background: #555;
+}
+body.fs-active .btn-fs:hover {
+  background: #777;
+}
+
+body.fs-active.async-mode .async-controls[data-timer="1"] {
+  bottom: 2.6rem;
+  background: rgba(42, 110, 219, 0.25);
+}
+body.fs-active.async-mode .async-controls[data-timer="2"] {
+  bottom: 0;
+  background: rgba(59, 178, 115, 0.25);
+}
+body.fs-active.async-mode.fs-one-timer .async-controls[data-timer="1"] {
+  bottom: 0;
+}
+
+body.fs-active.async-mode #simultaneousControls {
+  display: none !important;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .digital-display {
+    font-size: 2.2rem;
+  }
+  .dual-timers {
+    gap: 1rem;
+  }
+  .timer-panel {
+    max-width: 100%;
+  }
+  .input-group input[type="number"] {
+    width: 56px;
+  }
+  body.fs-active .digital-display {
+    font-size: clamp(2.5rem, 14vw, 5rem);
+  }
+}
