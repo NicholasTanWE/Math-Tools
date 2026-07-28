@@ -31,11 +31,12 @@
         <div id="stopwatchDisplay" class="digital-display">00:00.00</div>
       </div>
 
-      <div class="controls">
+      <div class="controls" id="swControls">
         <button id="swStartBtn" class="btn">Start</button>
         <button id="swStopBtn" class="btn" disabled>Stop</button>
         <button id="swLapBtn" class="btn" disabled>Lap</button>
         <button id="swResetBtn" class="btn">Reset</button>
+        <button id="swFullscreenBtn" class="btn btn-fs">Fullscreen</button>
       </div>
 
       <div class="laps-card">
@@ -87,6 +88,17 @@
             Mute chimes
           </label>
         </div>
+        <div class="fs-timer-count">
+          <span class="label">Fullscreen shows:</span>
+          <label class="radio-label">
+            <input type="radio" name="fsTimerCount" value="1" checked>
+            1 timer
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="fsTimerCount" value="2">
+            2 timers
+          </label>
+        </div>
       </div>
 
       <!-- Simultaneous shared controls -->
@@ -94,6 +106,10 @@
         <button id="tmStartBothBtn" class="btn">Start Both</button>
         <button id="tmPauseBothBtn" class="btn" disabled>Pause Both</button>
         <button id="tmResetBothBtn" class="btn">Reset Both</button>
+      </div>
+
+      <div class="controls fs-entry-controls">
+        <button id="tmFullscreenBtn" class="btn btn-fs">Fullscreen</button>
       </div>
 
       <!-- Two timer panels -->
