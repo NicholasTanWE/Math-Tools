@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stopwatch &amp; Timer</title>
+  <title>Stopwatch & Timer</title>
   <link rel="stylesheet" href="../style-guide/colors.css">
   <link rel="stylesheet" href="../style-guide/typography.css">
   <link rel="stylesheet" href="../style-guide/layout.css">
@@ -15,15 +15,16 @@
     <a href="../index.html" style="font-size:1.1rem; text-decoration:underline; color:#fff;">← Back to Landing Page</a>
   </nav>
   <header class="main-header" style="margin-top:0;">
-    <h1>Stopwatch &amp; Timer</h1>
+    <h1>Stopwatch & Timer</h1>
   </header>
 
   <main>
-    <!-- Top row: mode switcher (left) + timer options (right, only when Timer active) -->
+    <!-- Top row: mode switcher (left) + options (right) -->
     <div class="top-row">
       <div class="mode-switcher">
         <button id="btnStopwatch" class="mode-btn active">Stopwatch</button>
         <button id="btnTimer" class="mode-btn">Timer</button>
+        <button id="btnCountdown" class="mode-btn">Countdown</button>
       </div>
 
       <div id="timerOptions" class="timer-options card" style="display:none;">
@@ -71,6 +72,30 @@
           </label>
         </div>
       </div>
+
+      <div id="countdownOptions" class="timer-options card" style="display:none;">
+        <div class="display-mode">
+          <span class="label">Display mode:</span>
+          <label class="radio-label">
+            <input type="radio" name="cdDisplayMode" value="digital" checked>
+            Digital
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="cdDisplayMode" value="clock">
+            Clock Face
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="cdDisplayMode" value="progress">
+            Progress Bar
+          </label>
+        </div>
+        <div class="sound-options">
+          <label class="radio-label">
+            <input type="checkbox" id="cdMuteChimes">
+            Mute chimes
+          </label>
+        </div>
+      </div>
     </div>
 
     <!-- ==================== STOPWATCH ==================== -->
@@ -102,7 +127,6 @@
     <!-- ==================== TIMER ==================== -->
     <section id="timerSection" class="tool-section" style="display:none;">
 
-      <!-- Simultaneous shared controls -->
       <div id="simultaneousControls" class="controls shared-controls">
         <button id="tmStartBothBtn" class="btn">Start Both</button>
         <button id="tmPauseBothBtn" class="btn" disabled>Pause Both</button>
@@ -110,15 +134,12 @@
         <button id="tmFullscreenBtn" class="btn btn-fs">Fullscreen</button>
       </div>
 
-      <!-- Visible in async mode (and as Exit Fullscreen in FS when simultaneous is hidden) -->
       <div class="controls fs-entry-controls">
         <button id="tmFullscreenBtnAsync" class="btn btn-fs">Fullscreen</button>
       </div>
 
-      <!-- Two timer panels -->
       <div class="dual-timers">
 
-        <!-- ========== TIMER 1 ========== -->
         <div class="timer-panel timer-1">
           <h3 class="timer-title">Timer 1</h3>
 
@@ -137,13 +158,11 @@
             </div>
           </div>
 
-          <!-- Digital -->
           <div class="display-wrap digital-wrap" data-timer="1">
             <div class="digital-display" id="t1Digital">05:00</div>
             <div class="timer-status" id="t1Status"></div>
           </div>
 
-          <!-- Clock face -->
           <div class="display-wrap clock-wrap" data-timer="1" style="display:none;">
             <svg class="clock-svg" id="t1ClockSvg" viewBox="0 0 300 300" width="200" height="200">
               <circle cx="150" cy="150" r="140" fill="#fff" stroke="#222" stroke-width="6"/>
@@ -158,7 +177,6 @@
             <div class="timer-status" id="t1ClockStatus"></div>
           </div>
 
-          <!-- Progress bar -->
           <div class="display-wrap progress-wrap" data-timer="1" style="display:none;">
             <div class="progress-label" id="t1ProgressLabel">05:00</div>
             <div class="progress-track">
@@ -167,7 +185,6 @@
             <div class="timer-status" id="t1ProgressStatus"></div>
           </div>
 
-          <!-- Per-timer controls (visible in async mode) -->
           <div class="controls async-controls" data-timer="1">
             <button class="btn tm-start" data-timer="1">Start</button>
             <button class="btn tm-pause" data-timer="1" disabled>Pause</button>
@@ -175,7 +192,6 @@
           </div>
         </div>
 
-        <!-- ========== TIMER 2 ========== -->
         <div class="timer-panel timer-2">
           <h3 class="timer-title">Timer 2</h3>
 
@@ -194,13 +210,11 @@
             </div>
           </div>
 
-          <!-- Digital -->
           <div class="display-wrap digital-wrap" data-timer="2">
             <div class="digital-display" id="t2Digital">03:00</div>
             <div class="timer-status" id="t2Status"></div>
           </div>
 
-          <!-- Clock face -->
           <div class="display-wrap clock-wrap" data-timer="2" style="display:none;">
             <svg class="clock-svg" id="t2ClockSvg" viewBox="0 0 300 300" width="200" height="200">
               <circle cx="150" cy="150" r="140" fill="#fff" stroke="#222" stroke-width="6"/>
@@ -215,7 +229,6 @@
             <div class="timer-status" id="t2ClockStatus"></div>
           </div>
 
-          <!-- Progress bar -->
           <div class="display-wrap progress-wrap" data-timer="2" style="display:none;">
             <div class="progress-label" id="t2ProgressLabel">03:00</div>
             <div class="progress-track">
@@ -224,7 +237,6 @@
             <div class="timer-status" id="t2ProgressStatus"></div>
           </div>
 
-          <!-- Per-timer controls (visible in async mode) -->
           <div class="controls async-controls" data-timer="2">
             <button class="btn tm-start" data-timer="2">Start</button>
             <button class="btn tm-pause" data-timer="2" disabled>Pause</button>
@@ -232,6 +244,64 @@
           </div>
         </div>
 
+      </div>
+    </section>
+
+    <!-- ==================== COUNTDOWN ==================== -->
+    <section id="countdownSection" class="tool-section" style="display:none;">
+      <div class="countdown-panel card">
+        <h3 class="timer-title cd-title">Countdown to a specific time</h3>
+
+        <div class="duration-inputs cd-inputs">
+          <div class="input-group">
+            <label for="cdDate">Date</label>
+            <input type="date" id="cdDate">
+          </div>
+          <div class="input-group">
+            <label for="cdHours">Hours</label>
+            <input type="number" id="cdHours" min="0" max="23" value="10">
+          </div>
+          <div class="input-group">
+            <label for="cdMinutes">Minutes</label>
+            <input type="number" id="cdMinutes" min="0" max="59" value="0">
+          </div>
+        </div>
+
+        <p id="cdTargetLabel" class="cd-target-label">Until —</p>
+
+        <div class="display-wrap digital-wrap" data-cd="1">
+          <div class="digital-display" id="cdDigital">0d 00:00:00</div>
+          <div class="timer-status" id="cdStatus"></div>
+        </div>
+
+        <div class="display-wrap clock-wrap" data-cd="1" style="display:none;">
+          <svg class="clock-svg" id="cdClockSvg" viewBox="0 0 300 300" width="200" height="200">
+            <circle cx="150" cy="150" r="140" fill="#fff" stroke="#222" stroke-width="6"/>
+            <g class="minute-markers"></g>
+            <g class="hour-markers"></g>
+            <circle cx="150" cy="150" r="8" fill="#222"/>
+            <line class="minute-hand" x1="150" y1="150" x2="150" y2="40" stroke="#2a6edb" stroke-width="6" stroke-linecap="round"/>
+            <line class="second-hand" x1="150" y1="150" x2="150" y2="25" stroke="#e94f37" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="150" cy="150" r="5" fill="#e94f37"/>
+          </svg>
+          <div class="clock-hint" id="cdClockHint">0d 00:00:00</div>
+          <div class="timer-status" id="cdClockStatus"></div>
+        </div>
+
+        <div class="display-wrap progress-wrap" data-cd="1" style="display:none;">
+          <div class="progress-label" id="cdProgressLabel">0d 00:00:00</div>
+          <div class="progress-track">
+            <div class="progress-fill" id="cdProgressFill" style="width:0%"></div>
+          </div>
+          <div class="timer-status" id="cdProgressStatus"></div>
+        </div>
+
+        <div class="controls" id="cdControls">
+          <button id="cdStartBtn" class="btn">Start</button>
+          <button id="cdPauseBtn" class="btn" disabled>Pause</button>
+          <button id="cdResetBtn" class="btn">Reset</button>
+          <button id="cdFullscreenBtn" class="btn btn-fs">Fullscreen</button>
+        </div>
       </div>
     </section>
   </main>
