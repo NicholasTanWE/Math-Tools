@@ -1,15 +1,11 @@
-// Stopwatch & Timer – Math Tools mini-project
-// Lap times persist in localStorage
-// Dual timers with Simultaneous / Asynchronous start + Digital / Clock / Progress displays
-
 document.addEventListener('DOMContentLoaded', () => {
   const btnStopwatch = document.getElementById('btnStopwatch');
-  const btnTimer     = document.getElementById('btnTimer');
+  const btnTimer = document.getElementById('btnTimer');
   const btnCountdown = document.getElementById('btnCountdown');
   const stopwatchSection = document.getElementById('stopwatchSection');
-  const timerSection     = document.getElementById('timerSection');
+  const timerSection = document.getElementById('timerSection');
   const countdownSection = document.getElementById('countdownSection');
-  const timerOptions     = document.getElementById('timerOptions');
+  const timerOptions = document.getElementById('timerOptions');
   const countdownOptions = document.getElementById('countdownOptions');
 
   function setMode(mode) {
@@ -22,33 +18,28 @@ document.addEventListener('DOMContentLoaded', () => {
     if (timerOptions) timerOptions.style.display = mode === 'timer' ? '' : 'none';
     if (countdownOptions) countdownOptions.style.display = mode === 'countdown' ? '' : 'none';
   }
-
   if (btnStopwatch) btnStopwatch.addEventListener('click', () => setMode('stopwatch'));
   if (btnTimer) btnTimer.addEventListener('click', () => setMode('timer'));
   if (btnCountdown) btnCountdown.addEventListener('click', () => setMode('countdown'));
 
   // STOPWATCH
-  const swDisplay   = document.getElementById('stopwatchDisplay');
-  const swStartBtn  = document.getElementById('swStartBtn');
-  const swStopBtn   = document.getElementById('swStopBtn');
-  const swLapBtn    = document.getElementById('swLapBtn');
-  const swResetBtn  = document.getElementById('swResetBtn');
-  const lapsList    = document.getElementById('lapsList');
-  const noLapsMsg   = document.getElementById('noLapsMsg');
+  const swDisplay = document.getElementById('stopwatchDisplay');
+  const swStartBtn = document.getElementById('swStartBtn');
+  const swStopBtn = document.getElementById('swStopBtn');
+  const swLapBtn = document.getElementById('swLapBtn');
+  const swResetBtn = document.getElementById('swResetBtn');
+  const lapsList = document.getElementById('lapsList');
+  const noLapsMsg = document.getElementById('noLapsMsg');
   const clearLapsBtn = document.getElementById('clearLapsBtn');
-
   let swRunning = false, swStartTime = 0, swElapsed = 0, swRafId = null, laps = [];
   const LAPS_KEY = 'mathTools_stopwatchLaps';
-
-  function loadLaps() {
-    try { const raw = localStorage.getItem(LAPS_KEY); if (raw) { laps = JSON.parse(raw); renderLaps(); } } catch (e) { laps = []; }
-  }
+  function loadLaps() { try { const raw = localStorage.getItem(LAPS_KEY); if (raw) { laps = JSON.parse(raw); renderLaps(); } } catch (e) { laps = []; } }
   function saveLaps() { try { localStorage.setItem(LAPS_KEY, JSON.stringify(laps)); } catch (e) {} }
   function formatMs(ms) {
     const totalCs = Math.floor(ms / 10), cs = totalCs % 100, totalSec = Math.floor(totalCs / 100);
     const s = totalSec % 60, m = Math.floor(totalSec / 60) % 60, h = Math.floor(totalSec / 3600);
     const pad = (n, w = 2) => String(n).padStart(w, '0');
-    return h > 0 ? `${pad(h)}:${pad(m)}:${pad(s)}.${pad(cs)}` : `${pad(m)}:${pad(s)}.${pad(cs)}`;
+    return h > 0 ? pad(h)+':'+pad(m)+':'+pad(s)+'.'+pad(cs) : pad(m)+':'+pad(s)+'.'+pad(cs);
   }
   function updateSwDisplay() {
     const now = performance.now();
@@ -78,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     noLapsMsg.style.display = 'none';
     laps.forEach((lap, idx) => {
       const li = document.createElement('li');
-      li.innerHTML = `<span class="lap-num">Lap ${laps.length - idx}</span><span class="lap-time">${lap.label}</span>`;
+      li.innerHTML = '<span class="lap-num">Lap ' + (laps.length - idx) + '</span><span class="lap-time">' + lap.label + '</span>';
       lapsList.appendChild(li);
     });
   }
@@ -92,13 +83,12 @@ document.addEventListener('DOMContentLoaded', () => {
     loadLaps();
   }
 
-  // TIMER helpers
   function formatTimer(ms) {
     if (ms < 0) ms = 0;
     const totalSec = Math.ceil(ms / 1000), s = totalSec % 60;
     const totalMin = Math.floor(totalSec / 60), m = totalMin % 60, h = Math.floor(totalMin / 60);
     const pad = (n) => String(n).padStart(2, '0');
-    return h > 0 ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+    return h > 0 ? pad(h)+':'+pad(m)+':'+pad(s) : pad(m)+':'+pad(s);
   }
   function buildClockMarkers(svg) {
     const minuteG = svg.querySelector('.minute-markers'), hourG = svg.querySelector('.hour-markers');
@@ -159,23 +149,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const timers = {};
   function createTimer(id) {
-    const hoursInput = document.getElementById(`t${id}Hours`);
-    const minutesInput = document.getElementById(`t${id}Minutes`);
-    const secondsInput = document.getElementById(`t${id}Seconds`);
-    const digitalEl = document.getElementById(`t${id}Digital`);
-    const statusEl = document.getElementById(`t${id}Status`);
-    const clockSvg = document.getElementById(`t${id}ClockSvg`);
-    const clockHint = document.getElementById(`t${id}ClockHint`);
-    const clockStatus = document.getElementById(`t${id}ClockStatus`);
-    const progressLabel = document.getElementById(`t${id}ProgressLabel`);
-    const progressFill = document.getElementById(`t${id}ProgressFill`);
-    const progressStatus = document.getElementById(`t${id}ProgressStatus`);
-    const panel = document.querySelector(`.timer-${id}`);
+    const hoursInput = document.getElementById('t'+id+'Hours');
+    const minutesInput = document.getElementById('t'+id+'Minutes');
+    const secondsInput = document.getElementById('t'+id+'Seconds');
+    const digitalEl = document.getElementById('t'+id+'Digital');
+    const statusEl = document.getElementById('t'+id+'Status');
+    const clockSvg = document.getElementById('t'+id+'ClockSvg');
+    const clockHint = document.getElementById('t'+id+'ClockHint');
+    const clockStatus = document.getElementById('t'+id+'ClockStatus');
+    const progressLabel = document.getElementById('t'+id+'ProgressLabel');
+    const progressFill = document.getElementById('t'+id+'ProgressFill');
+    const progressStatus = document.getElementById('t'+id+'ProgressStatus');
+    const panel = document.querySelector('.timer-'+id);
     const minuteHand = clockSvg.querySelector('.minute-hand');
     const secondHand = clockSvg.querySelector('.second-hand');
-    const startBtn = document.querySelector(`.tm-start[data-timer="${id}"]`);
-    const pauseBtn = document.querySelector(`.tm-pause[data-timer="${id}"]`);
-    const resetBtn = document.querySelector(`.tm-reset[data-timer="${id}"]`);
+    const startBtn = document.querySelector('.tm-start[data-timer="'+id+'"]');
+    const pauseBtn = document.querySelector('.tm-pause[data-timer="'+id+'"]');
+    const resetBtn = document.querySelector('.tm-reset[data-timer="'+id+'"]');
     buildClockMarkers(clockSvg);
     let running = false, endTime = 0, remaining = 0, totalDuration = 0, rafId = null, finished = false;
     function getDurationMs() {
@@ -187,8 +177,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateClockHands(ms) {
       if (ms < 0) ms = 0;
       const seconds = (ms / 1000) % 60, minutes = (ms / 60000) % 60;
-      secondHand.setAttribute('transform', `rotate(${(seconds / 60) * 360} 150 150)`);
-      minuteHand.setAttribute('transform', `rotate(${(minutes / 60) * 360} 150 150)`);
+      secondHand.setAttribute('transform', 'rotate('+((seconds / 60) * 360)+' 150 150)');
+      minuteHand.setAttribute('transform', 'rotate('+((minutes / 60) * 360)+' 150 150)');
     }
     function setDisplays(ms) {
       const text = formatTimer(ms);
@@ -221,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (running) return; clearFinished();
       let duration = remaining > 0 ? remaining : getDurationMs();
       if (remaining <= 0) {
-        if (duration <= 0) { alert(`Timer ${id}: please set a duration greater than zero.`); return false; }
+        if (duration <= 0) { alert('Timer '+id+': please set a duration greater than zero.'); return false; }
         totalDuration = duration;
       }
       endTime = performance.now() + duration; running = true; remaining = 0;
@@ -260,7 +250,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.clock-wrap').forEach(el => { el.style.display = mode === 'clock' ? '' : 'none'; });
     document.querySelectorAll('.progress-wrap').forEach(el => { el.style.display = mode === 'progress' ? '' : 'none'; });
   }));
-  // init display mode
   (function(){ const mode = (document.querySelector('input[name="displayMode"]:checked') || {}).value || 'digital';
     document.querySelectorAll('.digital-wrap').forEach(el => { el.style.display = mode === 'digital' ? '' : 'none'; });
     document.querySelectorAll('.clock-wrap').forEach(el => { el.style.display = mode === 'clock' ? '' : 'none'; });
@@ -288,12 +277,11 @@ document.addEventListener('DOMContentLoaded', () => {
     tmResetBothBtn.addEventListener('click', () => { timer1.reset(); timer2.reset(); updateSharedButtons(); });
   }
 
-  // COUNTDOWN – full logic loaded from inline implementation
-  // (compact version)
+  // COUNTDOWN – single end-time input
   (function initCountdown() {
     const cdDateInput = document.getElementById('cdDate');
-    const cdHoursInput = document.getElementById('cdHours');
-    const cdMinutesInput = document.getElementById('cdMinutes');
+    const cdEndTimeInput = document.getElementById('cdEndTime');
+    const cdTimeError = document.getElementById('cdTimeError');
     const cdTargetLabel = document.getElementById('cdTargetLabel');
     const cdDigital = document.getElementById('cdDigital');
     const cdStatus = document.getElementById('cdStatus');
@@ -309,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cdResetBtn = document.getElementById('cdResetBtn');
     const cdFullscreenBtn = document.getElementById('cdFullscreenBtn');
     const cdMuteCheckbox = document.getElementById('cdMuteChimes');
-    if (!cdDateInput || !cdStartBtn) return;
+    if (!cdDateInput || !cdStartBtn || !cdEndTimeInput) return;
 
     if (cdClockSvg) buildClockMarkers(cdClockSvg);
     const cdMinuteHand = cdClockSvg ? cdClockSvg.querySelector('.minute-hand') : null;
@@ -332,16 +320,39 @@ document.addEventListener('DOMContentLoaded', () => {
       const opts = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
       return 'Until ' + pad2(date.getHours()) + ':' + pad2(date.getMinutes()) + ', ' + date.toLocaleDateString(undefined, opts);
     }
+    function parseEndTime(raw) {
+      if (raw == null) return null;
+      const str = String(raw).trim();
+      if (!str) return null;
+      let hours, minutes;
+      if (/^\d{1,4}$/.test(str)) {
+        if (str.length <= 2) { hours = parseInt(str, 10); minutes = 0; }
+        else if (str.length === 3) { hours = parseInt(str.charAt(0), 10); minutes = parseInt(str.slice(1), 10); }
+        else { hours = parseInt(str.slice(0, 2), 10); minutes = parseInt(str.slice(2), 10); }
+      } else if (/^\d{1,2}[.:]\d{2}$/.test(str)) {
+        const parts = str.split(/[.:]/);
+        hours = parseInt(parts[0], 10);
+        minutes = parseInt(parts[1], 10);
+      } else return null;
+      if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return null;
+      if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return null;
+      return { hours: hours, minutes: minutes };
+    }
+    function setCdTimeError(show) {
+      if (!cdTimeError) return;
+      if (show) { cdTimeError.hidden = false; cdTimeError.style.display = ''; }
+      else { cdTimeError.hidden = true; cdTimeError.style.display = 'none'; }
+    }
     function resolveTargetDate() {
+      const parsed = parseEndTime(cdEndTimeInput.value);
+      if (!parsed) return null;
       const now = new Date();
       let y, m, d;
       if (cdDateInput.value) {
         const parts = cdDateInput.value.split('-');
         y = parseInt(parts[0], 10); m = parseInt(parts[1], 10) - 1; d = parseInt(parts[2], 10);
       } else { y = now.getFullYear(); m = now.getMonth(); d = now.getDate(); }
-      const h = Math.max(0, Math.min(23, parseInt(cdHoursInput.value, 10) || 0));
-      const min = Math.max(0, Math.min(59, parseInt(cdMinutesInput.value, 10) || 0));
-      let target = new Date(y, m, d, h, min, 0, 0);
+      let target = new Date(y, m, d, parsed.hours, parsed.minutes, 0, 0);
       while (target.getTime() <= Date.now()) target = new Date(target.getTime() + 24 * 60 * 60 * 1000);
       return target;
     }
@@ -375,6 +386,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function refreshCdPreview() {
       if (cdRunning || cdFinished) return;
       const target = resolveTargetDate();
+      if (!target) {
+        setCdTimeError(true);
+        if (cdStartBtn && !cdRunning) cdStartBtn.disabled = true;
+        cdTargetLabel.textContent = 'Until —';
+        cdTotalDuration = 0; setCdDisplays(0);
+        return;
+      }
+      setCdTimeError(false);
+      if (cdStartBtn && !cdRunning && !cdFinished) cdStartBtn.disabled = false;
       cdTargetMs = target.getTime();
       cdTargetLabel.textContent = formatTargetLabel(target);
       cdTotalDuration = 0;
@@ -398,14 +418,16 @@ document.addEventListener('DOMContentLoaded', () => {
       if (cdRemaining > 0) { cdTargetMs = Date.now() + cdRemaining; cdRemaining = 0; }
       else {
         const target = resolveTargetDate();
+        if (!target) { setCdTimeError(true); if (cdStartBtn) cdStartBtn.disabled = true; return; }
+        setCdTimeError(false);
         cdTargetMs = target.getTime();
         cdTotalDuration = cdTargetMs - Date.now();
-        if (cdTotalDuration <= 0) { alert('Please choose a future date and time.'); return; }
+        if (cdTotalDuration <= 0) { setCdTimeError(true); return; }
         cdTargetLabel.textContent = formatTargetLabel(target);
         cdDateInput.value = formatDateInput(target);
       }
       cdRunning = true; cdStartBtn.disabled = true; cdPauseBtn.disabled = false;
-      cdDateInput.disabled = cdHoursInput.disabled = cdMinutesInput.disabled = true;
+      cdDateInput.disabled = true; cdEndTimeInput.disabled = true;
       cdRafId = requestAnimationFrame(cdTick);
     }
     function pauseCountdown() {
@@ -416,13 +438,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     function resetCountdown() {
       cdRunning = false; cancelAnimationFrame(cdRafId); cdRemaining = 0; cdTotalDuration = 0; clearCdFinished();
-      cdDateInput.disabled = cdHoursInput.disabled = cdMinutesInput.disabled = false;
+      cdDateInput.disabled = false; cdEndTimeInput.disabled = false;
       cdStartBtn.disabled = false; cdPauseBtn.disabled = true; refreshCdPreview();
     }
     if (!cdDateInput.value) cdDateInput.value = formatDateInput(new Date());
     cdDateInput.addEventListener('change', refreshCdPreview);
-    cdHoursInput.addEventListener('input', refreshCdPreview);
-    cdMinutesInput.addEventListener('input', refreshCdPreview);
+    cdEndTimeInput.addEventListener('input', refreshCdPreview);
+    cdEndTimeInput.addEventListener('change', refreshCdPreview);
     cdStartBtn.addEventListener('click', startCountdown);
     cdPauseBtn.addEventListener('click', pauseCountdown);
     cdResetBtn.addEventListener('click', resetCountdown);
@@ -433,9 +455,6 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('#countdownSection .progress-wrap').forEach(el => { el.style.display = mode === 'progress' ? '' : 'none'; });
     }));
     refreshCdPreview();
-
-    // Fullscreen wiring for countdown
-    window.__cdFullscreenBtn = cdFullscreenBtn;
   })();
 
   // FULLSCREEN
@@ -443,7 +462,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const tmFullscreenBtn = document.getElementById('tmFullscreenBtn');
   const tmFullscreenBtnAsync = document.getElementById('tmFullscreenBtnAsync');
   const cdFullscreenBtn = document.getElementById('cdFullscreenBtn');
-
   function getFsTimerCount() {
     const checked = document.querySelector('input[name="fsTimerCount"]:checked');
     return checked ? checked.value : '1';
