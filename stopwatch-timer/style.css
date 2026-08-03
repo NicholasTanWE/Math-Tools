@@ -416,7 +416,8 @@ body.async-mode .fs-entry-controls {
   margin-bottom: 0.6rem;
 }
 
-.cd-inputs input[type="date"] {
+.cd-inputs input[type="date"],
+.cd-inputs input[type="text"] {
   min-width: 9.5rem;
   text-align: center;
   background: #fff;
@@ -425,6 +426,18 @@ body.async-mode .fs-entry-controls {
   border: 1px solid #ccc;
   font-size: 1rem;
   padding: 0.45em 0.5em;
+}
+
+.cd-inputs input[type="text"] {
+  width: 9.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.cd-time-error {
+  margin: 0.15rem 0 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary-red);
 }
 
 .cd-target-label {
@@ -452,6 +465,7 @@ body.fs-active .duration-inputs,
 body.fs-active .timer-title,
 body.fs-active .cd-title,
 body.fs-active .cd-inputs,
+body.fs-active .cd-time-error,
 body.fs-active .cd-target-label {
   display: none !important;
 }
