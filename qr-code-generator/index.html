@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Code Generator</title>
+  <link rel="stylesheet" href="../style-guide/colors.css">
+  <link rel="stylesheet" href="../style-guide/typography.css">
+  <link rel="stylesheet" href="../style-guide/layout.css">
+  <link rel="stylesheet" href="../style-guide/components.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav>
+    <a href="../index.html">← Back to Landing Page</a>
+  </nav>
+  <header class="main-header">
+    <h1>QR Code Generator</h1>
+    <p>Create a QR code for any website URL.</p>
+  </header>
+  <main>
+    <section class="generator card" aria-labelledby="generator-title">
+      <h2 id="generator-title">Enter a URL</h2>
+      <form id="qr-form" novalidate>
+        <label for="url-input">Website address</label>
+        <div class="input-row">
+          <input id="url-input" name="url" type="text" inputmode="url" autocomplete="url" placeholder="example.com" aria-describedby="url-help url-error" required>
+          <button type="submit">Generate QR Code</button>
+        </div>
+        <p id="url-help" class="helper-text">If you leave off https://, it will be added for you.</p>
+        <p id="url-error" class="error-message" role="alert" hidden></p>
+      </form>
+      <div id="qr-result" class="qr-result" aria-live="polite" hidden>
+        <h2>Your QR code</h2>
+        <div id="qr-code" class="qr-code" role="img" aria-label="Generated QR code"></div>
+        <p id="qr-caption" class="qr-caption"></p>
+      </div>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

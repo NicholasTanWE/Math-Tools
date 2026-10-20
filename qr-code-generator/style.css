@@ -1,0 +1,117 @@
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f7f9fc;
+}
+
+nav a {
+  color: var(--text-light);
+  text-decoration: none;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+.main-header p {
+  margin: 0.25rem 0 0;
+}
+
+.generator {
+  max-width: 680px;
+  margin: 2rem auto;
+  padding: 2rem;
+}
+
+.generator h2 {
+  margin-top: 0;
+}
+
+#qr-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.input-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.input-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.65em 0.75em;
+  border: 1px solid #b8c2cc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.input-row input:focus {
+  outline: 3px solid rgba(40, 120, 190, 0.25);
+  border-color: var(--primary-blue);
+}
+
+.input-row input[aria-invalid="true"] {
+  border-color: #b42318;
+}
+
+.helper-text,
+.qr-caption {
+  color: #56616c;
+  overflow-wrap: anywhere;
+}
+
+.error-message {
+  color: #b42318;
+  font-weight: 600;
+}
+
+.qr-result {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #d9e0e7;
+  text-align: center;
+}
+
+.qr-result h2 {
+  margin-bottom: 1rem;
+}
+
+.qr-code {
+  display: inline-flex;
+  min-height: 256px;
+  min-width: 256px;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid #d9e0e7;
+  border-radius: 8px;
+}
+
+.qr-code img,
+.qr-code canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.qr-caption {
+  margin: 1rem auto 0;
+  max-width: 34rem;
+}
+
+@media (max-width: 600px) {
+  .generator {
+    margin: 1rem auto;
+    padding: 1.25rem;
+  }
+
+  .input-row {
+    flex-direction: column;
+  }
+
+  .input-row button {
+    width: 100%;
+  }
+}
